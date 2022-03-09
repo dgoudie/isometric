@@ -1,4 +1,6 @@
 @import url('https://fonts.googleapis.com/css2?family=Fredoka:wght@300;400;500;600;700&display=swap');
+@import '@fortawesome/fontawesome-free/css/fontawesome.css';
+@import '@fortawesome/fontawesome-free/css/solid.css';
 
 html,
 body {
@@ -9,11 +11,16 @@ body {
     --lime: #a0d911;
     --dark-blue: #001529;
 
-    background-color: white;
+    --primary: var(--lime);
+    --background: white;
+    --divider: #efefef;
 
     @media (prefers-color-scheme: dark) {
-        background-color: var(--dark-blue);
+        --background: var(--dark-blue);
+        --divider: #112e4a;
     }
+
+    background-color: var(--background);
 }
 
 a {
@@ -23,4 +30,9 @@ a {
 
 * {
     box-sizing: border-box;
+}
+.icon::before {
+    display: inline-block;
+    text-rendering: auto;
+    -webkit-font-smoothing: antialiased;
 }

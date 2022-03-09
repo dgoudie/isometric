@@ -1,8 +1,9 @@
+import AppBarLayout from '../components/AppBarLayout/AppBarLayout';
 import type { NextPage } from 'next';
 import React from 'react';
 
 const Home: NextPage = () => {
-    return <React.Fragment></React.Fragment>;
+    return <AppBarLayout>hello</AppBarLayout>;
 };
 
 export default Home;
