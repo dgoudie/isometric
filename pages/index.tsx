@@ -7,8 +7,7 @@ const Root: NextPage = () => {
 };
 
 export const getServerSideProps: GetServerSideProps = async ({ res }) => {
-    res.writeHead(301, { location: '/home' }).end();
-    return { props: {} };
+    return { redirect: { permanent: true, destination: '/home' } };
 };
 
 export default Root;

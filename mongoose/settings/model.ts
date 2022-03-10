@@ -1,10 +1,11 @@
-import { Model, Schema } from 'mongoose';
+// import { Model, Schema } from 'mongoose';
 
-import mongoose from 'mongoose';
+// import mongoose from 'mongoose';
 
-export interface SettingsModel {}
+// export interface SettingsModel {}
 
-const settingsSchema = new Schema<SettingsModel>({});
+// const settingsSchema = new Schema<SettingsModel>({});
 
-export default (mongoose.models.Settings as Model<SettingsModel>) ||
-    mongoose.model('Settings', settingsSchema);
+// export default (mongoose.models.Settings as Model<SettingsModel>) ||
+//     mongoose.model('Settings', settingsSchema);
+export {};
