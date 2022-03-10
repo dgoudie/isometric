@@ -14,7 +14,11 @@ export default function AppBarLayout({
             <div className={styles.body}>{children}</div>
             <div className={styles.bar}>
                 <div className={styles.barInner}>
-                    <AppBarButton href='/' text='Home' iconClass='fa-house' />
+                    <AppBarButton
+                        href='/home'
+                        text='Home'
+                        iconClass='fa-house'
+                    />
                     <AppBarButton
                         href='/exercises'
                         text='Exercises'
@@ -41,7 +45,7 @@ function AppBarButton({ href, text, iconClass }: AppBarButtonProps) {
     const { asPath } = useRouter();
     return (
         <Link href={href}>
-            <a className={classNames(asPath === href && styles.active)}>
+            <a className={classNames(asPath.startsWith(href) && styles.active)}>
                 <i className={classNames('fa-solid', iconClass)}></i>
                 {text}
             </a>

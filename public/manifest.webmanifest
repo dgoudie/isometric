@@ -24,7 +24,7 @@
     "shortcuts": [
         {
             "name": "Home",
-            "url": "/"
+            "url": "/home"
         },
         {
             "name": "Exercises",

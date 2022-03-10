@@ -1,17 +1,14 @@
-import AppBarLayout from '../components/AppBarLayout/AppBarLayout';
-import Head from 'next/head';
-import type { NextPage } from 'next';
+import type { GetServerSideProps, NextPage } from 'next';
+
 import React from 'react';
 
-const Home: NextPage = () => {
-    return (
-        <AppBarLayout>
-            <Head>
-                <title>Home | ISOMETRIC</title>
-            </Head>
-            hello
-        </AppBarLayout>
-    );
+const Root: NextPage = () => {
+    return <></>;
 };
 
-export default Home;
+export const getServerSideProps: GetServerSideProps = async ({ res }) => {
+    res.writeHead(301, { location: '/home' }).end();
+    return { props: {} };
+};
+
+export default Root;
