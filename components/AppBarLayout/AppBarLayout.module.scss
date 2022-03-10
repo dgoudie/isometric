@@ -1,8 +1,6 @@
 .root {
     --max-width: 540px;
     --bar-height: 5.5rem;
-
-    user-select: none;
 }
 
 .body {
@@ -20,6 +18,7 @@
     border-top: 1px solid rgba(128, 128, 128, 0.3);
     font-family: 'Syne Mono', monospace;
     font-weight: bold;
+    user-select: none;
 
     &Inner {
         max-width: var(--max-width);

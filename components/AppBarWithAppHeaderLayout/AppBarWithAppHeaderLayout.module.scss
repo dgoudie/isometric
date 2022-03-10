@@ -13,6 +13,7 @@
     font-weight: bold;
     font-size: 1.2rem;
     line-height: 2rem;
+    user-select: none;
     &Title {
         color: var(--coral);
         font-family: 'Syne Mono', monospace;
