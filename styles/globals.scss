@@ -7,19 +7,18 @@ body {
     padding: 0;
     margin: 0;
     font-family: 'Fredoka', sans-serif;
+    background-color: white;
 
-    --lime: #a0d911;
-    --dark-blue: #001529;
+    --coral: #e14658;
+    --navy: #22252c;
+    --mountain: #3f3250;
+    --scrub: #c0b3a0;
 
-    --primary: var(--lime);
     --background: white;
-    --divider: #efefef;
 
     @media (prefers-color-scheme: dark) {
-        --background: var(--dark-blue);
-        --divider: #112e4a;
+        --background: var(--navy);
     }
-
     background-color: var(--background);
 }
 

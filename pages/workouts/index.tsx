@@ -1,10 +1,14 @@
 import AppBarLayout from '../../components/AppBarLayout/AppBarLayout';
+import Head from 'next/head';
 import type { NextPage } from 'next';
 import React from 'react';
 
 const Exercises: NextPage = () => {
     return (
         <AppBarLayout>
+            <Head>
+                <title>Workouts | ISOMETRIC</title>
+            </Head>
             Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
             eiusmod tempor incididunt ut labore et dolore magna aliqua.
             Scelerisque viverra mauris in aliquam sem. Odio euismod lacinia at
