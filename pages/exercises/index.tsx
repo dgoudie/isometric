@@ -1,4 +1,4 @@
-import AppBarLayout from '../../components/AppBarLayout/AppBarLayout';
+import AppBarWithAppHeaderLayout from '../../components/AppBarWithAppHeaderLayout/AppBarWithAppHeaderLayout';
 import Exercise from '../../mongoose/exercise/model';
 import { ExerciseModel } from '../../mongoose/exercise/model';
 import Head from 'next/head';
@@ -11,25 +11,24 @@ interface Props {
     exercises: ExerciseModel[];
 }
 
-const Exercises: NextPage<Props & { userId: string }> = ({
-    exercises,
-    userId,
-}) => {
+const Exercises: NextPage<Props> = ({ exercises }) => {
     console.log('exercises', exercises);
     return (
-        <AppBarLayout>
+        <AppBarWithAppHeaderLayout>
             <Head>
-                <title>Exercises | ISOMETRIC</title>
+                <title>Exercises | {process.env.APP_NAME}</title>
             </Head>
-            hello
-        </AppBarLayout>
+            Barbell Bench Press
+        </AppBarWithAppHeaderLayout>
     );
 };
 
 export const getServerSideProps = withUserId<Props>(async ({}, userId) => {
     await dbConnect();
     const exercises = await Exercise.find({ userId }).exec();
-    return { props: { exercises } };
+    return {
+        props: { exercises },
+    };
 });
 
 export default Exercises;

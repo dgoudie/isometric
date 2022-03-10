@@ -10,14 +10,14 @@
     margin: 0 auto var(--bar-height);
 }
 
-.bar {
+.bottomBar {
     background-color: var(--background);
     position: fixed;
     bottom: 0;
     left: 0;
     right: 0;
     height: var(--bar-height);
-    border-top: 1px solid var(--divider);
+    border-top: 1px solid rgba(128, 128, 128, 0.3);
 
     &Inner {
         max-width: var(--max-width);

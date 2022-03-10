@@ -4,16 +4,20 @@ import classNames from 'classnames';
 import styles from './AppBarLayout.module.scss';
 import { useRouter } from 'next/router';
 
-type Props = {};
+type Props = {
+    header?: React.ReactNode;
+};
 
 export default function AppBarLayout({
     children,
+    header,
 }: React.PropsWithChildren<Props>) {
     return (
         <div className={styles.root}>
+            {header}
             <div className={styles.body}>{children}</div>
-            <div className={styles.bar}>
-                <div className={styles.barInner}>
+            <div className={styles.bottomBar}>
+                <div className={styles.bottomBarInner}>
                     <AppBarButton
                         href='/home'
                         text='Home'

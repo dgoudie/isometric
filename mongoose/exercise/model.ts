@@ -25,12 +25,17 @@ export const ExerciseMuscleGroups = stringLiterals(
 
 export type ExerciseMuscleGroup = ElementOf<typeof ExerciseMuscleGroups>;
 
+export const WeightTypes = stringLiterals('standard', 'assisted');
+
+export type WeightType = ElementOf<typeof WeightTypes>;
+
 export interface ExerciseModel {
     userId: string;
     name: string;
     breakTimeInSeconds: number;
     primaryMuscleGroup: ExerciseMuscleGroup;
     secondaryMuscleGroup?: ExerciseMuscleGroup;
+    weightType: WeightType;
 }
 
 const exerciseSchema = new Schema<ExerciseModel>({
@@ -43,6 +48,11 @@ const exerciseSchema = new Schema<ExerciseModel>({
         enum: ExerciseMuscleGroups,
     },
     secondaryMuscleGroup: { type: String, enum: ExerciseMuscleGroups },
+    weightType: {
+        type: String,
+        required: true,
+        enum: WeightTypes,
+    },
 });
 
 export default (mongoose.models.Exercise as Model<ExerciseModel>) ||

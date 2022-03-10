@@ -1,13 +1,16 @@
-import AppBarLayout from '../../components/AppBarLayout/AppBarLayout';
+import type { GetServerSideProps, NextPage } from 'next';
+
+import AppBarWithAppHeaderLayout from '../../components/AppBarWithAppHeaderLayout/AppBarWithAppHeaderLayout';
 import Head from 'next/head';
-import type { NextPage } from 'next';
 import React from 'react';
 
-const Exercises: NextPage = () => {
+type Props = {};
+
+const Exercises: NextPage<Props> = ({}) => {
     return (
-        <AppBarLayout>
+        <AppBarWithAppHeaderLayout>
             <Head>
-                <title>Workouts | ISOMETRIC</title>
+                <title>Workouts | {process.env.APP_NAME}</title>
             </Head>
             Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
             eiusmod tempor incididunt ut labore et dolore magna aliqua.
@@ -66,8 +69,12 @@ const Exercises: NextPage = () => {
             enim sed faucibus turpis. Tellus rutrum tellus pellentesque eu.
             Vestibulum rhoncus est pellentesque elit ullamcorper dignissim cras
             tincidunt lobortis.
-        </AppBarLayout>
+        </AppBarWithAppHeaderLayout>
     );
+};
+
+export const getServerSideProps: GetServerSideProps<Props> = async () => {
+    return { props: {} };
 };
 
 export default Exercises;
