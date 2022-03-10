@@ -2,7 +2,6 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 0.5rem;
     position: fixed;
     background-color: var(--background);
     border-bottom: 1px solid rgba(128, 128, 128, 0.3);
@@ -18,12 +17,19 @@
         color: var(--coral);
         font-family: 'Syne Mono', monospace;
         font-weight: bold;
+        padding: 0.5rem;
     }
     &SettingsLink {
-        height: 2rem;
-        width: 2rem;
+        height: 3rem;
+        width: 3rem;
         text-align: center;
-        line-height: 2rem;
+        line-height: 3rem;
+        transition: transform 100ms;
+        -webkit-tap-highlight-color: transparent;
+        &:active,
+        &:focus {
+            transform: scale(0.9);
+        }
     }
 }
 .body {
