@@ -22,7 +22,7 @@ export default function AppBarWithAppHeaderLayout({
                 </header>
             }
         >
-            {children}
+            <div className={styles.body}>{children}</div>
         </AppBarLayout>
     );
 }
