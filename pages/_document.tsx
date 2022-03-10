@@ -15,7 +15,11 @@ export default function Document() {
                     media='(prefers-color-scheme: dark)'
                     content='#22252c'
                 />
-                <link rel='manifest' href='/manifest.webmanifest' />
+                <link
+                    rel='manifest'
+                    href='/manifest.webmanifest'
+                    crossOrigin='use-credentials'
+                />
                 <link rel='apple-touch-icon' href='/images/isometric-sq.png' />
                 <link rel='icon' href='/images/isometric.ico' />
                 <link rel='preconnect' href='https://fonts.googleapis.com' />
