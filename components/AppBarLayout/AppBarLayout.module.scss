@@ -18,6 +18,8 @@
     right: 0;
     height: var(--bar-height);
     border-top: 1px solid rgba(128, 128, 128, 0.3);
+    font-family: 'Syne Mono', monospace;
+    font-weight: bold;
 
     &Inner {
         max-width: var(--max-width);

@@ -5,8 +5,8 @@ html,
 body {
     padding: 0;
     margin: 0;
-    font-family: 'Syne Mono', monospace;
-    background-color: white;
+    font-family: 'Work Sans', sans-serif;
+    background-color: var(--background);
 
     --coral: #e14658;
     --navy: #22252c;
@@ -18,7 +18,6 @@ body {
     @media (prefers-color-scheme: dark) {
         --background: var(--navy);
     }
-    background-color: var(--background);
     &::-webkit-scrollbar {
         display: none; // Safari and Chrome
         -webkit-appearance: none;
