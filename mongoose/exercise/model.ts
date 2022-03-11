@@ -1,48 +1,31 @@
 import { ElementOf, stringLiterals } from '../../utils/oneof-array';
-import { Model, Schema } from 'mongoose';
+import { ExerciseMuscleGroups, IExercise, WeightTypes } from './interface';
+import mongoose, { Model, Schema } from 'mongoose';
 
-import mongoose from 'mongoose';
+import { EJSON } from 'bson';
 
-export const ExerciseMuscleGroups = stringLiterals(
-    'shoulders',
-    'chest',
-    'forearms',
-    'obliques',
-    'quads',
-    'cardio',
-    'biceps',
-    'abs',
-    'adductors',
-    'traps',
-    'triceps',
-    'abductors',
-    'hamstrings',
-    'calves',
-    'lats',
-    'lower',
-    'glutes',
-    'lower back'
-);
-
-export type ExerciseMuscleGroup = ElementOf<typeof ExerciseMuscleGroups>;
-
-export const WeightTypes = stringLiterals('standard', 'assisted');
-
-export type WeightType = ElementOf<typeof WeightTypes>;
-
-export interface ExerciseModel {
-    userId: Schema.Types.ObjectId;
-    name: string;
-    breakTimeInSeconds: number;
-    primaryMuscleGroup: ExerciseMuscleGroup;
-    secondaryMuscleGroups?: ExerciseMuscleGroup[];
-    weightType: WeightType;
+interface ExerciseModel extends Model<IExercise> {
+    findByUserId: (userId: string) => Promise<
+        (mongoose.Document<unknown, any, IExercise> &
+            IExercise & {
+                _id: string;
+            })[]
+    >;
+    findByUserIdAndName: (
+        userId: string,
+        name: string
+    ) => Promise<
+        mongoose.Document<unknown, any, IExercise> &
+            IExercise & {
+                _id: string;
+            }
+    >;
 }
 
-const exerciseSchema = new Schema<ExerciseModel>(
+const exerciseSchema = new Schema<IExercise, ExerciseModel>(
     {
         userId: {
-            type: String,
+            type: Schema.Types.ObjectId,
             required: true,
             ref: 'Settings',
         },
@@ -63,8 +46,23 @@ const exerciseSchema = new Schema<ExerciseModel>(
     { timestamps: true }
 );
 
+exerciseSchema.index({ userId: 1, name: 1 }, { unique: true });
+
+exerciseSchema.static('findByUserId', async function (userId: string) {
+    const result = await this.find({ userId }).exec();
+    return EJSON.deserialize(result) as typeof result;
+});
+
+exerciseSchema.static(
+    'findByUserIdAndName',
+    async function (userId: string, name: string) {
+        const result = await this.findOne({ userId, name }).exec();
+        return !result ? null : (EJSON.deserialize(result) as typeof result);
+    }
+);
+
 const Exercise =
-    (mongoose.models.Exercise as Model<ExerciseModel>) ||
+    (mongoose.models.Exercise as ExerciseModel) ||
     mongoose.model('Exercise', exerciseSchema);
 
 export default Exercise;

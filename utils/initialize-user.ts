@@ -1,5 +1,5 @@
-import Exercise, { ExerciseModel } from '../mongoose/exercise/model';
-
+import Exercise from '../mongoose/exercise/model';
+import { IExercise } from '../mongoose/exercise/interface';
 import Settings from '../mongoose/settings/model';
 
 export const initializeUserDataIfNecessary = async (
@@ -22,7 +22,7 @@ const insertDefaultExercises = async (userId: string) => {
     await Exercise.insertMany(exercises);
 };
 
-const DEFAULT_EXERCISES: Partial<ExerciseModel>[] = [
+const DEFAULT_EXERCISES: Partial<IExercise>[] = [
     {
         name: 'Barbell Bench Press',
         primaryMuscleGroup: 'chest',
@@ -30,11 +30,6 @@ const DEFAULT_EXERCISES: Partial<ExerciseModel>[] = [
     },
     {
         name: 'Incline Barbell Bench Press',
-        primaryMuscleGroup: 'chest',
-        secondaryMuscleGroups: ['shoulders', 'triceps'],
-    },
-    {
-        name: 'Decline Barbell Bench Press',
         primaryMuscleGroup: 'chest',
         secondaryMuscleGroups: ['shoulders', 'triceps'],
     },

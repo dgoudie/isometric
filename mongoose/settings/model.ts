@@ -3,12 +3,12 @@ import { Model, Schema } from 'mongoose';
 import mongoose from 'mongoose';
 
 export interface SettingsModel {
-    userId: String;
+    userId: Schema.Types.ObjectId;
 }
 
 const settingsSchema = new Schema<SettingsModel>(
     {
-        userId: { type: String, required: true },
+        userId: { type: Schema.Types.ObjectId, required: true },
     },
     { timestamps: true }
 );

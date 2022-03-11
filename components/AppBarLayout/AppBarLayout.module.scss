@@ -37,8 +37,6 @@
             height: 100%;
             padding: 1rem 0 2rem;
             width: 100%;
-            transition: transform 100ms;
-            -webkit-tap-highlight-color: transparent;
             &.active {
                 color: var(--coral);
             }

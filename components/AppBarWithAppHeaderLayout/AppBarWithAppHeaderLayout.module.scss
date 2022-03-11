@@ -13,9 +13,9 @@
     font-size: 1.2rem;
     line-height: 2rem;
     user-select: none;
+    z-index: 1;
     &Title {
         color: var(--coral);
-        font-family: 'Syne Mono', monospace;
         font-weight: bold;
         padding: 0.5rem;
     }
@@ -24,7 +24,7 @@
         width: 3rem;
         text-align: center;
         line-height: 3rem;
-        transition: transform 100ms;
+        transition: transform 200ms cubic-bezier(0.4, 0, 0.2, 1);
         -webkit-tap-highlight-color: transparent;
         &:active,
         &:focus {
