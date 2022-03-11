@@ -43,7 +43,8 @@
                 color: var(--coral);
             }
 
-            &:active {
+            &:active,
+            &:focus {
                 transform: scale(0.9);
             }
         }

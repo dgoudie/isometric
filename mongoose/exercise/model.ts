@@ -20,7 +20,8 @@ export const ExerciseMuscleGroups = stringLiterals(
     'calves',
     'lats',
     'lower',
-    'glutes'
+    'glutes',
+    'lower back'
 );
 
 export type ExerciseMuscleGroup = ElementOf<typeof ExerciseMuscleGroups>;
@@ -30,30 +31,37 @@ export const WeightTypes = stringLiterals('standard', 'assisted');
 export type WeightType = ElementOf<typeof WeightTypes>;
 
 export interface ExerciseModel {
-    userId: string;
+    userId: Schema.Types.ObjectId;
     name: string;
     breakTimeInSeconds: number;
     primaryMuscleGroup: ExerciseMuscleGroup;
-    secondaryMuscleGroup?: ExerciseMuscleGroup;
+    secondaryMuscleGroups?: ExerciseMuscleGroup[];
     weightType: WeightType;
 }
 
-const exerciseSchema = new Schema<ExerciseModel>({
-    userId: { type: String, required: true },
-    name: { type: String, required: true, trim: true },
-    breakTimeInSeconds: { type: Number, required: true, default: 120 },
-    primaryMuscleGroup: {
-        type: String,
-        required: true,
-        enum: ExerciseMuscleGroups,
+const exerciseSchema = new Schema<ExerciseModel>(
+    {
+        userId: {
+            type: String,
+            required: true,
+            ref: 'Settings',
+        },
+        name: { type: String, required: true, trim: true },
+        breakTimeInSeconds: { type: Number, required: true, default: 120 },
+        primaryMuscleGroup: {
+            type: String,
+            required: true,
+            enum: ExerciseMuscleGroups,
+        },
+        secondaryMuscleGroups: { type: [String], enum: ExerciseMuscleGroups },
+        weightType: {
+            type: String,
+            default: 'standard',
+            enum: WeightTypes,
+        },
     },
-    secondaryMuscleGroup: { type: String, enum: ExerciseMuscleGroups },
-    weightType: {
-        type: String,
-        required: true,
-        enum: WeightTypes,
-    },
-});
+    { timestamps: true }
+);
 
 const Exercise =
     (mongoose.models.Exercise as Model<ExerciseModel>) ||

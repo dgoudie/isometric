@@ -2,9 +2,19 @@ import { Model, Schema } from 'mongoose';
 
 import mongoose from 'mongoose';
 
-export interface SettingsModel {}
+export interface SettingsModel {
+    userId: String;
+}
 
-const settingsSchema = new Schema<SettingsModel>({});
+const settingsSchema = new Schema<SettingsModel>(
+    {
+        userId: { type: Schema.Types.ObjectId, required: true },
+    },
+    { timestamps: true }
+);
 
-export default (mongoose.models.Settings as Model<SettingsModel>) ||
+const Settings =
+    (mongoose.models.Settings as Model<SettingsModel>) ||
     mongoose.model('Settings', settingsSchema);
+
+export default Settings;
