@@ -5,7 +5,6 @@ import { ExerciseModel } from '../../mongoose/exercise/model';
 import Head from 'next/head';
 import type { NextPage } from 'next';
 import React from 'react';
-import { Schema } from 'mongoose';
 import dbConnect from '../../mongoose/init';
 import { initializeUserDataIfNecessary } from '../../utils/initialize-user';
 import { withUserId } from '../../utils/with-user-id';

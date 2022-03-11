@@ -8,7 +8,7 @@ export interface SettingsModel {
 
 const settingsSchema = new Schema<SettingsModel>(
     {
-        userId: { type: Schema.Types.ObjectId, required: true },
+        userId: { type: String, required: true },
     },
     { timestamps: true }
 );
