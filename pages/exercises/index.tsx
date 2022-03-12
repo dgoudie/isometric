@@ -1,8 +1,8 @@
 import React, { useMemo } from 'react';
 
 import AppBarWithAppHeaderLayout from '../../components/AppBarWithAppHeaderLayout/AppBarWithAppHeaderLayout';
+import { EJSON } from 'bson';
 import Exercise from '../../mongoose/exercise/model';
-import ExerciseMuscleGroupSelect from '../../components/ExerciseMuscleGroupSelect/ExerciseMuscleGroupSelect';
 import Head from 'next/head';
 import { IExercise } from '../../mongoose/exercise/interface';
 import Link from 'next/link';
@@ -10,6 +10,7 @@ import MuscleGroupTag from '../../components/MuscleGroupTag/MuscleGroupTag';
 import type { NextPage } from 'next';
 import dbConnect from '../../mongoose/init';
 import { initializeUserDataIfNecessary } from '../../utils/initialize-user';
+import mongoose from 'mongoose';
 import styles from './index.module.scss';
 import { withUserId } from '../../utils/with-user-id';
 
@@ -34,7 +35,6 @@ const Exercises: NextPage<Props> = ({ exercises }) => {
                 <title>Exercises | {process.env.APP_NAME}</title>
             </Head>
             <div className={styles.root}>
-                <ExerciseMuscleGroupSelect />
                 <div className={styles.items}>{items}</div>
             </div>
         </AppBarWithAppHeaderLayout>
@@ -44,11 +44,23 @@ const Exercises: NextPage<Props> = ({ exercises }) => {
 export const getServerSideProps = withUserId<Props>(async ({}, userId) => {
     await dbConnect();
     await initializeUserDataIfNecessary(userId);
-    const exercises = await Exercise.findByUserId(userId);
+    const exercises = await getExercises(userId);
     return {
         props: { exercises },
     };
 });
+
+const getExercises = async (userId: string) => {
+    const result = await Exercise.find({ userId }).sort({ name: 1 }).exec();
+    return EJSON.deserialize(result) as (mongoose.Document<
+        unknown,
+        any,
+        IExercise
+    > &
+        IExercise & {
+            _id: string;
+        })[];
+};
 
 export default Exercises;
 

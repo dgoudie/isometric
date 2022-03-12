@@ -25,15 +25,24 @@ export const ExerciseMuscleGroups = stringLiterals(
 
 export type ExerciseMuscleGroup = ElementOf<typeof ExerciseMuscleGroups>;
 
-export const WeightTypes = stringLiterals('standard', 'assisted');
+export const ExerciseTypes = stringLiterals(
+    'weighted',
+    'assisted',
+    'rep_based',
+    'timed'
+);
 
-export type WeightType = ElementOf<typeof WeightTypes>;
+export type ExerciseType = ElementOf<typeof ExerciseTypes>;
 
 export interface IExercise {
     userId: Schema.Types.ObjectId;
     name: string;
+    setCount: number;
+    timePerSetInSeconds?: number;
+    minimumRecommendedRepetitions?: number;
+    maximumRecommendedRepetitions?: number;
     breakTimeInSeconds: number;
     primaryMuscleGroup: ExerciseMuscleGroup;
     secondaryMuscleGroups?: ExerciseMuscleGroup[];
-    weightType: WeightType;
+    exerciseType: ExerciseType;
 }
