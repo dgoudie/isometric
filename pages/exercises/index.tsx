@@ -9,10 +9,10 @@ import Link from 'next/link';
 import MuscleGroupTag from '../../components/MuscleGroupTag/MuscleGroupTag';
 import type { NextPage } from 'next';
 import dbConnect from '../../mongoose/init';
+import { getServerSidePropsWithUserId } from '../../utils/with-user-id';
 import { initializeUserDataIfNecessary } from '../../utils/initialize-user';
 import mongoose from 'mongoose';
 import styles from './index.module.scss';
-import { withUserId } from '../../utils/with-user-id';
 
 interface Props {
     exercises: (IExercise & {
@@ -41,14 +41,16 @@ const Exercises: NextPage<Props> = ({ exercises }) => {
     );
 };
 
-export const getServerSideProps = withUserId<Props>(async ({}, userId) => {
-    await dbConnect();
-    await initializeUserDataIfNecessary(userId);
-    const exercises = await getExercises(userId);
-    return {
-        props: { exercises },
-    };
-});
+export const getServerSideProps = getServerSidePropsWithUserId<Props>(
+    async ({}, userId) => {
+        await dbConnect();
+        await initializeUserDataIfNecessary(userId);
+        const exercises = await getExercises(userId);
+        return {
+            props: { exercises },
+        };
+    }
+);
 
 const getExercises = async (userId: string) => {
     const result = await Exercise.find({ userId }).sort({ name: 1 }).exec();

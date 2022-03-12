@@ -6,8 +6,8 @@ import Exercise from '../../../mongoose/exercise/model';
 import { IExercise } from '../../../mongoose/exercise/interface';
 import { NextPage } from 'next';
 import dbConnect from '../../../mongoose/init';
+import { getServerSidePropsWithUserId } from '../../../utils/with-user-id';
 import mongoose from 'mongoose';
-import { withUserId } from '../../../utils/with-user-id';
 
 interface Props {
     exercise: IExercise & {
@@ -25,7 +25,7 @@ const ExerciseDetail: NextPage<Props> = ({ exercise }) => {
     );
 };
 
-export const getServerSideProps = withUserId<Props>(
+export const getServerSideProps = getServerSidePropsWithUserId<Props>(
     async ({ query: { exercise_name } }, userId) => {
         if (typeof exercise_name !== 'string') {
             return { notFound: true };
