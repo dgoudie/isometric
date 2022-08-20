@@ -23,6 +23,7 @@ import { getExercises } from '../database/domains/exercise';
 import { getUserId } from '../utils/get-user-id';
 import { normalizeBSON } from '../utils/normalize-bson';
 import styles from '../styles/Workout.module.scss';
+import { useHeadWithTitle } from '../utils/use-head-with-title';
 
 export type ActiveExercise = {
   index: number;
@@ -45,9 +46,6 @@ export function getServerSideProps(
 }
 
 const Workout: NextPageWithLayout<WorkoutProps> = ({ exercises }) => {
-  useEffect(() => {
-    document.title = `Workout | ISOMETRIC`;
-  }, []);
   const { workout, endWorkout, discardWorkout, addExercise } =
     useContext(WorkoutContext);
 
@@ -112,12 +110,15 @@ const Workout: NextPageWithLayout<WorkoutProps> = ({ exercises }) => {
     [activeExercise.index, addExercise, openSnackbar]
   );
 
+  const head = useHeadWithTitle('Workout');
+
   if (!workout) {
     return <RouteLoader />;
   }
 
   return (
     <div className={styles.root}>
+      {head}
       <header className={styles.header}>
         <button
           type='button'

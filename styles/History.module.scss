@@ -1,0 +1,67 @@
+.root {
+  display: grid;
+  grid-template-rows: max-content auto;
+  height: 100%;
+}
+
+.workouts {
+  overflow-y: auto;
+  &Inner {
+    padding: 0 1rem 1rem;
+    border-radius: 8px;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+}
+
+.workout {
+  background: var(--background-alt);
+  padding: 1rem;
+  border-radius: 8px;
+  display: flex;
+  gap: 1rem;
+  flex-direction: column;
+
+  .item {
+    display: flex;
+    flex-direction: column;
+    gap: 0.2rem;
+    .header {
+      font-size: 1.2rem;
+    }
+    label {
+      color: var(--accent-color);
+      font-size: 0.9rem;
+      margin-bottom: 0;
+    }
+    .suffix {
+      color: var(--placeholder);
+      font-size: 0.8rem;
+    }
+  }
+  summary {
+    color: var(--accent-color);
+    height: 3rem;
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+  }
+}
+.exercises {
+  display: flex;
+  flex-direction: column;
+  margin-top: 1rem;
+  gap: 1rem;
+  .exercise {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    &Header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.5rem;
+    }
+  }
+}

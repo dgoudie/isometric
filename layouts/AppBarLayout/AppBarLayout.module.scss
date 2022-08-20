@@ -44,8 +44,7 @@
         color: var(--accent-color);
       }
 
-      &:active,
-      &:focus {
+      &:active {
         transform: scale(0.9);
       }
     }
