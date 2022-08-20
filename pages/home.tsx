@@ -1,4 +1,3 @@
-import BSON, { EJSON } from 'bson';
 import type { GetServerSidePropsContext, GetServerSidePropsResult } from 'next';
 import { IExercise, IScheduleDayWithExercises } from '@dgoudie/isometric-types';
 import { useContext, useMemo } from 'react';
@@ -15,7 +14,7 @@ import { getNextDaySchedule } from '../database/domains/schedule';
 import { getUserId } from '../utils/get-user-id';
 import { normalizeBSON } from '../utils/normalize-bson';
 import { secondsToMinutes } from 'date-fns';
-import styles from './home.module.scss';
+import styles from '../styles/Home.module.scss';
 import { useHeadWithTitle } from '../utils/use-head-with-title';
 
 const TIME_PER_SET = 60;

@@ -22,7 +22,7 @@ import classNames from 'classnames';
 import { getExercises } from '../database/domains/exercise';
 import { getUserId } from '../utils/get-user-id';
 import { normalizeBSON } from '../utils/normalize-bson';
-import styles from './workout.module.scss';
+import styles from '../styles/Workout.module.scss';
 
 export type ActiveExercise = {
   index: number;
