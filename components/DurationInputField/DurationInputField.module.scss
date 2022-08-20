@@ -1,0 +1,6 @@
+.root {
+  display: grid;
+  grid-template-columns: 1fr max-content 1fr max-content;
+  gap: 1rem;
+  align-items: center;
+}

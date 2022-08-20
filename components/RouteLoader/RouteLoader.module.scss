@@ -1,0 +1,16 @@
+.routeLoader {
+    margin-top: 20vh;
+    margin-top: 20dvh;
+    display: flex;
+    justify-content: center;
+    animation: loadingFadeIn 500ms forwards;
+}
+
+@keyframes loadingFadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}

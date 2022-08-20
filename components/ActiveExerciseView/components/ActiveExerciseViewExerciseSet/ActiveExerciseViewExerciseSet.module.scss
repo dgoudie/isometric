@@ -1,0 +1,105 @@
+.root {
+  background-color: var(--background-alt-2);
+  padding: 0.5rem;
+  height: 4rem;
+  border-radius: 8px;
+
+  pre {
+    margin: 0;
+  }
+
+  .set {
+    height: 100%;
+    align-items: center;
+    &Input {
+      display: flex;
+      align-items: baseline;
+      justify-content: center;
+      &Wrapper {
+        flex: 1;
+        input {
+          background-color: transparent;
+          border: none;
+          outline: none;
+          color: inherit;
+          font-family: inherit;
+          font-size: 1.3rem;
+          text-align: right;
+          width: 100%;
+          -moz-appearance: textfield;
+          padding: 0 0.1rem 0 0;
+
+          &::-webkit-outer-spin-button,
+          &::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+          }
+        }
+      }
+      &Suffix {
+        flex-shrink: 0;
+      }
+    }
+    &Type {
+      &Weighted {
+        display: grid;
+        grid-template-columns: auto auto 4rem;
+        gap: 0.5rem;
+      }
+      &RepBased {
+        display: grid;
+        grid-template-columns: auto 4rem;
+        gap: 0.5rem;
+      }
+      &Timed {
+        display: grid;
+        grid-template-columns: auto 3rem 3rem 3rem;
+        gap: 0.5rem;
+      }
+    }
+    &Button {
+      transition: color 100ms transform 50ms;
+      font-size: 1.3rem;
+      color: transparent;
+      align-self: stretch;
+
+      &:active {
+        transform: scale(0.8);
+      }
+    }
+  }
+
+  &.completed {
+    border: 2px solid var(--completed-color);
+    background: transparent;
+    padding: 0 0.5rem;
+    .set {
+      &Button {
+        &Completed {
+          color: var(--completed-color);
+        }
+        &StartStop {
+          color: transparent;
+        }
+      }
+    }
+  }
+
+  &.highlighted {
+    background-color: var(--maximum-blue-green);
+    color: black;
+    .set {
+      &Button {
+        color: black;
+      }
+      input::placeholder {
+        color: #00000044;
+      }
+    }
+  }
+}
+
+.timer {
+  padding-left: 0.5rem;
+  font-size: 1.3rem;
+}

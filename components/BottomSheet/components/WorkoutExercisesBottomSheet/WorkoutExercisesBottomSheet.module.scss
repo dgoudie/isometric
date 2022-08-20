@@ -1,0 +1,45 @@
+.root {
+  max-height: 85vh;
+  max-height: 85dvh;
+  border-radius: 8px 8px 0 0;
+  overflow-y: auto;
+  padding: 0 0 1rem;
+  margin: 0 1rem;
+}
+
+.items {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.item {
+  display: grid;
+  align-items: center;
+  grid-template-columns: min-content auto max-content;
+  border-radius: 8px;
+  border: 2px solid transparent;
+  background-color: var(--background-alt);
+  padding: 0.5rem 1rem;
+  min-height: 3rem;
+
+  &:active,
+  &:focus {
+    transform: scale(0.98);
+  }
+
+  i {
+    color: var(--completed-color);
+    margin-right: 0.75rem;
+  }
+
+  &Text {
+    text-align: start;
+    margin-right: 0.5rem;
+  }
+
+  &Complete {
+    background-color: transparent;
+    border-color: var(--completed-color);
+  }
+}

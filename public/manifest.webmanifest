@@ -1,0 +1,39 @@
+{
+  "$schema": "https://json.schemastore.org/web-manifest-combined.json",
+  "short_name": "ISOMETRIC",
+  "name": "ISOMETRIC",
+  "start_url": ".",
+  "display": "standalone",
+  "dir": "ltr",
+  "categories": ["fitness", "health", "lifestyle"],
+  "icons": [
+    {
+      "src": "images/isometric.ico",
+      "sizes": "512x512 256x256 128x128 64x64 32x32 24x24 16x16",
+      "type": "image/x-icon"
+    },
+    {
+      "src": "images/isometric.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "theme_color": "#E14658",
+  "background_color": "#22252C",
+  "orientation": "portrait",
+  "shortcuts": [
+    {
+      "name": "Home",
+      "url": "/home"
+    },
+    {
+      "name": "Exercises",
+      "url": "/exercises"
+    },
+    {
+      "name": "History",
+      "url": "/history"
+    }
+  ]
+}

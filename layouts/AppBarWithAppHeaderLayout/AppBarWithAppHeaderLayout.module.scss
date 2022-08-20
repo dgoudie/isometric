@@ -1,0 +1,39 @@
+.topBar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: fixed;
+  top: 0;
+  right: 0;
+  left: 0;
+  font-family: 'Permanent Marker', cursive;
+  font-weight: bold;
+  font-size: 1.2rem;
+  line-height: 2rem;
+  user-select: none;
+  height: var(--top-bar-height);
+  &Title {
+    color: var(--accent-color);
+    font-weight: bold;
+    padding: 0.5rem 1rem;
+    &:hover {
+      text-decoration: underline;
+    }
+  }
+  &SettingsLink {
+    height: var(--top-bar-height);
+    width: var(--top-bar-height);
+    text-align: center;
+    line-height: var(--top-bar-height);
+    transition: transform 200ms cubic-bezier(0.4, 0, 0.2, 1);
+    -webkit-tap-highlight-color: transparent;
+    &:active,
+    &:focus {
+      transform: scale(0.9);
+    }
+
+    &Active {
+      display: none;
+    }
+  }
+}

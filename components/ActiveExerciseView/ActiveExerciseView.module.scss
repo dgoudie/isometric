@@ -1,0 +1,15 @@
+.root {
+  display: grid;
+  grid-auto-flow: column;
+  scroll-snap-type: x mandatory;
+  overflow-x: auto;
+  gap: 1rem;
+  margin-bottom: 1rem;
+  flex: 1;
+  // transition: margin-bottom 200ms;
+  will-change: margin-bottom;
+
+  &.shrunk {
+    margin-bottom: 5.25rem;
+  }
+}

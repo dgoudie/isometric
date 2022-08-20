@@ -1,0 +1,32 @@
+.snackbar {
+    background-color: var(--background-inverse);
+    color: var(--color-inverse);
+    position: fixed;
+    bottom: 2rem;
+    left: 1rem;
+    right: 1rem;
+    border-radius: 8px;
+    box-shadow: rgba(0, 0, 0, 0.3) 0 4px 12px;
+    display: grid;
+    grid-template-columns: auto max-content;
+    align-items: center;
+    padding-left: 1rem;
+    max-width: calc(var(--max-width) - 2rem);
+    margin: 0 auto;
+    transition: transform 150ms cubic-bezier(0.4, 0, 0.2, 1),
+        opacity 150ms cubic-bezier(0.4, 0, 0.2, 1);
+
+    &Close {
+        height: 3rem;
+        width: 3rem;
+    }
+    &EnterAndExitActive {
+        transform: translateY(2rem);
+        opacity: 0;
+    }
+    &EnterActive,
+    &EnterDone {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}

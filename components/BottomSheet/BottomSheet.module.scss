@@ -1,0 +1,30 @@
+.pane {
+  :global {
+    .pane {
+      color: var(--color);
+      background-color: var(--background);
+      border-radius: 12px 12px 0 0;
+      padding-top: 0;
+      padding-bottom: 2rem;
+    }
+  }
+}
+.sheet {
+  &Header {
+    display: grid;
+    grid-template-columns: auto max-content;
+    align-items: center;
+    font-size: 1.3rem;
+    height: 4rem;
+
+    &Title {
+      padding-left: 1rem;
+    }
+
+    &Dismiss {
+      align-self: stretch;
+      width: 4rem;
+      justify-self: end;
+    }
+  }
+}

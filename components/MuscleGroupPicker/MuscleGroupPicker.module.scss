@@ -1,0 +1,19 @@
+.root {
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none; /* Remove default arrow */
+  -webkit-tap-highlight-color: transparent;
+  cursor: pointer;
+  font-size: 0.8rem;
+  color: var(--color);
+  border: 2px solid var(--color);
+  border-radius: 8px;
+  padding: 0.1rem 0.4rem;
+  font-family: 'Permanent Marker', cursive;
+  background: inherit;
+  outline: none;
+
+  option {
+    background: var(--background-alt-2);
+  }
+}
