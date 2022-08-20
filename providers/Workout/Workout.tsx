@@ -3,6 +3,7 @@ import React, {
   createContext,
   useCallback,
   useEffect,
+  useMemo,
   useRef,
   useState,
 } from 'react';
@@ -12,6 +13,7 @@ import equal from 'deep-equal';
 import { requestNotificationPermission } from '../../utils/notification';
 import { usePageVisibility } from 'react-page-visibility';
 import { useRouter } from 'next/router';
+import { useWebsocketUrl } from '../../utils/use-websocket-url';
 import { verifyType } from '../../utils/verify-type';
 
 export const WorkoutContext = createContext<{
@@ -53,9 +55,11 @@ export const WorkoutContext = createContext<{
 export default function WorkoutProvider({
   children,
 }: React.PropsWithChildren<{}>) {
+  const websocketUrl = useWebsocketUrl();
+
   const pageVisible: boolean = usePageVisibility();
   const { lastJsonMessage, sendJsonMessage, readyState } = useWebSocket(
-    process.env.NEXT_PUBLIC_WS!,
+    websocketUrl,
     { shouldReconnect: () => true },
     pageVisible
   );
