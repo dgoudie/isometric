@@ -1,23 +1,76 @@
-.topBar {
-  display: flex;
-  justify-content: space-between;
-  user-select: none;
-  height: var(--top-bar-height);
-  margin: 0 1rem;
-  align-items: center;
-  &Title {
-    font-family: 'Permanent Marker', cursive;
-    font-weight: bold;
-    font-size: 1.2rem;
-    line-height: 2rem;
-    color: var(--accent-color);
-    font-weight: bold;
-    &:hover {
-      text-decoration: underline;
-    }
-  }
+.root {
+  padding-bottom: 10vh;
+}
 
-  .profileBadge {
-    padding: 0.5rem 1rem;
+.welcome {
+  font-family: 'Permanent Marker', cursive;
+  font-size: 2rem;
+  text-align: center;
+  margin: 2rem;
+}
+
+.intro {
+  margin: 1rem;
+  background: var(--background-alt);
+  padding: 1rem;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  line-height: 1.2;
+  font-weight: 300;
+}
+
+.carousel {
+  display: grid;
+  grid-auto-flow: column;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  will-change: margin-bottom;
+
+  > div {
+    scroll-snap-align: center;
+  }
+}
+
+.sectionHeader {
+  font-family: 'Permanent Marker', cursive;
+  margin: 1rem;
+}
+
+.marketingImages {
+  gap: 1rem;
+  background: var(--maximum-blue-green);
+  padding: 1rem 3rem;
+
+  > div {
+    position: relative;
+    border-radius: 16px;
+    width: calc(100vw - 6rem);
+    overflow: hidden;
+  }
+}
+
+.sellingPoints {
+  padding: 0 1.5rem;
+  gap: 1rem;
+}
+
+.sellingPoint {
+  background-color: var(--background-alt-2);
+  padding: 1rem;
+  border-radius: 8px;
+  width: calc(100vw - 3rem);
+
+  &Header {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 0.75rem;
+    font-size: 1.5rem;
+    :global {
+      .fa-solid {
+        color: var(--maximum-blue-green);
+      }
+    }
   }
 }

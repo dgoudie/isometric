@@ -8,6 +8,14 @@ const nextAuthOptions: NextAuthOptions = {
       clientSecret: process.env.GOOGLE_OAUTH_CLIENT_SECRET!,
     }),
   ],
+  callbacks: {
+    async signIn({ account, profile }) {
+      if (account.provider === 'google') {
+        return profile.email_verified as boolean;
+      }
+      return true; // Do different verification for other providers that don't have `email_verified`
+    },
+  },
 };
 
 export default nextAuthOptions;

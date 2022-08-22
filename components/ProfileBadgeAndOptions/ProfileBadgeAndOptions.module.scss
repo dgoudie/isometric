@@ -16,7 +16,7 @@
   border-radius: 8px;
   position: absolute;
   top: calc(100% + 0.5rem);
-  right: -0.25rem;
+  right: 0.5rem;
   z-index: 2;
   box-shadow: rgb(0 0 0 / 19%) 0px 10px 20px, rgb(0 0 0 / 23%) 0px 6px 6px;
   white-space: nowrap;
@@ -31,6 +31,11 @@
       border-bottom: 1px solid var(--divider);
     }
   }
+}
+
+.login {
+  background-color: transparent;
+  border-color: transparent;
 }
 
 .profilePicture {

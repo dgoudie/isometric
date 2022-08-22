@@ -1,11 +1,16 @@
 import Link from 'next/link';
 import ProfileBadgeAndOptions from '../ProfileBadgeAndOptions/ProfileBadgeAndOptions';
 import React from 'react';
+import classNames from 'classnames';
 import styles from './AppHeader.module.scss';
 
-export default function AppHeader() {
+interface Props {
+  className?: string;
+}
+
+export default function AppHeader({ className }: Props) {
   return (
-    <header className={styles.topBar}>
+    <header className={classNames(styles.topBar, className)}>
       <Link href={'/'}>
         <a className={styles.topBarTitle} draggable='false'>
           ISOMETRIC

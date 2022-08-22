@@ -20,7 +20,11 @@ export default function AppBarLayout({
       {body}
       <div className={styles.bottomBar}>
         <div className={styles.bottomBarInner}>
-          <AppBarButton href='/home' text='Home' iconClass='fa-house' />
+          <AppBarButton
+            href='/dashboard'
+            text='Dashboard'
+            iconClass='fa-bars-progress'
+          />
           <AppBarButton
             href='/exercises'
             text='Exercises'

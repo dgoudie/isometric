@@ -23,7 +23,7 @@ export default function ProfileBadgeAndOptions({ className }: Props) {
   if (!session) {
     return (
       <button
-        className={classNames(className, 'standard-button outlined slim')}
+        className={classNames(className, 'standard-button', styles.login)}
         onClick={() => signIn()}
       >
         Log In
@@ -31,7 +31,7 @@ export default function ProfileBadgeAndOptions({ className }: Props) {
     );
   }
   return (
-    <details className={styles.details} ref={detailsRef}>
+    <details className={classNames(styles.details, className)} ref={detailsRef}>
       <summary>
         {session.user!.name!}
         <Image

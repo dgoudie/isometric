@@ -3,8 +3,6 @@ import { IExercise, IScheduleDayWithExercises } from '@dgoudie/isometric-types';
 import { useContext, useMemo } from 'react';
 
 import AppBarWithAppHeaderLayout from '../layouts/AppBarWithAppHeaderLayout/AppBarWithAppHeaderLayout';
-import AppBottomBar from '../components/AppBottomBar/AppBottomBar';
-import AppHeader from '../components/AppHeader/AppHeader';
 import Head from 'next/head';
 import Link from 'next/link';
 import MuscleGroupTag from '../components/MuscleGroupTag/MuscleGroupTag';
@@ -142,11 +140,7 @@ const Dashboard: NextPageWithLayout<HomeProps> = ({ schedule }) => {
 };
 
 Dashboard.getLayout = (page) => (
-  <>
-    <AppHeader />
-    {page}
-    <AppBottomBar />
-  </>
+  <AppBarWithAppHeaderLayout>{page}</AppBarWithAppHeaderLayout>
 );
 
 export default Dashboard;

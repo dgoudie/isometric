@@ -2,8 +2,7 @@ import { GetServerSidePropsContext, GetServerSidePropsResult } from 'next';
 import { formatDistance, formatDuration, intervalToDuration } from 'date-fns';
 import { useCallback, useMemo, useState } from 'react';
 
-import AppBottomBar from '../components/AppBottomBar/AppBottomBar';
-import AppHeader from '../components/AppHeader/AppHeader';
+import AppBarWithAppHeaderLayout from '../layouts/AppBarWithAppHeaderLayout/AppBarWithAppHeaderLayout';
 import { IWorkout } from '@dgoudie/isometric-types';
 import InfiniteScroll from '../components/InfiniteScroll/InfiniteScroll';
 import MuscleGroupTag from '../components/MuscleGroupTag/MuscleGroupTag';
@@ -169,9 +168,5 @@ function Workout({ workout }: WorkoutProps) {
 export default History;
 
 History.getLayout = (page) => (
-  <>
-    <AppHeader />
-    {page}
-    <AppBottomBar />
-  </>
+  <AppBarWithAppHeaderLayout>{page}</AppBarWithAppHeaderLayout>
 );

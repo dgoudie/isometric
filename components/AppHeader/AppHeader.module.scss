@@ -3,11 +3,13 @@
   justify-content: space-between;
   user-select: none;
   height: var(--top-bar-height);
-  padding: 0 1rem;
+  padding-left: 1rem;
   align-items: center;
   position: sticky;
   top: 0;
-  background: var(--background);
+  background: var(--header-background);
+  backdrop-filter: blur(5px);
+  z-index: 2;
   &Title {
     font-family: 'Permanent Marker', cursive;
     font-weight: bold;
@@ -21,6 +23,6 @@
   }
 
   .profileBadge {
-    padding: 0.5rem 1rem;
+    padding: 0 1rem;
   }
 }

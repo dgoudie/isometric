@@ -28,6 +28,7 @@ body {
   --background-alt: hsl(var(--y-in-mn-blue-hs), 75%);
   --background-alt-2: hsl(var(--y-in-mn-blue-hs), 70%);
   --divider: hsl(var(--y-in-mn-blue-hs), 60%);
+  --header-background: hsl(var(--y-in-mn-blue-hs), 80%, 70%);
   --color-inverse: white;
   --background-inverse: hsl(var(--space-cadet-hs), 30%);
   --placeholder: #00000055;
@@ -40,6 +41,9 @@ body {
   --between-bars: calc(
     100vh - calc(var(--top-bar-height) + var(--bottom-bar-height))
   );
+  // --between-bars: calc(
+  //   100dvh - calc(var(--top-bar-height) + var(--bottom-bar-height))
+  // );
   @media (prefers-color-scheme: dark) {
     --color: white;
     --secondary-color: hsl(0, 0%, 65%);
@@ -48,6 +52,7 @@ body {
     --background-alt: hsla(var(--oxford-blue-hs), 17%);
     --background-alt-2: hsla(var(--oxford-blue-hs), 25%);
     --divider: hsl(var(--space-cadet-hs), 40%);
+    --header-background: hsla(var(--oxford-blue-hs), 9%, 70%);
     --color-inverse: black;
     --background-inverse: hsl(var(--y-in-mn-blue-hs), 80%);
     --placeholder: #ffffff55;
