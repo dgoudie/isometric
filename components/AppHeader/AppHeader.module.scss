@@ -1,0 +1,26 @@
+.topBar {
+  display: flex;
+  justify-content: space-between;
+  user-select: none;
+  height: var(--top-bar-height);
+  padding: 0 1rem;
+  align-items: center;
+  position: sticky;
+  top: 0;
+  background: var(--background);
+  &Title {
+    font-family: 'Permanent Marker', cursive;
+    font-weight: bold;
+    font-size: 1.2rem;
+    line-height: 2rem;
+    color: var(--accent-color);
+    font-weight: bold;
+    &:hover {
+      text-decoration: underline;
+    }
+  }
+
+  .profileBadge {
+    padding: 0.5rem 1rem;
+  }
+}

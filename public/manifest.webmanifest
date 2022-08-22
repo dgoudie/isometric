@@ -24,8 +24,12 @@
   "orientation": "portrait",
   "shortcuts": [
     {
-      "name": "Home",
-      "url": "/home"
+      "name": "Landing",
+      "url": "/"
+    },
+    {
+      "name": "Dashboard",
+      "url": "/dashboard"
     },
     {
       "name": "Exercises",

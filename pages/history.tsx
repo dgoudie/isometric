@@ -1,8 +1,9 @@
 import { GetServerSidePropsContext, GetServerSidePropsResult } from 'next';
 import { formatDistance, formatDuration, intervalToDuration } from 'date-fns';
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 
-import AppBarWithAppHeaderLayout from '../layouts/AppBarWithAppHeaderLayout/AppBarWithAppHeaderLayout';
+import AppBottomBar from '../components/AppBottomBar/AppBottomBar';
+import AppHeader from '../components/AppHeader/AppHeader';
 import { IWorkout } from '@dgoudie/isometric-types';
 import InfiniteScroll from '../components/InfiniteScroll/InfiniteScroll';
 import MuscleGroupTag from '../components/MuscleGroupTag/MuscleGroupTag';
@@ -26,10 +27,13 @@ type HistoryProps = {
   workouts: IWorkout[];
 };
 
-export function getServerSideProps(
+export async function getServerSideProps(
   context: GetServerSidePropsContext
-): GetServerSidePropsResult<HistoryProps> {
-  const userId = getUserId(context.req);
+): Promise<GetServerSidePropsResult<HistoryProps>> {
+  const userId = await getUserId(context.req, context.res);
+  if (!userId) {
+    return { redirect: { destination: '/', permanent: false } };
+  }
   return {
     props: getCompletedWorkouts(userId, 1)
       .then((workouts) => normalizeBSON(workouts))
@@ -165,5 +169,9 @@ function Workout({ workout }: WorkoutProps) {
 export default History;
 
 History.getLayout = (page) => (
-  <AppBarWithAppHeaderLayout>{page}</AppBarWithAppHeaderLayout>
+  <>
+    <AppHeader />
+    {page}
+    <AppBottomBar />
+  </>
 );

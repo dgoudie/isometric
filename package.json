@@ -23,6 +23,7 @@
     "log4js": "^6.6.1",
     "mongoose": "^6.5.2",
     "next": "12.2.5",
+    "next-auth": "^4.10.3",
     "pusher": "^5.1.1-beta",
     "react": "18.2.0",
     "react-beautiful-dnd": "^13.1.0",

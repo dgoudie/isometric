@@ -3,6 +3,8 @@ import { IExercise, IScheduleDayWithExercises } from '@dgoudie/isometric-types';
 import { useContext, useMemo } from 'react';
 
 import AppBarWithAppHeaderLayout from '../layouts/AppBarWithAppHeaderLayout/AppBarWithAppHeaderLayout';
+import AppBottomBar from '../components/AppBottomBar/AppBottomBar';
+import AppHeader from '../components/AppHeader/AppHeader';
 import Head from 'next/head';
 import Link from 'next/link';
 import MuscleGroupTag from '../components/MuscleGroupTag/MuscleGroupTag';
@@ -14,7 +16,7 @@ import { getNextDaySchedule } from '../database/domains/schedule';
 import { getUserId } from '../utils/get-user-id';
 import { normalizeBSON } from '../utils/normalize-bson';
 import { secondsToMinutes } from 'date-fns';
-import styles from '../styles/Home.module.scss';
+import styles from '../styles/Dashboard.module.scss';
 import { useHeadWithTitle } from '../utils/use-head-with-title';
 
 const TIME_PER_SET = 60;
@@ -23,10 +25,13 @@ interface HomeProps {
   schedule: IScheduleDayWithExercises;
 }
 
-export function getServerSideProps(
+export async function getServerSideProps(
   context: GetServerSidePropsContext
-): GetServerSidePropsResult<HomeProps> {
-  const userId = getUserId(context.req);
+): Promise<GetServerSidePropsResult<HomeProps>> {
+  const userId = await getUserId(context.req, context.res);
+  if (!userId) {
+    return { redirect: { destination: '/', permanent: false } };
+  }
   return {
     props: getNextDaySchedule(userId)
       .then((schedule) => normalizeBSON(schedule))
@@ -34,7 +39,7 @@ export function getServerSideProps(
   };
 }
 
-const Home: NextPageWithLayout<HomeProps> = ({ schedule }) => {
+const Dashboard: NextPageWithLayout<HomeProps> = ({ schedule }) => {
   const greeting = useMemo(() => getGreeting(), []);
 
   const dayDurationInSeconds = useMemo(() => {
@@ -59,7 +64,7 @@ const Home: NextPageWithLayout<HomeProps> = ({ schedule }) => {
 
   const { startWorkout } = useContext(WorkoutContext);
 
-  const head = useHeadWithTitle('Home');
+  const head = useHeadWithTitle('Dashboard');
 
   if (!schedule) {
     return (
@@ -136,11 +141,15 @@ const Home: NextPageWithLayout<HomeProps> = ({ schedule }) => {
   );
 };
 
-Home.getLayout = function (page) {
-  return <AppBarWithAppHeaderLayout>{page}</AppBarWithAppHeaderLayout>;
-};
+Dashboard.getLayout = (page) => (
+  <>
+    <AppHeader />
+    {page}
+    <AppBottomBar />
+  </>
+);
 
-export default Home;
+export default Dashboard;
 
 interface HeaderItemProps {
   title: string;

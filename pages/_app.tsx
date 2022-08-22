@@ -8,6 +8,7 @@ import AfterExerciseTimerProvider from '../providers/AfterExerciseTimer/AfterExe
 import type { AppProps } from 'next/app';
 import type { NextPage } from 'next';
 import { PusherProvider } from '@harelpls/use-pusher';
+import { SessionProvider } from 'next-auth/react';
 import SnackbarProvider from '../providers/Snackbar/Snackbar';
 import WorkoutProvider from '../providers/Workout/Workout';
 
@@ -19,7 +20,10 @@ type AppPropsWithLayout = AppProps & {
   Component: NextPageWithLayout;
 };
 
-export default function MyApp({ Component, pageProps }: AppPropsWithLayout) {
+export default function MyApp({
+  Component,
+  pageProps: { session, ...pageProps },
+}: AppPropsWithLayout) {
   // Use the layout defined at the page level, if available
   const getLayout = Component.getLayout ?? ((page) => page);
   const config = {
@@ -29,15 +33,18 @@ export default function MyApp({ Component, pageProps }: AppPropsWithLayout) {
     triggerEndpoint: '/api/pusher/trigger',
     authEndpoint: '/api/pusher/auth',
   };
-  return getLayout(
-    <PusherProvider {...config}>
-      <SnackbarProvider>
-        <WorkoutProvider>
-          <AfterExerciseTimerProvider>
-            <Component {...pageProps} />
-          </AfterExerciseTimerProvider>
-        </WorkoutProvider>
-      </SnackbarProvider>
-    </PusherProvider>
+  const pageWithLayout = getLayout(<Component {...pageProps} />);
+  return (
+    <SessionProvider session={session}>
+      <PusherProvider {...config}>
+        <SnackbarProvider>
+          <WorkoutProvider>
+            <AfterExerciseTimerProvider>
+              {pageWithLayout}
+            </AfterExerciseTimerProvider>
+          </WorkoutProvider>
+        </SnackbarProvider>
+      </PusherProvider>
+    </SessionProvider>
   );
 }

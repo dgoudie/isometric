@@ -5,11 +5,15 @@ import { getUserId } from '../../utils/get-user-id';
 const handler: NextApiHandler = async (req, res) => {
   switch (req.method) {
     case 'GET': {
-      const userId = getUserId(req);
+      const userId = await getUserId(req, res);
+      if (!userId) {
+        res.status(403).end();
+        return;
+      }
       const { page } = req.query;
       if (typeof page !== 'undefined') {
         if (typeof page !== 'string' || isNaN(parseInt(page))) {
-          res.status(400);
+          res.status(400).end();
           return;
         }
       }
@@ -21,7 +25,7 @@ const handler: NextApiHandler = async (req, res) => {
       return;
     }
     default: {
-      res.status(405);
+      res.status(405).end();
       return;
     }
   }

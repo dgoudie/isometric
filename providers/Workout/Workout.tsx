@@ -146,7 +146,7 @@ export default function WorkoutProvider({
   useEffect(() => {
     if (typeof workout != 'undefined') {
       if (workout === null && router.pathname === '/workout') {
-        router.replace('/home');
+        router.replace('/dashboard');
       } else if (workout !== null && router.pathname !== '/workout') {
         router.replace('/workout');
       }

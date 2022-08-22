@@ -1,0 +1,38 @@
+.details {
+  position: relative;
+  summary {
+    list-style-type: none;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    cursor: pointer;
+  }
+}
+
+.detailsBody {
+  display: flex;
+  flex-direction: column;
+  background: var(--background-alt-2);
+  border-radius: 8px;
+  position: absolute;
+  top: calc(100% + 0.5rem);
+  right: -0.25rem;
+  z-index: 2;
+  box-shadow: rgb(0 0 0 / 19%) 0px 10px 20px, rgb(0 0 0 / 23%) 0px 6px 6px;
+  white-space: nowrap;
+  a,
+  button {
+    text-align: start;
+    padding: 0.75rem;
+    display: inline-flex;
+    gap: 0.5rem;
+    align-items: center;
+    &:not(:last-child) {
+      border-bottom: 1px solid var(--divider);
+    }
+  }
+}
+
+.profilePicture {
+  border-radius: 1000px;
+}

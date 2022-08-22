@@ -4,7 +4,11 @@ import { getMinifiedActiveWorkout } from '../../../database/domains/workout';
 import { getUserId } from '../../../utils/get-user-id';
 
 const handler: NextApiHandler = async (req, res) => {
-  const userId = getUserId(req);
+  const userId = await getUserId(req, res);
+  if (!userId) {
+    res.status(403).end();
+    return;
+  }
   const workout = await getMinifiedActiveWorkout(userId);
   broadcastWorkoutUpdate(userId, workout);
   res.end();

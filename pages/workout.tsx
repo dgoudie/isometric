@@ -1,10 +1,8 @@
 import { GetServerSidePropsContext, GetServerSidePropsResult } from 'next';
-import { IExercise, IExerciseExtended } from '@dgoudie/isometric-types';
-import React, {
+import {
   Suspense,
   useCallback,
   useContext,
-  useEffect,
   useState,
   useTransition,
 } from 'react';
@@ -12,6 +10,7 @@ import React, {
 import ActiveExerciseView from '../components/ActiveExerciseView/ActiveExerciseView';
 import EndWorkoutBottomSheet from '../components/BottomSheet/components/EndWorkoutBottomSheet/EndWorkoutBottomSheet';
 import ExercisePickerBottomSheet from '../components/BottomSheet/components/ExercisePickerBottomSheet/ExercisePickerBottomSheet';
+import { IExerciseExtended } from '@dgoudie/isometric-types';
 import { NextPageWithLayout } from './_app';
 import RouteLoader from '../components/RouteLoader/RouteLoader';
 import { SnackbarContext } from '../providers/Snackbar/Snackbar';
@@ -34,10 +33,13 @@ type WorkoutProps = {
   exercises: IExerciseExtended[];
 };
 
-export function getServerSideProps(
+export async function getServerSideProps(
   context: GetServerSidePropsContext
-): GetServerSidePropsResult<WorkoutProps> {
-  const userId = getUserId(context.req);
+): Promise<GetServerSidePropsResult<WorkoutProps>> {
+  const userId = await getUserId(context.req, context.res);
+  if (!userId) {
+    return { redirect: { destination: '/', permanent: false } };
+  }
   return {
     props: getExercises(userId)
       .then((exercises) => normalizeBSON(exercises))
