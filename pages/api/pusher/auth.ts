@@ -1,7 +1,6 @@
 import { NextApiHandler } from 'next';
 import Pusher from '../../../utils/pusher';
-import nextAuthOptions from '../../../utils/next-auth-options';
-import { unstable_getServerSession } from 'next-auth';
+import { getUserId } from '../../../utils/get-user-id';
 
 const pusher = Pusher;
 const handler: NextApiHandler = async (req, res) => {
@@ -11,13 +10,13 @@ const handler: NextApiHandler = async (req, res) => {
     res.status(400).send(undefined);
     return;
   }
-  const session = await unstable_getServerSession(req, res, nextAuthOptions);
-  if (!session) {
+  const userId = await getUserId(req, res);
+  if (!userId) {
     res.status(403).end();
     return;
   }
   const authResponse = pusher.authenticateUser(socketId, {
-    id: session.user!.email!,
+    id: userId,
   });
   res.send(authResponse);
 };

@@ -8,7 +8,7 @@
   position: sticky;
   top: 0;
   background: var(--header-background);
-  backdrop-filter: blur(5px);
+  backdrop-filter: blur(20px);
   z-index: 2;
   &Title {
     font-family: 'Permanent Marker', cursive;

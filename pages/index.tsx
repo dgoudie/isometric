@@ -1,11 +1,17 @@
-import { GetServerSidePropsContext, GetServerSidePropsResult } from 'next';
+import { signIn, useSession } from 'next-auth/react';
 
 import AppHeader from '../components/AppHeader/AppHeader';
 import Image from 'next/image';
+import Link from 'next/link';
 import { NextPageWithLayout } from './_app';
 import classNames from 'classnames';
-import styles from '../styles/Landing.module.scss';
+import marketingImage1 from '../public/images/marketing_1.png';
+import marketingImage2 from '../public/images/marketing_2.png';
+import marketingImage3 from '../public/images/marketing_3.png';
+import marketingImage4 from '../public/images/marketing_4.png';
+import styles from './Landing.module.scss';
 import { useHeadWithTitle } from '../utils/use-head-with-title';
+import useOneTapSignin from '../utils/use-google-one-tap-signin';
 
 interface LandingProps {}
 
@@ -49,6 +55,8 @@ const sellingPoints: SellingPoint[] = [
 
 const Landing: NextPageWithLayout<LandingProps> = ({}) => {
   const head = useHeadWithTitle('Welcome');
+  useOneTapSignin();
+  const { status } = useSession();
   return (
     <div className={styles.root}>
       {head}
@@ -58,21 +66,63 @@ const Landing: NextPageWithLayout<LandingProps> = ({}) => {
         you to keep track of important data points such as repetitions,
         resistance, and time for each set during your workout.
       </p>
-
+      <div className={styles.buttonWrapper}>
+        {status === 'unauthenticated' && (
+          <button
+            type='button'
+            className='standard-button primary'
+            onClick={() => signIn()}
+          >
+            <i className='fa-solid fa-right-to-bracket'></i>
+            Sign in
+          </button>
+        )}
+        {status === 'authenticated' && (
+          <Link href={'/dashboard'}>
+            <a className='standard-button primary'>
+              <i className='fa-solid fa-bars-progress'></i>
+              Go to Workout Dashboard
+            </a>
+          </Link>
+        )}
+      </div>
       <div className={classNames(styles.marketingImages, styles.carousel)}>
-        {Array(4)
-          .fill(0)
-          .map((_, index) => (
-            <div key={index}>
-              <Image
-                height={2960}
-                width={1440}
-                key={index}
-                src={`/images/marketing_${index + 1}.png`}
-                alt=''
-              />
-            </div>
-          ))}
+        <div>
+          <Image
+            placeholder='blur'
+            height={2960}
+            width={1440}
+            src={marketingImage1}
+            alt=''
+          />
+        </div>
+        <div>
+          <Image
+            placeholder='blur'
+            height={2960}
+            width={1440}
+            src={marketingImage2}
+            alt=''
+          />
+        </div>
+        <div>
+          <Image
+            placeholder='blur'
+            height={2960}
+            width={1440}
+            src={marketingImage3}
+            alt=''
+          />
+        </div>
+        <div>
+          <Image
+            placeholder='blur'
+            height={2960}
+            width={1440}
+            src={marketingImage4}
+            alt=''
+          />
+        </div>
       </div>
       <div className={styles.sectionHeader}>Why ISOMETRIC?</div>
       <div className={classNames(styles.sellingPoints, styles.carousel)}>

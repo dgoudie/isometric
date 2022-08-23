@@ -1,13 +1,24 @@
 import AppBarLayout from '../AppBarLayout/AppBarLayout';
 import AppHeader from '../../components/AppHeader/AppHeader';
 import styles from './AppBarWithAppHeaderLayout.module.scss';
-type Props = {};
+
+type Props = {
+  hideProfileBadge?: boolean;
+};
 
 export default function AppBarWithAppHeaderLayout({
   children,
+  hideProfileBadge,
 }: React.PropsWithChildren<Props>) {
   return (
-    <AppBarLayout header={<AppHeader className={styles.topBar} />}>
+    <AppBarLayout
+      header={
+        <AppHeader
+          hideProfileBadge={hideProfileBadge}
+          className={styles.topBar}
+        />
+      }
+    >
       {children}
     </AppBarLayout>
   );

@@ -14,7 +14,7 @@ import { getCompletedWorkouts } from '../database/domains/workout';
 import { getUserId } from '../utils/get-user-id';
 import { normalizeBSON } from '../utils/normalize-bson';
 import { secondsToMilliseconds } from 'date-fns';
-import styles from '../styles/History.module.scss';
+import styles from './History.module.scss';
 import { useHeadWithTitle } from '../utils/use-head-with-title';
 
 const format = new Intl.DateTimeFormat('en-US', {
@@ -33,10 +33,10 @@ export async function getServerSideProps(
   if (!userId) {
     return { redirect: { destination: '/', permanent: false } };
   }
+  let workouts = await getCompletedWorkouts(userId, 1);
+  workouts = normalizeBSON(workouts);
   return {
-    props: getCompletedWorkouts(userId, 1)
-      .then((workouts) => normalizeBSON(workouts))
-      .then((workouts) => ({ workouts })),
+    props: { workouts },
   };
 }
 

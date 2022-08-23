@@ -1,5 +1,7 @@
 import { Head, Html, Main, NextScript } from 'next/document';
 
+import Script from 'next/script';
+
 export default function Document() {
   return (
     <Html>
@@ -45,6 +47,10 @@ export default function Document() {
         <link
           href='https://fonts.googleapis.com/css2?family=Mitr:wght@300;400;500;600&family=Permanent+Marker&display=swap'
           rel='stylesheet'
+        />
+        <Script
+          src='https://accounts.google.com/gsi/client'
+          strategy='afterInteractive'
         />
       </Head>
       <body>

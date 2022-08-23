@@ -19,6 +19,7 @@
     "deep-equal": "^2.0.5",
     "focus-trap-react": "^9.0.2",
     "formik": "^2.2.9",
+    "google-auth-library": "^8.3.0",
     "immer": "^9.0.15",
     "log4js": "^6.6.1",
     "mongoose": "^6.5.2",
@@ -33,7 +34,8 @@
     "react-page-visibility": "^7.0.0",
     "react-transition-group": "^4.4.5",
     "react-use-websocket": "^3.0.0",
-    "sass": "^1.54.5"
+    "sass": "^1.54.5",
+    "sharp": "^0.30.7"
   },
   "devDependencies": {
     "@types/chroma-js": "^2.1.4",

@@ -21,7 +21,7 @@ import classNames from 'classnames';
 import { getExercises } from '../database/domains/exercise';
 import { getUserId } from '../utils/get-user-id';
 import { normalizeBSON } from '../utils/normalize-bson';
-import styles from '../styles/Workout.module.scss';
+import styles from './Workout.module.scss';
 import { useHeadWithTitle } from '../utils/use-head-with-title';
 
 export type ActiveExercise = {

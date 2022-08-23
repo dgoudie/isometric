@@ -14,7 +14,7 @@ import { getNextDaySchedule } from '../database/domains/schedule';
 import { getUserId } from '../utils/get-user-id';
 import { normalizeBSON } from '../utils/normalize-bson';
 import { secondsToMinutes } from 'date-fns';
-import styles from '../styles/Dashboard.module.scss';
+import styles from './Dashboard.module.scss';
 import { useHeadWithTitle } from '../utils/use-head-with-title';
 
 const TIME_PER_SET = 60;

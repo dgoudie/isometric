@@ -1,0 +1,54 @@
+.root {
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  height: 100vh;
+  height: 100dvh;
+}
+.inner {
+  padding: 1rem;
+  border-radius: 8px;
+  background-color: var(--background-alt);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+}
+
+.image {
+  border-radius: 20px;
+  overflow: hidden;
+  display: inline-flex;
+}
+
+.divider {
+  border-top: 1px solid var(--divider);
+  align-self: stretch;
+  margin: 0.5rem 0;
+}
+
+.signinButtons {
+  align-self: stretch;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.signinButton {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: white;
+  padding: 0.75rem 0.5rem;
+  border-radius: 8px;
+  box-shadow: rgba(0, 0, 0, 0.1) 0px 1px 3px 0px,
+    rgba(0, 0, 0, 0.06) 0px 1px 2px 0px;
+  justify-content: center;
+  color: black;
+  &.cancel {
+    background-color: var(--background-alt-2);
+    border: 1px solid var(--divider);
+    color: var(--color);
+  }
+}

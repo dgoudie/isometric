@@ -1,12 +1,13 @@
+.button {
+  list-style-type: none;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  cursor: pointer;
+}
+
 .details {
   position: relative;
-  summary {
-    list-style-type: none;
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    cursor: pointer;
-  }
 }
 
 .detailsBody {
@@ -31,11 +32,6 @@
       border-bottom: 1px solid var(--divider);
     }
   }
-}
-
-.login {
-  background-color: transparent;
-  border-color: transparent;
 }
 
 .profilePicture {

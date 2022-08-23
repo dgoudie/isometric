@@ -23,16 +23,17 @@ export default function ProfileBadgeAndOptions({ className }: Props) {
   if (!session) {
     return (
       <button
-        className={classNames(className, 'standard-button', styles.login)}
+        className={classNames(className, styles.button)}
         onClick={() => signIn()}
       >
-        Log In
+        <i className='fa-solid fa-right-to-bracket'></i>
+        Sign in
       </button>
     );
   }
   return (
     <details className={classNames(styles.details, className)} ref={detailsRef}>
-      <summary>
+      <summary className={styles.button}>
         {session.user!.name!}
         <Image
           alt={session.user!.name!}
