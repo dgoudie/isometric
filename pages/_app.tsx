@@ -7,6 +7,7 @@ import type { ReactElement, ReactNode } from 'react';
 import AfterExerciseTimerProvider from '../providers/AfterExerciseTimer/AfterExerciseTimer';
 import type { AppProps } from 'next/app';
 import type { NextPage } from 'next';
+import PageWrapper from '../components/PageWrapper/PageWrapper';
 import { PusherProvider } from '@harelpls/use-pusher';
 import { SessionProvider } from 'next-auth/react';
 import SnackbarProvider from '../providers/Snackbar/Snackbar';
@@ -40,7 +41,7 @@ export default function MyApp({
         <SnackbarProvider>
           <WorkoutProvider>
             <AfterExerciseTimerProvider>
-              {pageWithLayout}
+              <PageWrapper>{pageWithLayout}</PageWrapper>
             </AfterExerciseTimerProvider>
           </WorkoutProvider>
         </SnackbarProvider>

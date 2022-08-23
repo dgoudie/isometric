@@ -30,7 +30,7 @@
   overflow-x: auto;
   scroll-snap-type: x mandatory;
   will-change: margin-bottom;
-
+  grid-auto-columns: 100%;
   > div {
     scroll-snap-align: center;
   }
@@ -46,10 +46,6 @@
   padding: 1rem 3rem;
 
   > div {
-    position: relative;
-    width: calc(100vw - 6rem);
-    overflow: hidden;
-
     img {
       border-radius: 16px;
       border: 2px solid var(--background-inverse) !important;
@@ -66,7 +62,6 @@
   background-color: var(--background-alt-2);
   padding: 1rem;
   border-radius: 8px;
-  width: calc(100vw - 3rem);
 
   &Header {
     display: flex;
