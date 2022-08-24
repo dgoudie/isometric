@@ -1,10 +1,13 @@
+import { GetServerSidePropsContext, GetServerSidePropsResult } from 'next';
 import { signIn, useSession } from 'next-auth/react';
 
 import AppHeader from '../components/AppHeader/AppHeader';
 import Image from 'next/image';
 import Link from 'next/link';
 import { NextPageWithLayout } from './_app';
+import activeWorkoutExists from '../utils/active-workout-exists';
 import classNames from 'classnames';
+import { getUserId } from '../utils/get-user-id';
 import marketingImage1 from '../public/images/marketing_1.png';
 import marketingImage2 from '../public/images/marketing_2.png';
 import marketingImage3 from '../public/images/marketing_3.png';
@@ -15,13 +18,17 @@ import useOneTapSignin from '../utils/use-google-one-tap-signin';
 
 interface LandingProps {}
 
-// export function getServerSideProps(
-//   context: GetServerSidePropsContext
-// ): GetServerSidePropsResult<LandingProps> {
-//   return {
-//     props: {},
-//   };
-// }
+export async function getServerSideProps(
+  context: GetServerSidePropsContext
+): Promise<GetServerSidePropsResult<LandingProps>> {
+  const userId = await getUserId(context.req, context.res);
+  if (!!userId && (await activeWorkoutExists(userId))) {
+    return { redirect: { destination: '/workout', permanent: false } };
+  }
+  return {
+    props: {},
+  };
+}
 
 interface SellingPoint {
   iconClass: string;

@@ -1,31 +1,18 @@
-import {
-  IExercise,
-  IWorkoutExercise,
-  IWorkoutExerciseSet,
-} from '@dgoudie/isometric-types';
-import React, {
-  useCallback,
-  useContext,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-} from 'react';
+import { IExercise, IWorkoutExerciseSet } from '@dgoudie/isometric-types';
 import {
   addMilliseconds,
-  addSeconds,
   differenceInMilliseconds,
-  differenceInSeconds,
   intervalToDuration,
   millisecondsToSeconds,
   secondsToMilliseconds,
 } from 'date-fns';
+import { useContext, useEffect, useMemo, useRef, useState } from 'react';
 
-import { WorkoutContext } from '../../../../providers/Workout/Workout';
+import { WorkoutContext } from '../../providers/Workout/Workout';
 import classNames from 'classnames';
-import { inputForceInteger } from '../../../../utils/input-force-integer';
-import { inputSelectAllOnFocus } from '../../../../utils/input-select-all-on-focus';
-import { showNotification } from '../../../../utils/notification';
+import { inputForceInteger } from '../../utils/input-force-integer';
+import { inputSelectAllOnFocus } from '../../utils/input-select-all-on-focus';
+import { showNotification } from '../../utils/notification';
 import styles from './ActiveExerciseViewExerciseSet.module.scss';
 
 interface Props {
@@ -179,6 +166,7 @@ function TimedSet({ set, data, exerciseIndex, setIndex, setSelected }: Props) {
     return () => {
       clearInterval(intervalId);
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [paused]);
 
   const secondsRemaining = useMemo(

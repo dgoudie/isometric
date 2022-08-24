@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev",
+    "dev": "cross-env NODE_OPTIONS='--trace-warnings' next dev",
     "build": "next build",
     "start": "next start",
     "lint": "next lint"
@@ -35,7 +35,8 @@
     "react-transition-group": "^4.4.5",
     "react-use-websocket": "^3.0.0",
     "sass": "^1.54.5",
-    "sharp": "^0.30.7"
+    "sharp": "^0.30.7",
+    "yup": "^0.32.11"
   },
   "devDependencies": {
     "@types/chroma-js": "^2.1.4",
@@ -46,6 +47,7 @@
     "@types/react-dom": "18.0.6",
     "@types/react-page-visibility": "^6.4.1",
     "@types/react-transition-group": "^4.4.5",
+    "cross-env": "^7.0.3",
     "eslint": "8.22.0",
     "eslint-config-next": "12.2.5",
     "typescript": "4.7.4"

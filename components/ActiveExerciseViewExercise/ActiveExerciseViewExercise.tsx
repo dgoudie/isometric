@@ -1,34 +1,28 @@
 import { IExerciseExtended, IWorkoutExercise } from '@dgoudie/isometric-types';
-import {
-  ReadableResource,
-  emptyReadableResource,
-  fetchFromApiAsReadableResource,
-} from '../../../../utils/fetch-from-api';
-import {
-  Suspense,
-  useCallback,
-  useContext,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-  useTransition,
-} from 'react';
+import { useCallback, useContext, useEffect, useRef, useState } from 'react';
 
 import ActiveExerciseViewExerciseSet from '../ActiveExerciseViewExerciseSet/ActiveExerciseViewExerciseSet';
-import { AfterExerciseTimerContext } from '../../../../providers/AfterExerciseTimer/AfterExerciseTimer';
-import ConfirmationBottomSheet from '../../../BottomSheet/components/ConfirmationBottomSheet/ConfirmationBottomSheet';
-import ExerciseMetadata from '../../../ExerciseMetadata/ExerciseMetadata';
-import ExercisePickerBottomSheet from '../../../BottomSheet/components/ExercisePickerBottomSheet/ExercisePickerBottomSheet';
-import Loader from '../../../Loader/Loader';
-import MuscleGroupTag from '../../../MuscleGroupTag/MuscleGroupTag';
-import SetView from '../../../SetView/SetView';
-import { SnackbarContext } from '../../../../providers/Snackbar/Snackbar';
-import { WorkoutContext } from '../../../../providers/Workout/Workout';
+import { AfterExerciseTimerContext } from '../../providers/AfterExerciseTimer/AfterExerciseTimer';
+import ConfirmationBottomSheet from '../BottomSheet/components/ConfirmationBottomSheet/ConfirmationBottomSheet';
+import ExerciseMetadata from '../ExerciseMetadata/ExerciseMetadata';
+import ExercisePickerBottomSheet from '../BottomSheet/components/ExercisePickerBottomSheet/ExercisePickerBottomSheet';
+import MuscleGroupTag from '../MuscleGroupTag/MuscleGroupTag';
+import RouteLoader from '../RouteLoader/RouteLoader';
+import { SnackbarContext } from '../../providers/Snackbar/Snackbar';
+import { WorkoutContext } from '../../providers/Workout/Workout';
 import classNames from 'classnames';
+import dynamic from 'next/dynamic';
 import equal from 'deep-equal';
 import styles from './ActiveExerciseViewExercise.module.scss';
 import { useInView } from 'react-intersection-observer';
+
+const ActiveExerciseViewExerciseInstances = dynamic(
+  () =>
+    import(
+      '../ActiveExerciseViewExerciseInstances/ActiveExerciseViewExerciseInstances'
+    ),
+  { ssr: false }
+);
 
 interface Props {
   exercise: IWorkoutExercise;
@@ -39,10 +33,6 @@ interface Props {
   onSelected: (i: number) => void;
   onCompleted: () => void;
 }
-
-const format = new Intl.DateTimeFormat('en-US');
-
-let initialInstancesResponse = emptyReadableResource();
 
 export default function ActiveExerciseViewExercise({
   exercise: exerciseUnmemoized,
@@ -59,22 +49,8 @@ export default function ActiveExerciseViewExercise({
     if (!equal(exercise, exerciseUnmemoized)) {
       setExercise(exerciseUnmemoized);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [exerciseUnmemoized]);
-
-  const [instancesResource, setInstancesResource] = useState<
-    ReadableResource<IWorkoutExercise[]>
-  >(initialInstancesResponse);
-
-  const [_isPending, startTransaction] = useTransition();
-
-  useEffect(() => {
-    startTransaction(() => {
-      const updatedInstancesResource = fetchFromApiAsReadableResource<
-        IWorkoutExercise[]
-      >(`/api/workout-instances/${exercise.name}`);
-      setInstancesResource(updatedInstancesResource);
-    });
-  }, [exercise.name]);
 
   const { show, showAfterLastExercise, showAfterLastSet, cancel } = useContext(
     AfterExerciseTimerContext
@@ -108,6 +84,7 @@ export default function ActiveExerciseViewExercise({
       }
     }
     previousNumberOfCompletedSets.current = numberOfCompletedSets;
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [exercise, nextExercise]);
 
   const { ref, inView } = useInView({
@@ -149,6 +126,8 @@ export default function ActiveExerciseViewExercise({
     setShowDeleteExeciseConfirmationBottomSheet,
   ] = useState(false);
 
+  const { openSnackbar } = useContext(SnackbarContext);
+
   const newExerciseSelected = useCallback(
     (exerciseId: string | undefined) => {
       if (!!exerciseId) {
@@ -158,10 +137,8 @@ export default function ActiveExerciseViewExercise({
       }
       setShowExercisePicker(false);
     },
-    [exerciseIndex]
+    [exerciseIndex, openSnackbar, replaceExercise, scrollToTop]
   );
-
-  const { openSnackbar } = useContext(SnackbarContext);
 
   const removeExercise = useCallback(
     (removalConfirmed: boolean) => {
@@ -172,7 +149,7 @@ export default function ActiveExerciseViewExercise({
       }
       setShowDeleteExeciseConfirmationBottomSheet(false);
     },
-    [exerciseIndex]
+    [deleteExercise, exerciseIndex, openSnackbar, scrollToTop]
   );
 
   return (
@@ -248,46 +225,9 @@ export default function ActiveExerciseViewExercise({
               </button>
             )}
           </div>
-          <Suspense fallback={<Loader />}>
-            <Instances instancesResource={instancesResource} />
-          </Suspense>
+          <ActiveExerciseViewExerciseInstances exerciseName={exercise.name} />
         </div>
       </div>
     </section>
-  );
-}
-
-interface InstancesProps {
-  instancesResource: ReadableResource<IWorkoutExercise[]>;
-}
-
-function Instances({ instancesResource }: InstancesProps) {
-  const instances = useMemo(
-    () => instancesResource.read(),
-    [instancesResource]
-  );
-  return (
-    <div className={styles.instances}>
-      <div className={styles.instancesHeader}>Recent History</div>
-      {!!instances.length ? (
-        <div className={styles.instancesItems}>
-          {instances.map((instance, index) => (
-            <div className={styles.instancesItemsItem} key={index}>
-              <div>{format.format(new Date(instance.performedAt))}</div>
-              <SetView
-                key={index}
-                exerciseType={instance.exerciseType}
-                sets={instance.sets}
-              />
-            </div>
-          ))}
-        </div>
-      ) : (
-        <div className={styles.noInstances}>
-          <i className='fa-solid fa-circle-info'></i>
-          <span>You have not performed this exercise before.</span>
-        </div>
-      )}
-    </div>
   );
 }

@@ -55,7 +55,6 @@ const TIMEOUT = 250;
 export default function AfterExerciseTimerProvider({
   children,
 }: React.PropsWithChildren<{}>) {
-  // const [durationInMilliSeconds, setDurationInMilliSeconds] = useState(0);
   const previousEndDate = useRef<Date | undefined>();
   const [endDate, setEndDate] = useState<Date | undefined>();
   const [minimized, setMinimized] = useState(false);
@@ -69,25 +68,22 @@ export default function AfterExerciseTimerProvider({
   const [nextExerciseMuscleGroup, setNextExerciseMuscleGroup] =
     useState<ExerciseMuscleGroup>('cardio');
   const [millisecondsRemaining, setMillisecondsRemaining] = useState(0);
-  const [intervalId, setIntervalId] = useState<number>();
+  const intervalId = useRef<number>();
 
   useEffect(() => {
-    clearInterval(intervalId);
     if (!!endDate) {
-      setIntervalId(
-        setInterval(() => {
-          const remaining = differenceInMilliseconds(endDate, new Date());
-          if (remaining > 0) {
-            setMillisecondsRemaining(remaining);
-          } else {
-            showNotification('Time is up...');
-            setEndDate(undefined);
-          }
-        }, 100) as unknown as number
-      );
+      intervalId.current = setInterval(() => {
+        const remaining = differenceInMilliseconds(endDate, new Date());
+        if (remaining > 0) {
+          setMillisecondsRemaining(remaining);
+        } else {
+          showNotification('Time is up...');
+          setEndDate(undefined);
+        }
+      }, 100) as unknown as number;
     }
     return () => {
-      clearInterval(intervalId);
+      clearInterval(intervalId.current);
     };
   }, [endDate]);
 

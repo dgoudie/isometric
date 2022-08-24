@@ -5,11 +5,13 @@ import Schedule from '../models/schedule';
 import connectMongo from '../repository';
 import { getMostRecentCompletedWorkout } from './workout';
 
-export function getSchedule(userId: string) {
+export async function getSchedule(userId: string): Promise<ISchedule | null> {
+  await connectMongo();
   return Schedule.findOne({ userId });
 }
 
-export function saveSchedule(userId: string, schedule: ISchedule) {
+export async function saveSchedule(userId: string, schedule: ISchedule) {
+  await connectMongo();
   return Schedule.updateOne(
     { userId },
     { ...schedule, userId },
@@ -24,10 +26,10 @@ export async function getNextDaySchedule(userId: string) {
   if (!!lastWorkout) {
     dayNumber = lastWorkout.dayNumber + 1;
   }
-  const [day] = await Schedule.aggregate<IScheduleDayWithExercises>(
+  const [day] = await Schedule.aggregate<IScheduleDayWithExercises | undefined>(
     buildNextDayScheduleAggregation(userId, dayNumber)
   );
-  return day;
+  return day ?? null;
 }
 
 const buildNextDayScheduleAggregation = (userId: string, dayNumber: number) => {

@@ -1,10 +1,9 @@
 import { NextApiHandler } from 'next';
-import Pusher from '../../../utils/pusher';
+import getPusher from '../../../utils/pusher';
 import { getUserId } from '../../../utils/get-user-id';
 
-const pusher = Pusher;
+const pusher = getPusher();
 const handler: NextApiHandler = async (req, res) => {
-  console.log('here');
   const socketId = req.body.socket_id;
   if (!socketId) {
     res.status(400).send(undefined);

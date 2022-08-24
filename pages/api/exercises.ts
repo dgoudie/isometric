@@ -1,0 +1,80 @@
+import {
+  ExerciseMuscleGroup,
+  ExerciseMuscleGroups,
+} from '@dgoudie/isometric-types';
+
+import { NextApiHandler } from 'next';
+import { getExercises } from '../../database/domains/exercise';
+import { getUserId } from '../../utils/get-user-id';
+
+const handler: NextApiHandler = async (req, res) => {
+  switch (req.method) {
+    case 'GET': {
+      let {
+        search,
+        muscleGroup,
+        page,
+        ids,
+        onlyPerformed: onlyPerformedFromQuery,
+        onlyNotPerformed: onlyNotPerformedFromQuery,
+      } = req.query;
+      const onlyPerformed = !!onlyPerformedFromQuery;
+      const onlyNotPerformed = !!onlyNotPerformedFromQuery;
+      if (typeof search !== 'undefined') {
+        if (typeof search !== 'string') {
+          res.status(400).end();
+          return;
+        }
+      }
+      if (typeof muscleGroup !== 'undefined') {
+        if (
+          typeof muscleGroup !== 'string' ||
+          !ExerciseMuscleGroups.includes(muscleGroup as ExerciseMuscleGroup)
+        ) {
+          res.status(400).end();
+          return;
+        }
+      }
+      if (typeof page !== 'undefined') {
+        if (typeof page !== 'string' || isNaN(parseInt(page))) {
+          res.status(400).end();
+          return;
+        }
+      }
+      if (typeof ids !== 'undefined') {
+        if (typeof ids === 'string') {
+          ids = [ids];
+        }
+        ids = ids as string[];
+        if (!ids.every((id) => typeof id === 'string')) {
+          res.status(400).end();
+          return;
+        }
+      }
+      const userId = await getUserId(req, res);
+      if (!userId) {
+        res.status(403).end();
+        return;
+      }
+      const exercises = await getExercises(
+        userId,
+        {
+          search,
+          muscleGroup: muscleGroup as ExerciseMuscleGroup,
+          ids,
+          onlyNotPerformed,
+          onlyPerformed,
+        },
+        !!page ? parseInt(page) : undefined
+      );
+      res.send(exercises);
+      return;
+    }
+    default: {
+      res.status(405).end();
+      return;
+    }
+  }
+};
+
+export default handler;

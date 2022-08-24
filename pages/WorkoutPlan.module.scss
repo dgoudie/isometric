@@ -1,0 +1,19 @@
+.wrapper {
+    height: 100%;
+    display: grid;
+    grid-template-rows: max-content 1fr;
+}
+
+.root {
+    padding: 0 1rem;
+    display: grid;
+    grid-template-rows: auto max-content;
+    gap: 1rem;
+    min-height: 0;
+}
+
+.buttonBar {
+    margin-bottom: 1rem;
+    display: flex;
+    justify-content: space-between;
+}

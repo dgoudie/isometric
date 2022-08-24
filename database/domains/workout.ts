@@ -1,5 +1,6 @@
 import {
   IExercise,
+  ISchedule,
   IWorkout,
   IWorkoutExercise,
   IWorkoutExerciseSet,
@@ -14,10 +15,12 @@ import Exercise from '../models/exercise';
 import { PipelineStage } from 'mongoose';
 import Workout from '../models/workout';
 import { buildGetExerciseHistoryById as buildGetWorkoutInstancesByExerciseNameQuery } from '../aggregations';
+import connectMongo from '../repository';
 import { getExerciseById } from './exercise';
 import { getNextDaySchedule } from './schedule';
 
 export async function getCompletedWorkouts(userId: string, page?: number) {
+  await connectMongo();
   let query = Workout.find({ userId, endedAt: { $exists: true } }).sort({
     createdAt: -1,
   });
@@ -29,13 +32,15 @@ export async function getCompletedWorkouts(userId: string, page?: number) {
 
 export async function getMinifiedActiveWorkout(
   userId: string
-): Promise<Partial<IWorkout> | null> {
+): Promise<IWorkout | null> {
+  await connectMongo();
   return Workout.findOne({ userId, endedAt: undefined }, 'exercises');
 }
 
 export async function getFullActiveWorkout(
   userId: string
 ): Promise<IWorkout | null> {
+  await connectMongo();
   let pipeline: PipelineStage[] = [
     {
       $match: {
@@ -83,6 +88,7 @@ export async function getFullActiveWorkout(
 }
 
 export async function addCheckInToActiveExercise(userId: string) {
+  await connectMongo();
   Workout.updateOne(
     { userId, endedAt: undefined },
     {
@@ -91,8 +97,13 @@ export async function addCheckInToActiveExercise(userId: string) {
   ).exec();
 }
 
-export async function startWorkout(userId: string) {
-  const { nickname, dayNumber, exercises } = await getNextDaySchedule(userId);
+export async function startWorkout(userId: string): Promise<IWorkout | null> {
+  await connectMongo();
+  const nextDaySchedule = await getNextDaySchedule(userId);
+  if (!nextDaySchedule) {
+    return null;
+  }
+  const { nickname, dayNumber, exercises } = nextDaySchedule;
 
   const alreadyInProgressWorkout = await Workout.findOne({
     userId,
@@ -124,6 +135,7 @@ export async function persistSetComplete(
   setIndex: number,
   complete: boolean
 ) {
+  await connectMongo();
   await Workout.updateOne(
     { userId, endedAt: undefined },
     {
@@ -142,6 +154,7 @@ export async function persistSetRepetitions(
   setIndex: number,
   repetitions: number | undefined
 ) {
+  await connectMongo();
   await Workout.updateOne(
     { userId, endedAt: undefined },
     {
@@ -160,6 +173,7 @@ export async function persistSetResistance(
   setIndex: number,
   resistanceInPounds: number | undefined
 ) {
+  await connectMongo();
   await Workout.updateOne(
     { userId, endedAt: undefined },
     {
@@ -178,6 +192,7 @@ export async function replaceExercise(
   exerciseIndex: number,
   newExerciseId: string
 ) {
+  await connectMongo();
   const newExercise = await getExerciseById(userId, newExerciseId);
   if (!newExercise) {
     return;
@@ -195,6 +210,7 @@ export async function addExercise(
   exerciseId: string,
   index: number
 ) {
+  await connectMongo();
   const newExercise = await getExerciseById(userId, exerciseId);
   if (!newExercise) {
     return;
@@ -215,6 +231,7 @@ export async function addExercise(
 }
 
 export async function deleteExercise(userId: string, index: number) {
+  await connectMongo();
   const activeWorkout = await getFullActiveWorkout(userId);
   if (!activeWorkout) {
     return;
@@ -235,6 +252,7 @@ export async function deleteExercise(userId: string, index: number) {
 }
 
 export async function endWorkout(userId: string) {
+  await connectMongo();
   const activeWorkout = await getFullActiveWorkout(userId);
   if (!activeWorkout) {
     return;
@@ -294,13 +312,15 @@ export async function endWorkout(userId: string) {
 }
 
 export async function discardWorkout(userId: string) {
+  await connectMongo();
   return Workout.deleteOne({
     userId,
     endedAt: undefined,
   });
 }
 
-export function getMostRecentCompletedWorkout(userId: string) {
+export async function getMostRecentCompletedWorkout(userId: string) {
+  await connectMongo();
   return Workout.findOne({
     userId,
     endedAt: { $exists: true },
@@ -396,6 +416,7 @@ export async function getWorkoutInstancesByExerciseName(
   name: string,
   page?: number
 ) {
+  await connectMongo();
   const exercise = await Exercise.findOne({ name });
   if (!exercise) {
     throw new Error(`Exercise with name '${name}' not found.`);

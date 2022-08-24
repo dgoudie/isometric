@@ -8,6 +8,7 @@ import Link from 'next/link';
 import MuscleGroupTag from '../components/MuscleGroupTag/MuscleGroupTag';
 import { NextPageWithLayout } from './_app';
 import { WorkoutContext } from '../providers/Workout/Workout';
+import activeWorkoutExists from '../utils/active-workout-exists';
 import classNames from 'classnames';
 import { getGreeting } from '../utils/get-greeting';
 import { getNextDaySchedule } from '../database/domains/schedule';
@@ -20,7 +21,7 @@ import { useHeadWithTitle } from '../utils/use-head-with-title';
 const TIME_PER_SET = 60;
 
 interface HomeProps {
-  schedule: IScheduleDayWithExercises;
+  schedule: IScheduleDayWithExercises | null;
 }
 
 export async function getServerSideProps(
@@ -29,6 +30,9 @@ export async function getServerSideProps(
   const userId = await getUserId(context.req, context.res);
   if (!userId) {
     return { redirect: { destination: '/', permanent: false } };
+  }
+  if (await activeWorkoutExists(userId)) {
+    return { redirect: { destination: '/workout', permanent: false } };
   }
   return {
     props: getNextDaySchedule(userId)
@@ -41,6 +45,9 @@ const Dashboard: NextPageWithLayout<HomeProps> = ({ schedule }) => {
   const greeting = useMemo(() => getGreeting(), []);
 
   const dayDurationInSeconds = useMemo(() => {
+    if (!schedule) {
+      return 0;
+    }
     return schedule.exercises
       .map(
         (exercise) =>
@@ -50,6 +57,9 @@ const Dashboard: NextPageWithLayout<HomeProps> = ({ schedule }) => {
   }, [schedule]);
 
   const setCount = useMemo(() => {
+    if (!schedule) {
+      return 0;
+    }
     return schedule.exercises
       .map((exercise) => exercise.setCount)
       .reduce((sum, exerciseDuration) => sum + exerciseDuration, 0);

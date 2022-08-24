@@ -8,7 +8,7 @@ import React, {
 } from 'react';
 
 import { ActiveExercise } from '../../pages/workout';
-import ActiveExerciseViewExercise from './components/ActiveExerciseViewExercise/ActiveExerciseViewExercise';
+import ActiveExerciseViewExercise from '../ActiveExerciseViewExercise/ActiveExerciseViewExercise';
 import { AfterExerciseTimerContext } from '../../providers/AfterExerciseTimer/AfterExerciseTimer';
 import classNames from 'classnames';
 import styles from './ActiveExerciseView.module.scss';

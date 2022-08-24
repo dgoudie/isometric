@@ -7,6 +7,7 @@ import {
 } from '@dgoudie/isometric-types';
 import {
   ReadableResource,
+  emptyReadableResource,
   fetchFromApi,
   fetchFromApiAsReadableResource,
 } from '../../utils/fetch-from-api';
@@ -37,11 +38,7 @@ export const HistoryOptions = literals(
 
 export type HistoryOption = ElementOf<typeof HistoryOptions>;
 
-let initialExercisesResponse = fetchFromApiAsReadableResource<
-  IExerciseExtended[]
->(`/api/exercises`, {
-  page: '1',
-});
+let initialExercisesResponse = emptyReadableResource();
 
 interface Props {
   search: string | undefined;
@@ -81,9 +78,6 @@ export default function ExerciseSearch(props: Props) {
         params
       );
       setExercisesResponse(newResource);
-      if (Array.from(params.entries()).length === 1) {
-        initialExercisesResponse = newResource;
-      }
     });
   }, [searchParams]);
 

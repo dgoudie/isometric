@@ -1,16 +1,25 @@
 import { GetServerSidePropsContext, GetServerSidePropsResult } from 'next';
 import {
+  IExerciseExtended,
+  IWorkout,
+  IWorkoutExercise,
+} from '@dgoudie/isometric-types';
+import {
   Suspense,
   useCallback,
   useContext,
+  useEffect,
   useState,
   useTransition,
 } from 'react';
+import {
+  getMinifiedActiveWorkout,
+  getWorkoutInstancesByExerciseName,
+} from '../database/domains/workout';
 
 import ActiveExerciseView from '../components/ActiveExerciseView/ActiveExerciseView';
 import EndWorkoutBottomSheet from '../components/BottomSheet/components/EndWorkoutBottomSheet/EndWorkoutBottomSheet';
 import ExercisePickerBottomSheet from '../components/BottomSheet/components/ExercisePickerBottomSheet/ExercisePickerBottomSheet';
-import { IExerciseExtended } from '@dgoudie/isometric-types';
 import { NextPageWithLayout } from './_app';
 import RouteLoader from '../components/RouteLoader/RouteLoader';
 import { SnackbarContext } from '../providers/Snackbar/Snackbar';
@@ -21,8 +30,10 @@ import classNames from 'classnames';
 import { getExercises } from '../database/domains/exercise';
 import { getUserId } from '../utils/get-user-id';
 import { normalizeBSON } from '../utils/normalize-bson';
+import { requestNotificationPermission } from '../utils/notification';
 import styles from './Workout.module.scss';
 import { useHeadWithTitle } from '../utils/use-head-with-title';
+import { useRouter } from 'next/router';
 
 export type ActiveExercise = {
   index: number;
@@ -30,6 +41,7 @@ export type ActiveExercise = {
 };
 
 type WorkoutProps = {
+  workout: IWorkout;
   exercises: IExerciseExtended[];
 };
 
@@ -40,16 +52,45 @@ export async function getServerSideProps(
   if (!userId) {
     return { redirect: { destination: '/', permanent: false } };
   }
+  const [exercises, workout] = await Promise.all([
+    getExercises(userId).then((exercises) => normalizeBSON(exercises)),
+    getMinifiedActiveWorkout(userId).then((workout) => normalizeBSON(workout)),
+  ]);
+  if (!workout) {
+    return { redirect: { destination: '/dashboard', permanent: false } };
+  }
   return {
-    props: getExercises(userId)
-      .then((exercises) => normalizeBSON(exercises))
-      .then((exercises) => ({ exercises })),
+    props: { exercises, workout },
   };
 }
 
-const Workout: NextPageWithLayout<WorkoutProps> = ({ exercises }) => {
-  const { workout, endWorkout, discardWorkout, addExercise } =
-    useContext(WorkoutContext);
+const Workout: NextPageWithLayout<WorkoutProps> = ({
+  exercises,
+  workout: initialWorkout,
+}) => {
+  useEffect(() => {
+    requestNotificationPermission();
+  }, []);
+
+  const [workout, setWorkout] = useState(initialWorkout);
+  const {
+    workout: workoutUpdates,
+    endWorkout,
+    discardWorkout,
+    addExercise,
+  } = useContext(WorkoutContext);
+
+  const router = useRouter();
+
+  useEffect(() => {
+    if (typeof workoutUpdates !== 'undefined') {
+      if (workoutUpdates === null) {
+        router.replace('/dashboard');
+      } else {
+        setWorkout(workoutUpdates);
+      }
+    }
+  }, [workoutUpdates, router]);
 
   const { openSnackbar } = useContext(SnackbarContext);
 

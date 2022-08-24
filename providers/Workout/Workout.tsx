@@ -1,32 +1,31 @@
-import { IWorkout, WSWorkoutUpdate } from '@dgoudie/isometric-types';
 import React, { createContext, useCallback, useEffect, useState } from 'react';
-import { useChannel, useEvent, useTrigger } from '@harelpls/use-pusher';
 
-import { requestNotificationPermission } from '../../utils/notification';
+import { IWorkout } from '@dgoudie/isometric-types';
+import { usePageVisibility } from 'react-page-visibility';
+import { usePusher } from '@harelpls/use-pusher';
 import { useRouter } from 'next/router';
-import { verifyType } from '../../utils/verify-type';
 
 export const WorkoutContext = createContext<{
-  workout: IWorkout | undefined;
+  workout: IWorkout | null | undefined;
   startWorkout: () => void;
   endWorkout: () => void;
   discardWorkout: () => void;
   persistSetComplete: (
-    exericiseIndex: number,
+    exerciseIndex: number,
     setIndex: number,
     complete: boolean
   ) => void;
   persistSetRepetitions: (
-    exericiseIndex: number,
+    exerciseIndex: number,
     setIndex: number,
     repetitions: number | undefined
   ) => void;
   persistSetResistance: (
-    exericiseIndex: number,
+    exerciseIndex: number,
     setIndex: number,
     resistanceInPounds: number | undefined
   ) => void;
-  replaceExercise: (exericiseIndex: number, newExerciseId: string) => void;
+  replaceExercise: (exerciseIndex: number, newExerciseId: string) => void;
   addExercise: (exerciseId: string, index: number) => void;
   deleteExercise: (index: number) => void;
 }>({
@@ -45,36 +44,42 @@ export const WorkoutContext = createContext<{
 export default function WorkoutProvider({
   children,
 }: React.PropsWithChildren<{}>) {
-  const [workout, setWorkout] = useState<IWorkout | undefined>();
+  const [workout, setWorkout] = useState<IWorkout | null | undefined>(
+    undefined
+  );
+  const { client } = usePusher();
 
-  const channel = useChannel('workout');
-  useEvent<IWorkout>(channel, 'state', (data) => setWorkout(data));
+  const pageVisible = usePageVisibility();
 
-  // useEffect(() => {
-  //   channel.
-  //   !!channel?.subscribed && fetch(`/api/pusher/request_workout_state`);
-  // }, [channel?.subscribed]);
+  useEffect(() => {
+    let bind: any;
+    if (!!client && pageVisible) {
+      bind = client?.user.bind('workout_state', (data: IWorkout | undefined) =>
+        setWorkout(data ?? null)
+      );
+    }
+    return () => {
+      bind?.unbind();
+    };
+  }, [client, pageVisible]);
 
   const startWorkout = useCallback(() => {
-    requestNotificationPermission();
-    // sendJsonMessage(verifyType<WSWorkoutUpdate>({ type: 'START' }));
+    fetch(`/api/workout/start`);
   }, []);
   const endWorkout = useCallback(() => {
-    // sendJsonMessage(verifyType<WSWorkoutUpdate>({ type: 'END' }));
+    fetch(`/api/workout/end`);
   }, []);
   const discardWorkout = useCallback(() => {
-    // sendJsonMessage(verifyType<WSWorkoutUpdate>({ type: 'DISCARD' }));
+    fetch(`/api/workout/discard`);
   }, []);
   const persistSetComplete = useCallback(
     (exerciseIndex: number, setIndex: number, complete: boolean) => {
-      // sendJsonMessage(
-      //   verifyType<WSWorkoutUpdate>({
-      //     type: 'PERSIST_SET_COMPLETE',
-      //     exerciseIndex,
-      //     setIndex,
-      //     complete,
-      //   })
-      // );
+      const query = new URLSearchParams({
+        exercise_index: exerciseIndex.toString(),
+        set_index: setIndex.toString(),
+        complete: complete.toString(),
+      });
+      fetch(`/api/workout/persist_set_complete?${query}`);
     },
     []
   );
