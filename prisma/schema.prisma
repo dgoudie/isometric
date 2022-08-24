@@ -1,0 +1,108 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider        = "prisma-client-js"
+  previewFeatures = ["fullTextSearch"]
+}
+
+datasource db {
+  provider = "cockroachdb"
+  url      = env("DATABASE_URL")
+}
+
+enum ExerciseMuscleGroup {
+  shoulders
+  chest
+  forearms
+  obliques
+  quads
+  cardio
+  biceps
+  abs
+  adductors
+  traps
+  triceps
+  abductors
+  hamstrings
+  calves
+  lats
+  glutes
+  lower_back
+}
+
+enum ExerciseType {
+  weighted
+  assisted
+  rep_based
+  timed
+}
+
+model User {
+  userId    String     @id
+  exercises Exercise[]
+  workouts  Workout[]
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @default(now())
+}
+
+model Exercise {
+  id                            Int                   @id @default(sequence())
+  userId                        String
+  user                          User                  @relation(fields: [userId], references: [userId])
+  name                          String                @unique
+  breakTimeInSeconds            Int
+  setCount                      Int
+  timePerSetInSeconds           Int?
+  minimumRecommendedRepetitions Int?
+  maximumRecommendedRepetitions Int?
+  primaryMuscleGroup            ExerciseMuscleGroup
+  secondaryMuscleGroups         ExerciseMuscleGroup[]
+  exerciseType                  ExerciseType
+  createdAt                     DateTime              @default(now())
+  updatedAt                     DateTime              @default(now())
+  WorkoutExercise               WorkoutExercise[]
+}
+
+model Workout {
+  id                Int               @id @default(sequence())
+  userId            String
+  user              User              @relation(fields: [userId], references: [userId])
+  endedAt           DateTime?
+  dayNumber         Int
+  nickname          String
+  durationInSeconds Int
+  checkins          WorkoutCheckin[]
+  exercises         WorkoutExercise[]
+  createdAt         DateTime          @default(now())
+  updatedAt         DateTime          @default(now())
+}
+
+model WorkoutExercise {
+  id                 Int                  @id @default(sequence())
+  workoutId          Int
+  workout            Workout              @relation(fields: [workoutId], references: [id])
+  name               String
+  exercise           Exercise?            @relation(fields: [name], references: [name])
+  exerciseType       ExerciseType
+  primaryMuscleGroup ExerciseMuscleGroup
+  performedAt        DateTime             @default(now())
+  sets               WorkoutExerciseSet[]
+}
+
+model WorkoutExerciseSet {
+  id                 Int             @id @default(sequence())
+  workoutExerciseId  Int
+  workoutExercise    WorkoutExercise @relation(fields: [workoutExerciseId], references: [id])
+  resistanceInPounds Int?
+  repetitions        Int?
+  timeInSeconds      Int?
+  complete           Boolean
+}
+
+model WorkoutCheckin {
+  id        Int      @id @default(sequence())
+  at        DateTime @default(now())
+  workoutId Int
+  workout   Workout  @relation(fields: [workoutId], references: [id])
+}

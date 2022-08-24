@@ -3,16 +3,15 @@ import { formatDistance, formatDuration, intervalToDuration } from 'date-fns';
 import { useCallback, useMemo, useState } from 'react';
 
 import AppBarWithAppHeaderLayout from '../layouts/AppBarWithAppHeaderLayout/AppBarWithAppHeaderLayout';
-import { IWorkout } from '@dgoudie/isometric-types';
 import InfiniteScroll from '../components/InfiniteScroll/InfiniteScroll';
 import MuscleGroupTag from '../components/MuscleGroupTag/MuscleGroupTag';
 import { NextPageWithLayout } from './_app';
 import SetView from '../components/SetView/SetView';
 import classNames from 'classnames';
+import { convertToPlainObject } from '../utils/normalize-bson';
 import { fetchFromApi } from '../utils/fetch-from-api';
 import { getCompletedWorkouts } from '../database/domains/workout';
 import { getUserId } from '../utils/get-user-id';
-import { normalizeBSON } from '../utils/normalize-bson';
 import { secondsToMilliseconds } from 'date-fns';
 import styles from './History.module.scss';
 import { useHeadWithTitle } from '../utils/use-head-with-title';
@@ -23,7 +22,7 @@ const format = new Intl.DateTimeFormat('en-US', {
 });
 
 type HistoryProps = {
-  workouts: IWorkout[];
+  workouts: Awaited<ReturnType<typeof getCompletedWorkouts>>;
 };
 
 export async function getServerSideProps(
@@ -34,7 +33,7 @@ export async function getServerSideProps(
     return { redirect: { destination: '/', permanent: false } };
   }
   let workouts = await getCompletedWorkouts(userId, 1);
-  workouts = normalizeBSON(workouts);
+  workouts = convertToPlainObject(workouts);
   return {
     props: { workouts },
   };
@@ -49,14 +48,16 @@ const History: NextPageWithLayout<HistoryProps> = ({
 
   const items = useMemo(() => {
     return workouts.map((workout) => (
-      <Workout workout={workout} key={workout._id} />
+      <Workout workout={workout} key={workout.id} />
     ));
   }, [workouts]);
 
   const loadMore = useCallback(async () => {
     const params = new URLSearchParams();
     params.set('page', page.toString());
-    const nextPage = await fetchFromApi<IWorkout[]>(`/api/workouts`, params);
+    const nextPage = await fetchFromApi<
+      Awaited<ReturnType<typeof getCompletedWorkouts>>
+    >(`/api/workouts`, params);
     if (nextPage.length < 10) {
       setMoreWorkouts(false);
     }
@@ -87,7 +88,7 @@ const History: NextPageWithLayout<HistoryProps> = ({
 };
 
 interface WorkoutProps {
-  workout: IWorkout;
+  workout: Awaited<ReturnType<typeof getCompletedWorkouts>>[0];
 }
 
 function Workout({ workout }: WorkoutProps) {

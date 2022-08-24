@@ -1,4 +1,4 @@
-export function normalizeBSON<T>(item: T): T {
+export function convertToPlainObject<T>(item: T): T {
   if (item === null) {
     return item;
   }

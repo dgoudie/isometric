@@ -3,7 +3,6 @@ import {
   ExerciseMuscleGroups,
 } from '@dgoudie/isometric-types';
 
-import MuscleGroupTag from '../MuscleGroupTag/MuscleGroupTag';
 import React from 'react';
 import classNames from 'classnames';
 import styles from './MuscleGroupPicker.module.scss';

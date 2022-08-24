@@ -1,27 +1,28 @@
-import Exercise from './models/exercise.js';
-import { IExercise } from '@dgoudie/isometric-types';
-import Settings from './models/settings.js';
+import { Prisma } from '@prisma/client';
+import prisma from './prisma';
 
 export const initializeUserDataIfNecessary = async (
   userId: string
 ): Promise<void> => {
-  const userSettings = await Settings.findOne({ userId }).exec();
-  if (!!userSettings) {
+  const user = await prisma.user.findUnique({
+    where: {
+      userId,
+    },
+  });
+  if (!!user) {
     return;
   }
-  await new Settings({ userId }).save();
-  await insertDefaultExercises(userId);
+  await prisma.user.create({
+    data: {
+      userId,
+      exercises: {
+        create: DEFAULT_EXERCISES,
+      },
+    },
+  });
 };
 
-const insertDefaultExercises = async (userId: string) => {
-  const exercises = DEFAULT_EXERCISES.map((exercise) => ({
-    ...exercise,
-    userId,
-  }));
-  await Exercise.insertMany(exercises);
-};
-
-const DEFAULT_EXERCISES: Omit<IExercise, 'userId' | '_id' | 'createdAt'>[] = [
+const DEFAULT_EXERCISES: Prisma.ExerciseCreateWithoutUserInput[] = [
   {
     name: 'Barbell Bench Press',
     primaryMuscleGroup: 'chest',
@@ -493,7 +494,7 @@ const DEFAULT_EXERCISES: Omit<IExercise, 'userId' | '_id' | 'createdAt'>[] = [
   {
     name: 'Bent-Over Barbell Row - Overhand Grip',
     primaryMuscleGroup: 'lats',
-    secondaryMuscleGroups: ['lower back', 'biceps'],
+    secondaryMuscleGroups: ['lower_back', 'biceps'],
     exerciseType: 'weighted',
     breakTimeInSeconds: 120,
     minimumRecommendedRepetitions: 8,
@@ -503,7 +504,7 @@ const DEFAULT_EXERCISES: Omit<IExercise, 'userId' | '_id' | 'createdAt'>[] = [
   {
     name: 'Bent-Over Barbell Row - Underhand Grip',
     primaryMuscleGroup: 'lats',
-    secondaryMuscleGroups: ['lower back', 'biceps'],
+    secondaryMuscleGroups: ['lower_back', 'biceps'],
     exerciseType: 'weighted',
     breakTimeInSeconds: 120,
     minimumRecommendedRepetitions: 8,
@@ -513,7 +514,7 @@ const DEFAULT_EXERCISES: Omit<IExercise, 'userId' | '_id' | 'createdAt'>[] = [
   {
     name: 'TBar Row',
     primaryMuscleGroup: 'lats',
-    secondaryMuscleGroups: ['lower back', 'biceps'],
+    secondaryMuscleGroups: ['lower_back', 'biceps'],
     exerciseType: 'weighted',
     breakTimeInSeconds: 120,
     minimumRecommendedRepetitions: 8,
@@ -1494,7 +1495,7 @@ const DEFAULT_EXERCISES: Omit<IExercise, 'userId' | '_id' | 'createdAt'>[] = [
     name: 'Roman Chair Back Extension',
     exerciseType: 'weighted',
     primaryMuscleGroup: 'hamstrings',
-    secondaryMuscleGroups: ['glutes', 'lower back'],
+    secondaryMuscleGroups: ['glutes', 'lower_back'],
     breakTimeInSeconds: 120,
     minimumRecommendedRepetitions: 8,
     maximumRecommendedRepetitions: 10,
@@ -1504,7 +1505,7 @@ const DEFAULT_EXERCISES: Omit<IExercise, 'userId' | '_id' | 'createdAt'>[] = [
     name: 'Roman Chair Single Leg Back Extension',
     exerciseType: 'weighted',
     primaryMuscleGroup: 'hamstrings',
-    secondaryMuscleGroups: ['glutes', 'lower back'],
+    secondaryMuscleGroups: ['glutes', 'lower_back'],
     breakTimeInSeconds: 120,
     minimumRecommendedRepetitions: 8,
     maximumRecommendedRepetitions: 10,

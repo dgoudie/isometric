@@ -18,10 +18,10 @@ import { SnackbarContext } from '../providers/Snackbar/Snackbar';
 import WorkoutPlanEditor from '../components/WorkoutPlanEditor/WorkoutPlanEditor';
 import activeWorkoutExists from '../utils/active-workout-exists';
 import classNames from 'classnames';
+import { convertToPlainObject } from '../utils/normalize-bson';
 import { getExercises } from '../database/domains/exercise';
 import { getSchedule } from '../database/domains/schedule';
 import { getUserId } from '../utils/get-user-id';
-import { normalizeBSON } from '../utils/normalize-bson';
 import styles from './WorkoutPlan.module.scss';
 import { useHeadWithTitle } from '../utils/use-head-with-title';
 import { useRouter } from 'next/router';
@@ -52,8 +52,8 @@ export async function getServerSideProps(
     return { redirect: { destination: '/workout', permanent: false } };
   }
   const [exercises, schedule] = await Promise.all([
-    getExercises(userId).then((exercises) => normalizeBSON(exercises)),
-    getSchedule(userId).then((schedule) => normalizeBSON(schedule)),
+    getExercises(userId).then((exercises) => convertToPlainObject(exercises)),
+    getSchedule(userId).then((schedule) => convertToPlainObject(schedule)),
   ]);
   return {
     props: { exercises, schedule },

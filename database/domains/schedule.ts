@@ -2,7 +2,7 @@ import { ISchedule, IScheduleDayWithExercises } from '@dgoudie/isometric-types';
 import mongoose, { PipelineStage } from 'mongoose';
 
 import Schedule from '../models/schedule';
-import connectMongo from '../repository';
+import connectMongo from '../mongodb';
 import { getMostRecentCompletedWorkout } from './workout';
 
 export async function getSchedule(userId: string): Promise<ISchedule | null> {

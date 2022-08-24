@@ -4,6 +4,7 @@ import {
 } from '@dgoudie/isometric-types';
 import chroma, { contrast } from 'chroma-js';
 
+import { ExerciseMuscleGroup as PrismaExerciseMuscleGroup } from '@prisma/client';
 import { useMemo } from 'react';
 
 export interface MuscleGroupStyles {
@@ -26,11 +27,16 @@ const colorScale = chroma
   .colors(ExerciseMuscleGroups.length);
 
 export const getMuscleGroupStyles = (
-  group: ExerciseMuscleGroup | undefined
+  group: ExerciseMuscleGroup | PrismaExerciseMuscleGroup | undefined
 ): MuscleGroupStyles => {
-  const backgroundColor = group
-    ? colorScale[ExerciseMuscleGroups.indexOf(group)]
-    : 'var(--background-color)';
+  let backgroundColor: string;
+  if (group === 'lower_back') {
+    backgroundColor = colorScale[ExerciseMuscleGroups.indexOf('lower back')];
+  } else {
+    backgroundColor = group
+      ? colorScale[ExerciseMuscleGroups.indexOf(group)]
+      : 'var(--background-color)';
+  }
   let color = 'black';
   let borderColor = 'transparent';
   if (!group) {
@@ -47,7 +53,7 @@ export const getMuscleGroupStyles = (
 };
 
 export const useMuscleGroupStyles = (
-  group: ExerciseMuscleGroup | undefined
+  group: ExerciseMuscleGroup | PrismaExerciseMuscleGroup | undefined
 ): MuscleGroupStyles => {
   return useMemo(() => getMuscleGroupStyles(group), [group]);
 };

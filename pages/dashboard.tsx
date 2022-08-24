@@ -10,10 +10,10 @@ import { NextPageWithLayout } from './_app';
 import { WorkoutContext } from '../providers/Workout/Workout';
 import activeWorkoutExists from '../utils/active-workout-exists';
 import classNames from 'classnames';
+import { convertToPlainObject } from '../utils/normalize-bson';
 import { getGreeting } from '../utils/get-greeting';
 import { getNextDaySchedule } from '../database/domains/schedule';
 import { getUserId } from '../utils/get-user-id';
-import { normalizeBSON } from '../utils/normalize-bson';
 import { secondsToMinutes } from 'date-fns';
 import styles from './Dashboard.module.scss';
 import { useHeadWithTitle } from '../utils/use-head-with-title';
@@ -36,7 +36,7 @@ export async function getServerSideProps(
   }
   return {
     props: getNextDaySchedule(userId)
-      .then((schedule) => normalizeBSON(schedule))
+      .then((schedule) => convertToPlainObject(schedule))
       .then((schedule) => ({ schedule })),
   };
 }

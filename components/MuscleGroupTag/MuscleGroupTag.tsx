@@ -4,6 +4,7 @@ import {
 } from '@dgoudie/isometric-types';
 import chroma, { contrast } from 'chroma-js';
 
+import { ExerciseMuscleGroup as PrismaExerciseMuscleGroup } from '@prisma/client';
 import classNames from 'classnames';
 import styles from './MuscleGroupTag.module.scss';
 import { useMemo } from 'react';
@@ -23,7 +24,7 @@ const colorScale = chroma
   .colors(ExerciseMuscleGroups.length);
 
 interface Props {
-  muscleGroup?: ExerciseMuscleGroup;
+  muscleGroup?: ExerciseMuscleGroup | PrismaExerciseMuscleGroup;
   className?: string;
 }
 

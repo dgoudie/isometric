@@ -1,7 +1,6 @@
 import {
   ElementOf,
   ExerciseMuscleGroup,
-  IExercise,
   IExerciseExtended,
   literals,
 } from '@dgoudie/isometric-types';

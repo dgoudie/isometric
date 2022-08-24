@@ -27,9 +27,9 @@ import SwipeDeadZone from '../components/SwipeDeadZone/SwipeDeadZone';
 import { WorkoutContext } from '../providers/Workout/Workout';
 import WorkoutExercisesBottomSheet from '../components/BottomSheet/components/WorkoutExercisesBottomSheet/WorkoutExercisesBottomSheet';
 import classNames from 'classnames';
+import { convertToPlainObject } from '../utils/normalize-bson';
 import { getExercises } from '../database/domains/exercise';
 import { getUserId } from '../utils/get-user-id';
-import { normalizeBSON } from '../utils/normalize-bson';
 import { requestNotificationPermission } from '../utils/notification';
 import styles from './Workout.module.scss';
 import { useHeadWithTitle } from '../utils/use-head-with-title';
@@ -53,8 +53,10 @@ export async function getServerSideProps(
     return { redirect: { destination: '/', permanent: false } };
   }
   const [exercises, workout] = await Promise.all([
-    getExercises(userId).then((exercises) => normalizeBSON(exercises)),
-    getMinifiedActiveWorkout(userId).then((workout) => normalizeBSON(workout)),
+    getExercises(userId).then((exercises) => convertToPlainObject(exercises)),
+    getMinifiedActiveWorkout(userId).then((workout) =>
+      convertToPlainObject(workout)
+    ),
   ]);
   if (!workout) {
     return { redirect: { destination: '/dashboard', permanent: false } };

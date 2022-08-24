@@ -6,7 +6,7 @@ import {
 
 import Exercise from '../models/exercise';
 import { buildFindExercisesWithBasicHistoryQuery } from '../aggregations';
-import connectMongo from '../repository';
+import connectMongo from '../mongodb';
 import mongoose from 'mongoose';
 
 export async function getExercises(

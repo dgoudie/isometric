@@ -1,6 +1,5 @@
 import {
   IExercise,
-  ISchedule,
   IWorkout,
   IWorkoutExercise,
   IWorkoutExerciseSet,
@@ -15,19 +14,31 @@ import Exercise from '../models/exercise';
 import { PipelineStage } from 'mongoose';
 import Workout from '../models/workout';
 import { buildGetExerciseHistoryById as buildGetWorkoutInstancesByExerciseNameQuery } from '../aggregations';
-import connectMongo from '../repository';
+import connectMongo from '../mongodb';
 import { getExerciseById } from './exercise';
 import { getNextDaySchedule } from './schedule';
+import prisma from '../prisma';
 
 export async function getCompletedWorkouts(userId: string, page?: number) {
-  await connectMongo();
-  let query = Workout.find({ userId, endedAt: { $exists: true } }).sort({
-    createdAt: -1,
-  });
+  let take: number | undefined = undefined;
+  let skip: number | undefined = undefined;
   if (typeof page !== 'undefined') {
-    query = query.limit(10).skip((page - 1) * 10);
+    take = 10;
+    skip = (page - 1) * 10;
   }
-  return query.exec();
+  return prisma.workout.findMany({
+    include: {
+      exercises: {
+        include: {
+          sets: true,
+        },
+      },
+    },
+    where: { userId, endedAt: { not: null } },
+    orderBy: { createdAt: 'desc' },
+    take,
+    skip,
+  });
 }
 
 export async function getMinifiedActiveWorkout(
