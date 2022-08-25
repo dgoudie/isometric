@@ -3,6 +3,8 @@ import React, { useCallback, useEffect } from 'react';
 import styles from './PageWrapper.module.scss';
 import { usePageVisibility } from 'react-page-visibility';
 import { usePusher } from '@harelpls/use-pusher';
+import { useRouter } from 'next/router';
+import { useSession } from 'next-auth/react';
 
 export default function PageWrapper({ children }: React.PropsWithChildren<{}>) {
   const pageVisible = usePageVisibility();

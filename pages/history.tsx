@@ -1,53 +1,52 @@
-import { GetServerSidePropsContext, GetServerSidePropsResult } from 'next';
 import { formatDistance, formatDuration, intervalToDuration } from 'date-fns';
-import { useCallback, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 
 import AppBarWithAppHeaderLayout from '../layouts/AppBarWithAppHeaderLayout/AppBarWithAppHeaderLayout';
 import InfiniteScroll from '../components/InfiniteScroll/InfiniteScroll';
 import MuscleGroupTag from '../components/MuscleGroupTag/MuscleGroupTag';
 import { NextPageWithLayout } from './_app';
+import RouteGuard from '../components/RouteGuard/RouteGuard';
+import RouteLoader from '../components/RouteLoader/RouteLoader';
 import SetView from '../components/SetView/SetView';
 import classNames from 'classnames';
-import { convertToPlainObject } from '../utils/normalize-bson';
 import { fetchFromApi } from '../utils/fetch-from-api';
 import { getCompletedWorkouts } from '../database/domains/workout';
-import { getUserId } from '../utils/get-user-id';
 import { secondsToMilliseconds } from 'date-fns';
 import styles from './History.module.scss';
+import useFetchWith403Redirect from '../utils/fetch-with-403-redirect';
 import { useHeadWithTitle } from '../utils/use-head-with-title';
+import useSWR from 'swr';
 
 const format = new Intl.DateTimeFormat('en-US', {
   dateStyle: 'medium',
   timeStyle: 'short',
 });
 
-type HistoryProps = {
-  workouts: Awaited<ReturnType<typeof getCompletedWorkouts>>;
-};
-
-export async function getServerSideProps(
-  context: GetServerSidePropsContext
-): Promise<GetServerSidePropsResult<HistoryProps>> {
-  const userId = await getUserId(context.req, context.res);
-  if (!userId) {
-    return { redirect: { destination: '/', permanent: false } };
-  }
-  let workouts = await getCompletedWorkouts(userId, 1);
-  workouts = convertToPlainObject(workouts);
-  return {
-    props: { workouts },
-  };
-}
-
-const History: NextPageWithLayout<HistoryProps> = ({
-  workouts: workoutsFirstPage,
-}) => {
-  const [workouts, setWorkouts] = useState(workoutsFirstPage);
-  const [moreWorkouts, setMoreWorkouts] = useState(workouts.length >= 10);
+const History: NextPageWithLayout = ({}) => {
+  const [workouts, setWorkouts] = useState<
+    Awaited<ReturnType<typeof getCompletedWorkouts>>
+  >([]);
+  const [moreWorkouts, setMoreWorkouts] = useState(
+    workouts && workouts.length >= 10
+  );
   const [page, setPage] = useState(2);
 
+  const fetcher = useFetchWith403Redirect();
+
+  const { data, error } = useSWR<
+    Awaited<ReturnType<typeof getCompletedWorkouts>>
+  >('/api/workouts?page=1', fetcher);
+
+  useEffect(() => {
+    if (!!data) {
+      setWorkouts(data);
+      setMoreWorkouts(data.length < 10);
+      setPage(2);
+    }
+  }, [data]);
+
   const items = useMemo(() => {
-    return workouts.map((workout) => (
+    return workouts?.map((workout) => (
       <Workout workout={workout} key={workout.id} />
     ));
   }, [workouts]);
@@ -61,11 +60,14 @@ const History: NextPageWithLayout<HistoryProps> = ({
     if (nextPage.length < 10) {
       setMoreWorkouts(false);
     }
-    setWorkouts([...workouts, ...nextPage]);
+    setWorkouts([...workouts!, ...nextPage]);
     setPage(page + 1);
   }, [workouts, page]);
 
   const head = useHeadWithTitle('Workout History');
+
+  if (error) throw error;
+  if (!data) return <RouteLoader />;
 
   return (
     <div className={styles.root}>
@@ -169,5 +171,7 @@ function Workout({ workout }: WorkoutProps) {
 export default History;
 
 History.getLayout = (page) => (
-  <AppBarWithAppHeaderLayout>{page}</AppBarWithAppHeaderLayout>
+  <AppBarWithAppHeaderLayout>
+    <RouteGuard>{page}</RouteGuard>
+  </AppBarWithAppHeaderLayout>
 );

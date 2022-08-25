@@ -1,10 +1,12 @@
 import { GetServerSidePropsContext, GetServerSidePropsResult } from 'next';
 import { signIn, useSession } from 'next-auth/react';
+import { useContext, useEffect } from 'react';
 
 import AppHeader from '../components/AppHeader/AppHeader';
 import Image from 'next/image';
 import Link from 'next/link';
 import { NextPageWithLayout } from './_app';
+import { SnackbarContext } from '../providers/Snackbar/Snackbar';
 import activeWorkoutExists from '../utils/active-workout-exists';
 import classNames from 'classnames';
 import { getUserId } from '../utils/get-user-id';
@@ -15,20 +17,7 @@ import marketingImage4 from '../public/images/marketing_4.png';
 import styles from './Landing.module.scss';
 import { useHeadWithTitle } from '../utils/use-head-with-title';
 import useOneTapSignin from '../utils/use-google-one-tap-signin';
-
-interface LandingProps {}
-
-export async function getServerSideProps(
-  context: GetServerSidePropsContext
-): Promise<GetServerSidePropsResult<LandingProps>> {
-  const userId = await getUserId(context.req, context.res);
-  if (!!userId && (await activeWorkoutExists(userId))) {
-    return { redirect: { destination: '/workout', permanent: false } };
-  }
-  return {
-    props: {},
-  };
-}
+import { useRouter } from 'next/router';
 
 interface SellingPoint {
   iconClass: string;
@@ -60,7 +49,18 @@ const sellingPoints: SellingPoint[] = [
   },
 ];
 
-const Landing: NextPageWithLayout<LandingProps> = ({}) => {
+const Landing: NextPageWithLayout = () => {
+  const router = useRouter();
+  const { openSnackbar } = useContext(SnackbarContext);
+
+  useEffect(() => {
+    if (router.query.reason) {
+      if (router.query.reason === 'loggedoff')
+        openSnackbar('Please sign in to continue...');
+      router.replace('/');
+    }
+  }, [openSnackbar, router]);
+
   const head = useHeadWithTitle('Welcome');
   useOneTapSignin();
   const { status } = useSession();
