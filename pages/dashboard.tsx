@@ -72,7 +72,6 @@ const Dashboard: NextPageWithLayout = () => {
     return (
       <>
         {head}
-        <h1>{greeting}</h1>
         <RouteLoader />
       </>
     );
@@ -81,7 +80,7 @@ const Dashboard: NextPageWithLayout = () => {
     return (
       <div className={styles.wrapper}>
         {head}
-        <h1>{greeting}</h1>
+        <h1 className='fade-in'>{greeting}</h1>
         <div className={styles.root}>
           <div className={styles.noSchedule}>
             <span>
@@ -102,7 +101,7 @@ const Dashboard: NextPageWithLayout = () => {
   return (
     <div className={styles.wrapper}>
       {head}
-      <h1>{greeting}</h1>
+      <h1 className='fade-in'>{greeting}</h1>
       <div className={styles.root}>
         <div className={classNames(styles.day, 'fade-in')}>
           <div className={styles.dayHeader}>
