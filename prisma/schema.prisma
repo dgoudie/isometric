@@ -83,8 +83,8 @@ model ScheduleDay {
   id          Int                  @id @default(sequence())
   nickname    String
   exercises   ExerciseInSchedule[]
-  schedule    Schedule?            @relation(fields: [scheduleId], references: [id])
-  scheduleId  Int?
+  schedule    Schedule             @relation(fields: [scheduleId], references: [id])
+  scheduleId  Int
   orderNumber Int
 
   @@unique([scheduleId, orderNumber])
@@ -93,7 +93,7 @@ model ScheduleDay {
 model ExerciseInSchedule {
   exercise      Exercise    @relation(fields: [exerciseId], references: [id])
   exerciseId    Int
-  scheduleDay   ScheduleDay @relation(fields: [scheduleDayId], references: [id])
+  scheduleDay   ScheduleDay @relation(fields: [scheduleDayId], references: [id], onDelete: Cascade)
   scheduleDayId Int
   orderNumber   Int
 

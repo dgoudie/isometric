@@ -11,19 +11,17 @@ import {
   moveItemInArray,
 } from '../../../../utils/array-helpers';
 
+import { DayWithExerciseIds } from '../../WorkoutPlanEditor';
 import ExercisePickerBottomSheet from '../../../BottomSheet/components/ExercisePickerBottomSheet/ExercisePickerBottomSheet';
 import WorkoutPlanDayExerciseEditor from '../WorkoutPlanDayExerciseEditor/WorkoutPlanDayExerciseEditor';
 import classNames from 'classnames';
 import styles from './WorkoutPlanDayEditor.module.scss';
 
 interface Props {
-  day: Prisma.ScheduleDayCreateInput;
+  day: DayWithExerciseIds['day'];
   exerciseIds: number[];
   guid: string;
-  dayChanged: (
-    day: Prisma.ScheduleDayCreateInput,
-    exerciseIds: number[]
-  ) => void;
+  dayChanged: (day: DayWithExerciseIds['day'], exerciseIds: number[]) => void;
   index: number;
   exerciseMap: Map<number, Exercise>;
   onDelete: () => void;

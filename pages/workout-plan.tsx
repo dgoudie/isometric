@@ -25,12 +25,12 @@ const WorkoutPlanSchema = Yup.array()
   .required()
   .of(
     Yup.object().shape({
-      nickname: Yup.string().required(),
-      exerciseIds: Yup.array().min(1).required().of(Yup.string()),
+      day: Yup.object().shape({
+        nickname: Yup.string().required(),
+      }),
+      exerciseIds: Yup.array().min(1).required().of(Yup.number()),
     })
   );
-
-interface WorkoutPlanProps {}
 
 const WorkoutPlan: NextPageWithLayout = () => {
   const fetcher = useFetchWith403Redirect();
@@ -56,7 +56,11 @@ const WorkoutPlan: NextPageWithLayout = () => {
     ): DayWithExerciseIds[] => {
       return (
         schedule?.days.map((day) => ({
-          day: { nickname: day.nickname, orderNumber: day.orderNumber },
+          day: {
+            nickname: day.nickname,
+            orderNumber: day.orderNumber,
+            schedule: schedule.id,
+          },
           exerciseIds: day.exercises.map((exercise) => exercise.exerciseId),
           guid: uuidv4(),
         })) ?? []
@@ -87,9 +91,10 @@ const WorkoutPlan: NextPageWithLayout = () => {
   const { openSnackbar } = useContext(SnackbarContext);
 
   const save = useCallback(async () => {
+    const daysWithoutGuid = days.map(({ guid, ...day }) => day);
     await fetch(`/api/schedule`, {
       method: 'PUT',
-      body: JSON.stringify({ days }),
+      body: JSON.stringify(daysWithoutGuid),
       headers: { 'content-type': 'application/json' },
       credentials: 'same-origin',
     });
@@ -118,6 +123,7 @@ const WorkoutPlan: NextPageWithLayout = () => {
       <h1>Workout Plan</h1>
       <div className={styles.root}>
         <WorkoutPlanEditor
+          scheduleId={schedule!.id}
           dayReorderModeEnabled={isReorderMode}
           days={days}
           exerciseMap={exerciseMap}

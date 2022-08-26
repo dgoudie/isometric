@@ -9,17 +9,22 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 
 import CopyDayBottomSheet from '../BottomSheet/components/CopyDayBottomSheet/CopyDayBottomSheet';
 import WorkoutPlanDayEditor from './components/WorkoutPlanDayEditor/WorkoutPlanDayEditor';
+import { XOR } from '../../utils/xor';
 import classNames from 'classnames';
 import styles from './WorkoutPlanEditor.module.scss';
 import { v4 as uuidv4 } from 'uuid';
 
 export interface DayWithExerciseIds {
-  day: Prisma.ScheduleDayCreateInput;
+  day: XOR<
+    Prisma.ScheduleDayCreateInput,
+    Prisma.ScheduleDayUncheckedCreateInput
+  >;
   exerciseIds: number[];
   guid: string;
 }
 
 interface Props {
+  scheduleId: number;
   days: DayWithExerciseIds[];
   daysChanged: (days: DayWithExerciseIds[]) => void;
   exerciseMap: Map<number, Exercise>;
@@ -27,6 +32,7 @@ interface Props {
 }
 
 export default function WorkoutPlanEditor({
+  scheduleId,
   days,
   exerciseMap,
   daysChanged,
@@ -63,12 +69,12 @@ export default function WorkoutPlanEditor({
     daysChanged([
       ...days,
       {
-        day: { nickname: '', orderNumber: days.length },
+        day: { nickname: '', orderNumber: days.length, scheduleId },
         exerciseIds: [],
         guid: uuidv4(),
       },
     ]);
-  }, [days, daysChanged]);
+  }, [days, daysChanged, scheduleId]);
 
   const handleDelete = useCallback(
     (index: number) => {

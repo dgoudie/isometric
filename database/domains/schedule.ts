@@ -1,3 +1,4 @@
+import { DayWithExerciseIds } from '../../components/WorkoutPlanEditor/WorkoutPlanEditor';
 import { Schedule } from '@prisma/client';
 import { ScheduleWithFullDetail } from '../../types';
 import { getMostRecentCompletedWorkout } from './workout';
@@ -30,13 +31,45 @@ export async function getSchedule(userId: string) {
   });
 }
 
-export async function saveSchedule(userId: string, schedule: Schedule) {
-  // await connectMongo();
-  // return Schedule.updateOne(
-  //   { userId },
-  //   { ...schedule, userId },
-  //   { upsert: true }
-  // );
+export async function saveSchedule(
+  userId: string,
+  days: Omit<DayWithExerciseIds, 'guid'>[]
+) {
+  const schedule = await prisma.schedule.upsert({
+    where: {
+      userId,
+    },
+    update: {},
+    create: {
+      userId,
+    },
+  });
+  await prisma.scheduleDay.deleteMany({
+    where: {
+      schedule: {
+        userId,
+      },
+    },
+  });
+  await Promise.all(
+    days.map(({ day, exerciseIds }) =>
+      prisma.scheduleDay.create({
+        data: {
+          scheduleId: schedule.id,
+          nickname: day.nickname,
+          orderNumber: day.orderNumber,
+          exercises: {
+            createMany: {
+              data: exerciseIds.map((exerciseId, index) => ({
+                exerciseId,
+                orderNumber: index,
+              })),
+            },
+          },
+        },
+      })
+    )
+  );
 }
 
 export type NextDaySchedule = {
@@ -61,6 +94,9 @@ export async function getNextDaySchedule(
   });
   if (dayCount === 0) {
     return { dayCount: 0, day: null };
+  }
+  if (dayNumber >= dayCount) {
+    dayNumber = 0;
   }
   const day = await prisma.scheduleDay.findFirst({
     where: {

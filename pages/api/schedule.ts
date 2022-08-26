@@ -1,5 +1,10 @@
-import { createSchedule, getSchedule } from '../../database/domains/schedule';
+import {
+  createSchedule,
+  getSchedule,
+  saveSchedule,
+} from '../../database/domains/schedule';
 
+import { DayWithExerciseIds } from '../../components/WorkoutPlanEditor/WorkoutPlanEditor';
 import { NextApiHandler } from 'next';
 import { getUserId } from '../../utils/get-user-id';
 
@@ -20,6 +25,7 @@ const handler: NextApiHandler = async (req, res) => {
       return;
     }
     case 'PUT': {
+      await saveSchedule(userId, req.body);
       res.end();
       return;
     }
