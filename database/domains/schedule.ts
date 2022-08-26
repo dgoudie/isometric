@@ -24,7 +24,13 @@ export async function getSchedule(userId: string) {
         include: {
           exercises: {
             include: { exercise: true },
+            orderBy: {
+              orderNumber: 'asc',
+            },
           },
+        },
+        orderBy: {
+          orderNumber: 'asc',
         },
       },
     },

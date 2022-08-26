@@ -93,12 +93,23 @@ export default function WorkoutPlanEditor({
   const onCopyDayResult = useCallback(
     (result: number | undefined) => {
       if (typeof result !== 'undefined') {
-        const day = days[result];
-        daysChanged([...days, { ...day, guid: uuidv4() }]);
+        const dayToCopy = days[result];
+        daysChanged([
+          ...days,
+          {
+            day: {
+              nickname: dayToCopy.day.nickname,
+              orderNumber: days.length,
+              scheduleId,
+            },
+            guid: uuidv4(),
+            exerciseIds: dayToCopy.exerciseIds,
+          },
+        ]);
       }
       setCopyDayVisible(false);
     },
-    [days, daysChanged]
+    [days, daysChanged, scheduleId]
   );
 
   if (!days.length) {

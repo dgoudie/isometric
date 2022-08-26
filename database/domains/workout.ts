@@ -465,7 +465,7 @@ export async function getMostRecentCompletedWorkout(userId: string) {
   return prisma.finishedWorkout.findFirst({
     where: { userId },
     orderBy: {
-      createdAt: 'asc',
+      createdAt: 'desc',
     },
   });
 }

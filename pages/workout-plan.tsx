@@ -91,7 +91,10 @@ const WorkoutPlan: NextPageWithLayout = () => {
   const { openSnackbar } = useContext(SnackbarContext);
 
   const save = useCallback(async () => {
-    const daysWithoutGuid = days.map(({ guid, ...day }) => day);
+    const daysWithoutGuid = days.map(({ guid, ...day }, index) => ({
+      ...day,
+      day: { ...day.day, orderNumber: index },
+    }));
     await fetch(`/api/schedule`, {
       method: 'PUT',
       body: JSON.stringify(daysWithoutGuid),
