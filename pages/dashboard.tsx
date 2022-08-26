@@ -3,7 +3,7 @@ import {
   NextDaySchedule,
   getNextDaySchedule,
 } from '../database/domains/schedule';
-import { useContext, useMemo } from 'react';
+import { useContext, useEffect, useMemo, useState } from 'react';
 
 import AppBarWithAppHeaderLayout from '../layouts/AppBarWithAppHeaderLayout/AppBarWithAppHeaderLayout';
 import { Exercise } from '@prisma/client';
@@ -11,13 +11,9 @@ import Link from 'next/link';
 import MuscleGroupTag from '../components/MuscleGroupTag/MuscleGroupTag';
 import { NextPageWithLayout } from './_app';
 import RouteLoader from '../components/RouteLoader/RouteLoader';
-import { ScheduleWithFullDetail } from '../types';
 import { WorkoutContext } from '../providers/Workout/Workout';
-import activeWorkoutExists from '../utils/active-workout-exists';
 import classNames from 'classnames';
-import { convertToPlainObject } from '../utils/normalize-bson';
 import { getGreeting } from '../utils/get-greeting';
-import { getUserId } from '../utils/get-user-id';
 import { secondsToMinutes } from 'date-fns';
 import styles from './Dashboard.module.scss';
 import useFetchWith403Redirect from '../utils/fetch-with-403-redirect';
@@ -27,7 +23,11 @@ import useSWR from 'swr';
 const TIME_PER_SET = 60;
 
 const Dashboard: NextPageWithLayout = () => {
-  const greeting = useMemo(() => getGreeting(), []);
+  const [greeting, setGreeting] = useState('');
+
+  useEffect(() => {
+    setGreeting(getGreeting());
+  }, []);
 
   const fetcher = useFetchWith403Redirect();
 

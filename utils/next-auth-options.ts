@@ -20,7 +20,7 @@ const nextAuthOptions: NextAuthOptions = {
   ],
   callbacks: {
     async signIn({ user, account, profile }) {
-      let verified = false;
+      let verified = true;
       if (account.provider === 'google') {
         verified = profile.email_verified as boolean;
       }
