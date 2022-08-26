@@ -1,5 +1,4 @@
 import { NextApiHandler } from 'next';
-import { broadcastWorkoutUpdate } from '../../../utils/broadcast-workout-update';
 import { getUserId } from '../../../utils/get-user-id';
 import { startWorkout } from '../../../database/domains/workout';
 
@@ -10,7 +9,6 @@ const handler: NextApiHandler = async (req, res) => {
     return;
   }
   const workout = await startWorkout(userId);
-  await broadcastWorkoutUpdate(userId, workout);
   res.status(204).end();
 };
 
