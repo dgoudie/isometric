@@ -2,7 +2,6 @@ import React, { createContext, useCallback, useEffect, useState } from 'react';
 
 import { IWorkout } from '@dgoudie/isometric-types';
 import { usePageVisibility } from 'react-page-visibility';
-import { usePusher } from '@harelpls/use-pusher';
 import { useRouter } from 'next/router';
 
 export const WorkoutContext = createContext<{
@@ -47,21 +46,6 @@ export default function WorkoutProvider({
   const [workout, setWorkout] = useState<IWorkout | null | undefined>(
     undefined
   );
-  const { client } = usePusher();
-
-  const pageVisible = usePageVisibility();
-
-  useEffect(() => {
-    let bind: any;
-    if (!!client && pageVisible) {
-      bind = client?.user.bind('workout_state', (data: IWorkout | undefined) =>
-        setWorkout(data ?? null)
-      );
-    }
-    return () => {
-      bind?.unbind();
-    };
-  }, [client, pageVisible]);
 
   const startWorkout = useCallback(() => {
     fetch(`/api/workout/start`);
