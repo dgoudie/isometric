@@ -126,7 +126,7 @@ function Workout({ workout }: WorkoutProps) {
             </div>
             <SetView
               exerciseType={exercise.exerciseType}
-              sets={exercise.sets.filter((set) => set.complete)}
+              sets={exercise.sets}
             />
           </div>
         );

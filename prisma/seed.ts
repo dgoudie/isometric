@@ -1,4 +1,8 @@
-import { PrismaClient } from '@prisma/client';
+import {
+  ExerciseMuscleGroup,
+  ExerciseType,
+  PrismaClient,
+} from '@prisma/client';
 
 const prisma = new PrismaClient();
 
@@ -10254,30 +10258,44 @@ const DATA = [
 ];
 
 async function main() {
-  const mappedData: any[] = DATA.map((item) => ({
+  const workouts = DATA.map((item) => ({
     ...item,
     createdAt: new Date(parseInt(item.createdAt.$date.$numberLong)),
     endedAt: new Date(parseInt(item.endedAt.$date.$numberLong)),
     updatedAt: new Date(parseInt(item.updatedAt.$date.$numberLong)),
   }));
 
-  mappedData.forEach(async ({ exercises, ...workout }) => {
-    const insertedWorkout = await prisma.workout.create({
-      data: { ...workout },
+  workouts.forEach(async ({ exercises, ...workout }) => {
+    const insertedWorkout = await prisma.finishedWorkout.create({
+      data: {
+        userId: workout.userId,
+        dayNumber: workout.dayNumber,
+        endedAt: workout.endedAt,
+        nickname: workout.nickname,
+        durationInSeconds: workout.durationInSeconds,
+        createdAt: workout.createdAt,
+      },
     });
-    exercises.forEach(async ({ _id, sets, ...exercise }: any) => {
-      await prisma.workoutExercise.create({
+    console.log('insertedWorkout.id', insertedWorkout.id);
+    exercises.forEach(async ({ _id, sets, ...exercise }, index) => {
+      await prisma.finishedWorkoutExercise.create({
         data: {
-          ...exercise,
-          performedAt: new Date(
-            parseInt(exercise.performedAt.$date.$numberLong)
-          ),
-          sets: { create: sets },
-          workout: {
+          exerciseType: exercise.exerciseType as ExerciseType,
+          primaryMuscleGroup:
+            exercise.primaryMuscleGroup as ExerciseMuscleGroup,
+          orderNumber: index,
+          sets: {
+            create: sets.map(({ complete, ...set }, index) => ({
+              ...set,
+              orderNumber: index,
+            })),
+          },
+          finishedWorkout: {
             connect: {
               id: insertedWorkout.id,
             },
           },
+          name: exercise.name,
         },
       });
     });
@@ -10286,7 +10304,6 @@ async function main() {
 
 main()
   .then(async () => {
-    console.log('done');
     await prisma.$disconnect();
   })
   .catch(async (e) => {

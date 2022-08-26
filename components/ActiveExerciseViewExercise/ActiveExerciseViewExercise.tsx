@@ -1,15 +1,13 @@
-import { IExerciseExtended, IWorkoutExercise } from '@dgoudie/isometric-types';
 import { useCallback, useContext, useEffect, useRef, useState } from 'react';
 
 import ActiveExerciseViewExerciseSet from '../ActiveExerciseViewExerciseSet/ActiveExerciseViewExerciseSet';
 import { AfterExerciseTimerContext } from '../../providers/AfterExerciseTimer/AfterExerciseTimer';
 import ConfirmationBottomSheet from '../BottomSheet/components/ConfirmationBottomSheet/ConfirmationBottomSheet';
-import ExerciseMetadata from '../ExerciseMetadata/ExerciseMetadata';
 import ExercisePickerBottomSheet from '../BottomSheet/components/ExercisePickerBottomSheet/ExercisePickerBottomSheet';
 import MuscleGroupTag from '../MuscleGroupTag/MuscleGroupTag';
-import RouteLoader from '../RouteLoader/RouteLoader';
 import { SnackbarContext } from '../../providers/Snackbar/Snackbar';
 import { WorkoutContext } from '../../providers/Workout/Workout';
+import { WorkoutExerciseWithSetsAndDetails } from '../../types';
 import classNames from 'classnames';
 import dynamic from 'next/dynamic';
 import equal from 'deep-equal';
@@ -25,9 +23,8 @@ const ActiveExerciseViewExerciseInstances = dynamic(
 );
 
 interface Props {
-  exercise: IWorkoutExercise;
-  data: IExerciseExtended;
-  nextExercise: IExerciseExtended | undefined;
+  workoutExercise: WorkoutExerciseWithSetsAndDetails;
+  nextWorkoutExercise: WorkoutExerciseWithSetsAndDetails | undefined;
   exerciseIndex: number;
   exerciseCount: number;
   onSelected: (i: number) => void;
@@ -35,30 +32,31 @@ interface Props {
 }
 
 export default function ActiveExerciseViewExercise({
-  exercise: exerciseUnmemoized,
-  data,
+  workoutExercise: workoutExerciseUnmemoized,
   exerciseIndex,
-  nextExercise,
+  nextWorkoutExercise,
   exerciseCount,
   onSelected,
   onCompleted,
 }: Props) {
-  const [exercise, setExercise] = useState(exerciseUnmemoized);
+  const [workoutExercise, setWorkoutExercise] = useState(
+    workoutExerciseUnmemoized
+  );
 
   useEffect(() => {
-    if (!equal(exercise, exerciseUnmemoized)) {
-      setExercise(exerciseUnmemoized);
+    if (!equal(workoutExercise, workoutExerciseUnmemoized)) {
+      setWorkoutExercise(workoutExerciseUnmemoized);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [exerciseUnmemoized]);
+  }, [workoutExerciseUnmemoized]);
 
   const { show, showAfterLastExercise, showAfterLastSet, cancel } = useContext(
     AfterExerciseTimerContext
   );
 
   const getNumberOfCompletedSets = useCallback(
-    () => exercise.sets.filter((set) => set.complete).length,
-    [exercise]
+    () => workoutExercise.sets.filter((set) => set.complete).length,
+    [workoutExercise]
   );
 
   const previousNumberOfCompletedSets = useRef(getNumberOfCompletedSets());
@@ -67,25 +65,26 @@ export default function ActiveExerciseViewExercise({
 
   useEffect(() => {
     if (numberOfCompletedSets > previousNumberOfCompletedSets.current) {
-      let allSetsCompleted = numberOfCompletedSets === exercise.sets.length;
+      let allSetsCompleted =
+        numberOfCompletedSets === workoutExercise.sets.length;
       if (allSetsCompleted) {
-        if (!!nextExercise) {
+        if (!!nextWorkoutExercise) {
           showAfterLastSet(
-            data.breakTimeInSeconds,
-            nextExercise.name,
-            nextExercise.primaryMuscleGroup,
+            workoutExercise.exercise!.breakTimeInSeconds,
+            nextWorkoutExercise.exercise.name,
+            nextWorkoutExercise.exercise.primaryMuscleGroup,
             onCompleted
           );
         } else {
-          showAfterLastExercise(data.breakTimeInSeconds);
+          showAfterLastExercise(workoutExercise.exercise.breakTimeInSeconds);
         }
       } else {
-        show(data.breakTimeInSeconds);
+        show(workoutExercise.exercise.breakTimeInSeconds);
       }
     }
     previousNumberOfCompletedSets.current = numberOfCompletedSets;
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [exercise, nextExercise]);
+  }, [workoutExercise, nextWorkoutExercise]);
 
   const { ref, inView } = useInView({
     threshold: 0.55,
@@ -129,7 +128,7 @@ export default function ActiveExerciseViewExercise({
   const { openSnackbar } = useContext(SnackbarContext);
 
   const newExerciseSelected = useCallback(
-    (exerciseId: string | undefined) => {
+    (exerciseId: number | undefined) => {
       if (!!exerciseId) {
         replaceExercise(exerciseIndex, exerciseId);
         openSnackbar(`Exercise replaced.`, 2000);
@@ -157,24 +156,24 @@ export default function ActiveExerciseViewExercise({
       <div className={styles.sectionInner} ref={sectionInnerRef}>
         <div className={styles.main}>
           <div className={styles.mainContent}>
-            <div className={styles.header}>{data.name}</div>
+            <div className={styles.header}>{workoutExercise.exercise.name}</div>
             <div className={styles.groups}>
               {[
-                data.primaryMuscleGroup,
-                ...(data.secondaryMuscleGroups ?? []),
+                workoutExercise.exercise.primaryMuscleGroup,
+                ...(workoutExercise.exercise.secondaryMuscleGroups ?? []),
               ].map((group) => (
                 <MuscleGroupTag key={group} muscleGroup={group} />
               ))}
             </div>
-            {!!data.lastPerformed && (
+            {/* {!!workoutExercise.exercise.lastPerformed && (
               <ExerciseMetadata className={styles.metadata} exercise={data} />
-            )}
+            )} */}
             <div className={styles.sets}>
-              {exercise.sets.map((set, index) => (
+              {workoutExercise.sets.map((set, index) => (
                 <ActiveExerciseViewExerciseSet
                   key={index}
                   set={set}
-                  data={data}
+                  data={workoutExercise.exercise}
                   exerciseSelected={inView}
                   setSelected={numberOfCompletedSets === index}
                   exerciseIndex={exerciseIndex}
@@ -184,7 +183,7 @@ export default function ActiveExerciseViewExercise({
             </div>
             {showExercisePicker && (
               <ExercisePickerBottomSheet
-                muscleGroup={data.primaryMuscleGroup}
+                muscleGroup={workoutExercise.exercise.primaryMuscleGroup}
                 onResult={newExerciseSelected}
               />
             )}
@@ -225,7 +224,9 @@ export default function ActiveExerciseViewExercise({
               </button>
             )}
           </div>
-          <ActiveExerciseViewExerciseInstances exerciseName={exercise.name} />
+          <ActiveExerciseViewExerciseInstances
+            exerciseName={workoutExercise.exercise.name}
+          />
         </div>
       </div>
     </section>

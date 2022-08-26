@@ -1,20 +1,10 @@
-import {
-  IExercise,
-  IWorkout,
-  IWorkoutExercise,
-  IWorkoutExerciseSet,
-} from '@dgoudie/isometric-types';
+import { FinishedWorkoutExerciseWithSets, FullWorkout } from '../../types';
 import {
   differenceInMilliseconds,
   millisecondsToSeconds,
   minutesToMilliseconds,
 } from 'date-fns';
 
-import Exercise from '../models/exercise';
-import { PipelineStage } from 'mongoose';
-import Workout from '../models/workout';
-import { buildGetExerciseHistoryById as buildGetWorkoutInstancesByExerciseNameQuery } from '../aggregations';
-import connectMongo from '../mongodb';
 import { getExerciseById } from './exercise';
 import { getNextDaySchedule } from './schedule';
 import prisma from '../prisma';
@@ -26,7 +16,7 @@ export async function getCompletedWorkouts(userId: string, page?: number) {
     take = 10;
     skip = (page - 1) * 10;
   }
-  return prisma.workout.findMany({
+  return prisma.finishedWorkout.findMany({
     include: {
       exercises: {
         include: {
@@ -34,110 +24,126 @@ export async function getCompletedWorkouts(userId: string, page?: number) {
         },
       },
     },
-    where: { userId, endedAt: { not: null } },
+    where: { userId },
     orderBy: { createdAt: 'desc' },
     take,
     skip,
   });
 }
 
-export async function getMinifiedActiveWorkout(
-  userId: string
-): Promise<IWorkout | null> {
-  await connectMongo();
-  return Workout.findOne({ userId, endedAt: undefined }, 'exercises');
+export async function getActiveWorkoutId(userId: string) {
+  const onlyId = await prisma.workout.findUnique({
+    where: {
+      userId,
+    },
+    select: {
+      id: true,
+    },
+  });
+  return onlyId?.id;
+}
+
+export async function getMinifiedActiveWorkout(userId: string) {
+  return prisma.workout.findUnique({
+    where: {
+      userId,
+    },
+  });
 }
 
 export async function getFullActiveWorkout(
   userId: string
-): Promise<IWorkout | null> {
-  await connectMongo();
-  let pipeline: PipelineStage[] = [
-    {
-      $match: {
-        userId,
-        endedAt: undefined,
-      },
+): Promise<FullWorkout | null> {
+  return prisma.workout.findUnique({
+    where: {
+      userId,
     },
-    {
-      $unwind: {
-        path: '$checkIns',
-      },
-    },
-    {
-      $sort: {
-        checkIns: 1,
-      },
-    },
-    {
-      $group: {
-        _id: '$_id',
-        root: {
-          $first: '$$ROOT',
-        },
-        checkIns: {
-          $push: '$checkIns',
+    include: {
+      exercises: {
+        include: {
+          exercise: true,
+          sets: true,
         },
       },
+      checkins: true,
     },
-    {
-      $replaceRoot: {
-        newRoot: {
-          $mergeObjects: [
-            '$root',
-            {
-              checkIns: '$checkIns',
-            },
-          ],
-        },
-      },
-    },
-    { $limit: 1 },
-  ];
-  const [result] = await Workout.aggregate(pipeline);
-  return result ?? null;
+  });
 }
 
-export async function addCheckInToActiveExercise(userId: string) {
-  await connectMongo();
-  Workout.updateOne(
-    { userId, endedAt: undefined },
-    {
-      $push: { checkIns: new Date() },
-    }
-  ).exec();
+export async function addCheckInToActiveWorkout(userId: string) {
+  const activeWorkoutId = await getActiveWorkoutId(userId);
+  if (activeWorkoutId === null) {
+    return;
+  }
+  await prisma.workoutCheckin.create({
+    data: {
+      at: new Date(),
+      workout: {
+        connect: {
+          id: activeWorkoutId,
+        },
+      },
+    },
+  });
 }
 
-export async function startWorkout(userId: string): Promise<IWorkout | null> {
-  await connectMongo();
+export async function startWorkout(userId: string) {
+  const alreadyInProgressWorkout = await getActiveWorkoutId(userId);
+
+  if (alreadyInProgressWorkout !== null) {
+    return getFullActiveWorkout(userId);
+  }
+
   const nextDaySchedule = await getNextDaySchedule(userId);
-  if (!nextDaySchedule) {
+  if (!nextDaySchedule.day) {
     return null;
   }
-  const { nickname, dayNumber, exercises } = nextDaySchedule;
 
-  const alreadyInProgressWorkout = await Workout.findOne({
-    userId,
-    endedAt: undefined,
+  const { nickname, orderNumber, exercises } = nextDaySchedule.day;
+
+  const workout = await prisma.workout.create({
+    data: {
+      userId,
+      dayNumber: orderNumber,
+      nickname,
+      checkins: {
+        create: {
+          at: new Date(),
+        },
+      },
+    },
   });
-
-  let exercisesMapped: IWorkoutExercise[] = exercises.map(
-    mapExerciseToInstance
+  await Promise.all(
+    exercises.map(async (exerciseInSchedule) => {
+      return prisma.workoutExercise.create({
+        data: {
+          workout: {
+            connect: workout,
+          },
+          exercise: {
+            connect: {
+              id: exerciseInSchedule.exerciseId,
+            },
+          },
+          orderNumber: exerciseInSchedule.orderNumber,
+          exerciseType: exerciseInSchedule.exercise.exerciseType,
+          primaryMuscleGroup: exerciseInSchedule.exercise.primaryMuscleGroup,
+          sets: {
+            createMany: {
+              data: new Array(exerciseInSchedule.exercise.setCount).fill({
+                complete: false,
+                timeInSeconds:
+                  exerciseInSchedule.exercise.exerciseType === 'timed'
+                    ? exerciseInSchedule.exercise.timePerSetInSeconds
+                    : undefined,
+              }),
+            },
+          },
+        },
+      });
+    })
   );
-
-  if (!!alreadyInProgressWorkout) {
-    return alreadyInProgressWorkout;
-  }
-
-  await Workout.create({
-    userId,
-    startedAt: new Date(),
-    dayNumber,
-    nickname,
-    exercises: exercisesMapped,
-    checkIns: [new Date()],
-  });
-  return getMinifiedActiveWorkout(userId);
+  return getFullActiveWorkout(userId);
 }
 
 export async function persistSetComplete(
@@ -146,16 +152,38 @@ export async function persistSetComplete(
   setIndex: number,
   complete: boolean
 ) {
-  await connectMongo();
-  await Workout.updateOne(
-    { userId, endedAt: undefined },
-    {
-      $set: {
-        [`exercises.${exerciseIndex}.sets.${setIndex}.complete`]: complete,
+  await prisma.workoutExerciseSet.updateMany({
+    data: {
+      complete: true,
+    },
+    where: {
+      orderNumber: {
+        lt: complete ? setIndex : setIndex - 1,
       },
-    }
-  );
-  await ensureNoIncompleteSetsBeforeCompleteSets(userId, exerciseIndex);
+      workoutExercise: {
+        orderNumber: exerciseIndex,
+        workout: {
+          userId,
+        },
+      },
+    },
+  });
+  await prisma.workoutExerciseSet.updateMany({
+    data: {
+      complete: false,
+    },
+    where: {
+      orderNumber: {
+        lt: complete ? setIndex + 1 : setIndex,
+      },
+      workoutExercise: {
+        orderNumber: exerciseIndex,
+        workout: {
+          userId,
+        },
+      },
+    },
+  });
   return getMinifiedActiveWorkout(userId);
 }
 
@@ -165,16 +193,20 @@ export async function persistSetRepetitions(
   setIndex: number,
   repetitions: number | undefined
 ) {
-  await connectMongo();
-  await Workout.updateOne(
-    { userId, endedAt: undefined },
-    {
-      [typeof repetitions !== 'undefined' ? '$set' : '$unset']: {
-        [`exercises.${exerciseIndex}.sets.${setIndex}.repetitions`]:
-          repetitions ?? '',
+  await prisma.workoutExerciseSet.updateMany({
+    data: {
+      repetitions,
+    },
+    where: {
+      orderNumber: setIndex,
+      workoutExercise: {
+        orderNumber: exerciseIndex,
+        workout: {
+          userId,
+        },
       },
-    }
-  );
+    },
+  });
   return getMinifiedActiveWorkout(userId);
 }
 
@@ -184,91 +216,183 @@ export async function persistSetResistance(
   setIndex: number,
   resistanceInPounds: number | undefined
 ) {
-  await connectMongo();
-  await Workout.updateOne(
-    { userId, endedAt: undefined },
-    {
-      [typeof resistanceInPounds !== 'undefined' ? '$set' : '$unset']: {
-        [`exercises.${exerciseIndex}.sets.${setIndex}.resistanceInPounds`]:
-          resistanceInPounds ?? '',
+  await prisma.workoutExerciseSet.updateMany({
+    data: {
+      resistanceInPounds,
+    },
+    where: {
+      OR: [
+        { orderNumber: setIndex },
+        {
+          AND: [
+            {
+              orderNumber: {
+                gt: setIndex,
+              },
+              resistanceInPounds: null,
+              repetitions: null,
+            },
+          ],
+        },
+      ],
+      workoutExercise: {
+        orderNumber: exerciseIndex,
+        workout: {
+          userId,
+        },
       },
-    }
-  );
-  await populateResistanceForNextSets(userId, exerciseIndex, setIndex);
+    },
+  });
   return getMinifiedActiveWorkout(userId);
 }
 
 export async function replaceExercise(
   userId: string,
   exerciseIndex: number,
-  newExerciseId: string
+  newExerciseId: number
 ) {
-  await connectMongo();
+  const activeWorkoutId = await getActiveWorkoutId(userId);
+  if (activeWorkoutId === null) {
+    return;
+  }
   const newExercise = await getExerciseById(userId, newExerciseId);
   if (!newExercise) {
     return;
   }
-  const workoutExerciseMapped = mapExerciseToInstance(newExercise);
-  await Workout.updateOne(
-    { userId, endedAt: undefined },
-    { [`exercises.${exerciseIndex}`]: workoutExerciseMapped }
-  );
+  await prisma.workoutExercise.deleteMany({
+    where: {
+      workout: {
+        userId,
+      },
+      orderNumber: exerciseIndex,
+    },
+  });
+  await prisma.workoutExercise.create({
+    data: {
+      workout: {
+        connect: {
+          id: activeWorkoutId,
+        },
+      },
+      exercise: {
+        connect: {
+          id: newExercise.id,
+        },
+      },
+      orderNumber: exerciseIndex,
+      exerciseType: newExercise.exerciseType,
+      primaryMuscleGroup: newExercise.primaryMuscleGroup,
+      sets: {
+        createMany: {
+          data: new Array(newExercise.setCount).fill({
+            complete: false,
+            timeInSeconds:
+              newExercise.exerciseType === 'timed'
+                ? newExercise.timePerSetInSeconds
+                : undefined,
+          }),
+        },
+      },
+    },
+  });
   return getMinifiedActiveWorkout(userId);
 }
 
 export async function addExercise(
   userId: string,
-  exerciseId: string,
+  exerciseId: number,
   index: number
 ) {
-  await connectMongo();
+  const activeWorkoutId = await getActiveWorkoutId(userId);
+  if (activeWorkoutId === null) {
+    return;
+  }
   const newExercise = await getExerciseById(userId, exerciseId);
   if (!newExercise) {
     return;
   }
-  const workoutExerciseMapped = mapExerciseToInstance(newExercise);
-  await Workout.updateOne(
-    { userId, endedAt: undefined },
-    {
-      $push: {
-        exercises: {
-          $each: [workoutExerciseMapped],
-          $position: index,
+  await prisma.workoutExercise.updateMany({
+    data: {
+      orderNumber: {
+        increment: 1,
+      },
+    },
+    where: {
+      workout: {
+        userId,
+      },
+      orderNumber: {
+        gte: index,
+      },
+    },
+  });
+  await prisma.workoutExercise.create({
+    data: {
+      workout: {
+        connect: {
+          id: activeWorkoutId,
         },
       },
-    }
-  );
+      exercise: {
+        connect: {
+          id: newExercise.id,
+        },
+      },
+      orderNumber: index,
+      exerciseType: newExercise.exerciseType,
+      primaryMuscleGroup: newExercise.primaryMuscleGroup,
+      sets: {
+        createMany: {
+          data: new Array(newExercise.setCount).fill({
+            complete: false,
+            timeInSeconds:
+              newExercise.exerciseType === 'timed'
+                ? newExercise.timePerSetInSeconds
+                : undefined,
+          }),
+        },
+      },
+    },
+  });
   return getMinifiedActiveWorkout(userId);
 }
 
 export async function deleteExercise(userId: string, index: number) {
-  await connectMongo();
-  const activeWorkout = await getFullActiveWorkout(userId);
-  if (!activeWorkout) {
-    return;
-  }
-  if (activeWorkout.exercises.length < 2) {
-    return null;
-  }
-  activeWorkout.exercises.splice(index, 1);
-  await Workout.updateOne(
-    { userId, endedAt: undefined },
-    {
-      $set: {
-        exercises: activeWorkout.exercises,
+  await prisma.workoutExercise.deleteMany({
+    where: {
+      workout: {
+        userId,
       },
-    }
-  );
+      orderNumber: index,
+    },
+  });
+  await prisma.workoutExercise.updateMany({
+    data: {
+      orderNumber: {
+        decrement: 1,
+      },
+    },
+    where: {
+      workout: {
+        userId,
+      },
+      orderNumber: {
+        gte: index,
+      },
+    },
+  });
   return getMinifiedActiveWorkout(userId);
 }
 
 export async function endWorkout(userId: string) {
-  await connectMongo();
   const activeWorkout = await getFullActiveWorkout(userId);
   if (!activeWorkout) {
     return;
   }
-  const checkIns = [...activeWorkout.checkIns!, new Date()];
+  const checkIns = [
+    ...activeWorkout.checkins.map((item) => item.at),
+    new Date(),
+  ];
   let durationInMilliseconds = 0;
   for (let index = 0; index < checkIns.length - 1; index++) {
     const checkIn = checkIns[index];
@@ -283,161 +407,85 @@ export async function endWorkout(userId: string) {
     );
   }
   const durationInSeconds = millisecondsToSeconds(durationInMilliseconds);
-  return Workout.updateOne(
-    {
-      userId,
-      endedAt: undefined,
-    },
-    [
-      {
-        $addFields: {
-          endedAt: new Date(),
-          durationInSeconds,
-          exercises: {
-            $filter: {
-              input: '$exercises',
-              as: 'exercise',
-              cond: {
-                $gt: [
-                  {
-                    $size: {
-                      $filter: {
-                        input: '$$exercise.sets',
-                        as: 'set',
-                        cond: {
-                          $eq: ['$$set.complete', true],
-                        },
-                      },
-                    },
-                  },
-                  0,
-                ],
-              },
-            },
+  await prisma.$transaction(async (prisma) => {
+    const finishedWorkout = await prisma.finishedWorkout.create({
+      data: {
+        dayNumber: activeWorkout.dayNumber,
+        endedAt: new Date(),
+        nickname: activeWorkout.nickname,
+        durationInSeconds,
+        createdAt: activeWorkout.createdAt,
+        user: {
+          connect: {
+            userId,
           },
         },
       },
-      { $unset: 'checkIns' },
-    ]
-  );
+    });
+    await Promise.all(
+      activeWorkout.exercises.map((workoutExercise) =>
+        prisma.finishedWorkoutExercise.create({
+          data: {
+            name: workoutExercise.exercise.name,
+            exerciseType: workoutExercise.exercise.exerciseType,
+            primaryMuscleGroup: workoutExercise.exercise.primaryMuscleGroup,
+            orderNumber: workoutExercise.orderNumber,
+            finishedWorkout: {
+              connect: finishedWorkout,
+            },
+            sets: {
+              createMany: {
+                data: workoutExercise.sets.filter((set) => set.complete),
+              },
+            },
+          },
+        })
+      )
+    );
+  });
+  await discardWorkout(userId);
 }
 
 export async function discardWorkout(userId: string) {
-  await connectMongo();
-  return Workout.deleteOne({
-    userId,
-    endedAt: undefined,
+  return prisma.workout.delete({
+    where: {
+      userId,
+    },
   });
 }
 
 export async function getMostRecentCompletedWorkout(userId: string) {
-  await connectMongo();
-  return Workout.findOne({
-    userId,
-    endedAt: { $exists: true },
-  }).sort({ createdAt: -1 });
-}
-
-function mapExerciseToInstance(exercise: IExercise): IWorkoutExercise {
-  return {
-    ...exercise,
-    sets: new Array<IWorkoutExerciseSet>(exercise.setCount).fill({
-      complete: false,
-      timeInSeconds:
-        exercise.exerciseType === 'timed'
-          ? exercise.timePerSetInSeconds
-          : undefined,
-    }),
-    performedAt: new Date(),
-  };
-}
-
-async function ensureNoIncompleteSetsBeforeCompleteSets(
-  userId: string,
-  exerciseIndex: number
-) {
-  let activeWorkout = await getFullActiveWorkout(userId);
-  if (!activeWorkout) {
-    return;
-  }
-  let exerciseAtIndex = activeWorkout.exercises[exerciseIndex];
-  let firstUnfinishedExercise = exerciseAtIndex.sets.findIndex(
-    (set) => !set.complete
-  );
-  if (firstUnfinishedExercise < 0) {
-    return;
-  }
-  let updatePromises = [];
-  for (let i = firstUnfinishedExercise; i < exerciseAtIndex.sets.length; i++) {
-    updatePromises.push(
-      Workout.updateOne(
-        {
-          userId,
-          endedAt: undefined,
-        },
-        { $set: { [`exercises.${exerciseIndex}.sets.${i}.complete`]: false } }
-      )
-    );
-  }
-  await Promise.all(updatePromises);
-}
-async function populateResistanceForNextSets(
-  userId: string,
-  exerciseIndex: number,
-  setIndex: number
-) {
-  let activeWorkout = await getFullActiveWorkout(userId);
-  if (!activeWorkout) {
-    return;
-  }
-  let exerciseAtIndex = activeWorkout.exercises[exerciseIndex];
-  if (setIndex >= exerciseAtIndex.sets.length - 1) {
-    return;
-  }
-  const set = exerciseAtIndex.sets[setIndex];
-  if (set.complete) {
-    return;
-  }
-  const setResistancePersisted = set.resistanceInPounds;
-  let promises: ReturnType<typeof Workout.updateOne>[] = [];
-  exerciseAtIndex.sets.slice(setIndex).forEach((set, index) => {
-    if (typeof set.repetitions === 'undefined' && !set.complete) {
-      promises.push(
-        Workout.updateOne(
-          {
-            userId,
-            endedAt: undefined,
-          },
-          {
-            $set: {
-              [`exercises.${exerciseIndex}.sets.${
-                setIndex + index
-              }.resistanceInPounds`]: setResistancePersisted,
-            },
-          }
-        )
-      );
-    }
+  return prisma.finishedWorkout.findFirst({
+    where: { userId },
+    orderBy: {
+      createdAt: 'asc',
+    },
   });
-  await Promise.all(promises);
 }
 
 export async function getWorkoutInstancesByExerciseName(
   userId: string,
   name: string,
   page?: number
-) {
-  await connectMongo();
-  const exercise = await Exercise.findOne({ name });
-  if (!exercise) {
-    throw new Error(`Exercise with name '${name}' not found.`);
+): Promise<FinishedWorkoutExerciseWithSets[]> {
+  let take: number | undefined = undefined;
+  let skip: number | undefined = undefined;
+  if (typeof page !== 'undefined') {
+    take = 10;
+    skip = (page - 1) * 10;
   }
-  return Workout.aggregate<IWorkoutExercise>(
-    buildGetWorkoutInstancesByExerciseNameQuery(
-      userId,
-      exercise._id,
+  return prisma.finishedWorkoutExercise.findMany({
+    where: {
       name,
-      page
-    )
-  );
+      finishedWorkout: {
+        userId,
+      },
+    },
+    include: {
+      sets: true,
+      finishedWorkout: true,
+    },
+    take,
+    skip,
+  });
 }

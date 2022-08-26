@@ -16,7 +16,7 @@ import {
 } from 'date-fns';
 
 import { CSSTransition } from 'react-transition-group';
-import { ExerciseMuscleGroup } from '@dgoudie/isometric-types';
+import { ExerciseMuscleGroup } from '@prisma/client';
 import FocusTrap from 'focus-trap-react';
 import MuscleGroupTag from '../../components/MuscleGroupTag/MuscleGroupTag';
 import Portal from '../../components/Portal/Portal';

@@ -1,9 +1,5 @@
-import {
-  ElementOf,
-  ExerciseMuscleGroup,
-  IExerciseExtended,
-  literals,
-} from '@dgoudie/isometric-types';
+import { ElementOf, literals } from '../../utils/oneof-array';
+import { Exercise, ExerciseMuscleGroup } from '@prisma/client';
 import {
   ReadableResource,
   emptyReadableResource,
@@ -47,7 +43,7 @@ interface Props {
   searchChanged: (search: string | undefined) => void;
   muscleGroupChanged: (muscleGroup: ExerciseMuscleGroup | undefined) => void;
   historyChanged: (option: HistoryOption) => void;
-  onSelect?: (exerciseId: string) => void;
+  onSelect?: (exerciseId: number) => void;
 }
 
 export default function ExerciseSearch(props: Props) {
@@ -72,7 +68,7 @@ export default function ExerciseSearch(props: Props) {
     startTransaction(() => {
       const params = new URLSearchParams(searchParams);
       params.set('page', '1');
-      const newResource = fetchFromApiAsReadableResource<IExerciseExtended[]>(
+      const newResource = fetchFromApiAsReadableResource<Exercise[]>(
         `/api/exercises`,
         params
       );
@@ -88,7 +84,7 @@ export default function ExerciseSearch(props: Props) {
 }
 
 interface ExerciseSearchContentProps extends Props {
-  exercisesResponse: ReadableResource<IExerciseExtended[]>;
+  exercisesResponse: ReadableResource<Exercise[]>;
 }
 
 function ExerciseSearchContent({
@@ -133,10 +129,7 @@ function ExerciseSearchContent({
   const loadMore = useCallback(async () => {
     const params = new URLSearchParams(searchParams);
     params.set('page', page.toString());
-    const nextPage = await fetchFromApi<IExerciseExtended[]>(
-      `/api/exercises`,
-      params
-    );
+    const nextPage = await fetchFromApi<Exercise[]>(`/api/exercises`, params);
     if (!nextPage.length) {
       setMoreExercises(false);
     } else {
@@ -209,8 +202,8 @@ function ExerciseSearchContent({
 }
 
 interface ExerciseButtonProps {
-  exercise: IExerciseExtended;
-  onSelect?: (exerciseId: string) => void;
+  exercise: Exercise;
+  onSelect?: (exerciseId: number) => void;
 }
 
 const ExerciseButton = ({ exercise, onSelect }: ExerciseButtonProps) => {
@@ -245,7 +238,7 @@ const ExerciseButton = ({ exercise, onSelect }: ExerciseButtonProps) => {
       <button
         type='button'
         className={classNames('fade-in', styles.item)}
-        onClick={() => onSelect(exercise._id)}
+        onClick={() => onSelect(exercise.id)}
       >
         {itemInnards}
       </button>

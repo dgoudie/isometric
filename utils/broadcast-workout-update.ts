@@ -1,7 +1,7 @@
-import { IWorkout } from '@dgoudie/isometric-types';
+import { FullWorkout } from '../types';
 import getPusher from './pusher';
 
 export const broadcastWorkoutUpdate = (
   userId: string,
-  workout: Partial<IWorkout> | null
+  workout: FullWorkout | null
 ) => getPusher().sendToUser(userId, 'workout_state', workout);

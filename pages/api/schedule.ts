@@ -1,20 +1,25 @@
-import {
-  ExerciseMuscleGroup,
-  ExerciseMuscleGroups,
-} from '@dgoudie/isometric-types';
+import { createSchedule, getSchedule } from '../../database/domains/schedule';
 
 import { NextApiHandler } from 'next';
-import { getExercises } from '../../database/domains/exercise';
 import { getUserId } from '../../utils/get-user-id';
 
 const handler: NextApiHandler = async (req, res) => {
+  const userId = await getUserId(req, res);
+  if (!userId) {
+    res.status(403).end();
+    return;
+  }
   switch (req.method) {
-    case 'PUT': {
-      const userId = await getUserId(req, res);
-      if (!userId) {
-        res.status(403).end();
-        return;
+    case 'GET': {
+      let schedule = await getSchedule(userId);
+      if (!schedule) {
+        await createSchedule(userId);
+        schedule = await getSchedule(userId);
       }
+      res.send(schedule);
+      return;
+    }
+    case 'PUT': {
       res.end();
       return;
     }

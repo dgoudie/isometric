@@ -1,12 +1,12 @@
 import type { GetServerSidePropsContext, GetServerSidePropsResult } from 'next';
-import { IExercise, IScheduleDayWithExercises } from '@dgoudie/isometric-types';
 import { useContext, useMemo } from 'react';
 
 import AppBarWithAppHeaderLayout from '../layouts/AppBarWithAppHeaderLayout/AppBarWithAppHeaderLayout';
-import Head from 'next/head';
+import { Exercise } from '@prisma/client';
 import Link from 'next/link';
 import MuscleGroupTag from '../components/MuscleGroupTag/MuscleGroupTag';
 import { NextPageWithLayout } from './_app';
+import { ScheduleWithFullDetail } from '../types';
 import { WorkoutContext } from '../providers/Workout/Workout';
 import activeWorkoutExists from '../utils/active-workout-exists';
 import classNames from 'classnames';
@@ -21,7 +21,10 @@ import { useHeadWithTitle } from '../utils/use-head-with-title';
 const TIME_PER_SET = 60;
 
 interface HomeProps {
-  schedule: IScheduleDayWithExercises | null;
+  schedule: {
+    day: ScheduleWithFullDetail['days'][0] | null;
+    dayCount: number;
+  };
 }
 
 export async function getServerSideProps(
@@ -45,23 +48,23 @@ const Dashboard: NextPageWithLayout<HomeProps> = ({ schedule }) => {
   const greeting = useMemo(() => getGreeting(), []);
 
   const dayDurationInSeconds = useMemo(() => {
-    if (!schedule) {
+    if (!schedule.day) {
       return 0;
     }
-    return schedule.exercises
+    return schedule.day.exercises
       .map(
-        (exercise) =>
+        ({ exercise }) =>
           (exercise.breakTimeInSeconds + TIME_PER_SET) * exercise.setCount
       )
       .reduce((sum, exerciseDuration) => sum + exerciseDuration, 0);
   }, [schedule]);
 
   const setCount = useMemo(() => {
-    if (!schedule) {
+    if (!schedule.day) {
       return 0;
     }
-    return schedule.exercises
-      .map((exercise) => exercise.setCount)
+    return schedule.day.exercises
+      .map(({ exercise }) => exercise.setCount)
       .reduce((sum, exerciseDuration) => sum + exerciseDuration, 0);
   }, [schedule]);
 
@@ -74,7 +77,7 @@ const Dashboard: NextPageWithLayout<HomeProps> = ({ schedule }) => {
 
   const head = useHeadWithTitle('Dashboard');
 
-  if (!schedule) {
+  if (!schedule.day) {
     return (
       <div className={styles.wrapper}>
         {head}
@@ -105,9 +108,9 @@ const Dashboard: NextPageWithLayout<HomeProps> = ({ schedule }) => {
           <div className={styles.dayHeader}>
             <div className={styles.dayHeaderNumber}>
               <div>
-                Day {schedule.dayNumber + 1}/{schedule.dayCount}
+                Day {schedule.day.orderNumber + 1}/{schedule.dayCount}
               </div>
-              <div>{schedule.nickname}</div>
+              <div>{schedule.day.nickname}</div>
             </div>
             <div className={styles.dayHeaderMeta}>
               <HeaderItem
@@ -115,13 +118,19 @@ const Dashboard: NextPageWithLayout<HomeProps> = ({ schedule }) => {
                 value={dayDurationInMinutes}
                 suffix='mins'
               />
-              <HeaderItem title='Exercises' value={schedule.exercises.length} />
+              <HeaderItem
+                title='Exercises'
+                value={schedule.day.exercises.length}
+              />
               <HeaderItem title='Sets' value={setCount!} />
             </div>
           </div>
           <div className={styles.exercises}>
-            {schedule.exercises.map((exercise) => (
-              <ExerciseItem key={exercise._id} exercise={exercise} />
+            {schedule.day.exercises.map((scheduledExercise) => (
+              <ExerciseItem
+                key={scheduledExercise.exerciseId}
+                exercise={scheduledExercise.exercise}
+              />
             ))}
           </div>
         </div>
@@ -141,7 +150,7 @@ const Dashboard: NextPageWithLayout<HomeProps> = ({ schedule }) => {
             className={classNames('standard-button primary')}
           >
             <i className='fa-solid fa-person-walking'></i>
-            Start Day {schedule.dayNumber + 1}
+            Start Day {schedule.day.orderNumber + 1}
           </button>
         </div>
       </div>
@@ -176,7 +185,7 @@ function HeaderItem({ title, value, suffix }: HeaderItemProps) {
 }
 
 interface ExerciseItemProps {
-  exercise: IExercise;
+  exercise: Exercise;
 }
 
 function ExerciseItem({ exercise }: ExerciseItemProps) {

@@ -1,8 +1,4 @@
-import {
-  ExerciseMuscleGroup,
-  ExerciseMuscleGroups,
-} from '@dgoudie/isometric-types';
-
+import { ExerciseMuscleGroup } from '@prisma/client';
 import React from 'react';
 import classNames from 'classnames';
 import styles from './MuscleGroupPicker.module.scss';
@@ -37,9 +33,11 @@ export default function MuscleGroupPicker({
       }
     >
       <option value={''}>N/A</option>
-      {[...ExerciseMuscleGroups].sort().map((group) => (
-        <option key={group}>{group}</option>
-      ))}
+      {Object.keys(ExerciseMuscleGroup)
+        .sort()
+        .map((group) => (
+          <option key={group}>{group}</option>
+        ))}
     </select>
   );
 }

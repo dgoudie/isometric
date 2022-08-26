@@ -1,30 +1,24 @@
 import * as Yup from 'yup';
 
-import { GetServerSidePropsContext, GetServerSidePropsResult } from 'next';
-import { IExercise, ISchedule, IScheduleDay } from '@dgoudie/isometric-types';
-import {
-  Suspense,
-  useCallback,
-  useContext,
-  useEffect,
-  useMemo,
-  useState,
-  useTransition,
-} from 'react';
+import WorkoutPlanEditor, {
+  DayWithExerciseIds,
+} from '../components/WorkoutPlanEditor/WorkoutPlanEditor';
+import { useCallback, useContext, useEffect, useMemo, useState } from 'react';
 
 import AppBarWithAppHeaderLayout from '../layouts/AppBarWithAppHeaderLayout/AppBarWithAppHeaderLayout';
+import { Exercise } from '@prisma/client';
 import { NextPageWithLayout } from './_app';
+import RouteGuard from '../components/RouteGuard/RouteGuard';
+import RouteLoader from '../components/RouteLoader/RouteLoader';
+import { ScheduleWithFullDetail } from '../types';
 import { SnackbarContext } from '../providers/Snackbar/Snackbar';
-import WorkoutPlanEditor from '../components/WorkoutPlanEditor/WorkoutPlanEditor';
-import activeWorkoutExists from '../utils/active-workout-exists';
 import classNames from 'classnames';
-import { convertToPlainObject } from '../utils/normalize-bson';
-import { getExercises } from '../database/domains/exercise';
-import { getSchedule } from '../database/domains/schedule';
-import { getUserId } from '../utils/get-user-id';
 import styles from './WorkoutPlan.module.scss';
+import useFetchWith403Redirect from '../utils/fetch-with-403-redirect';
 import { useHeadWithTitle } from '../utils/use-head-with-title';
 import { useRouter } from 'next/router';
+import useSWR from 'swr';
+import { v4 as uuidv4 } from 'uuid';
 
 const WorkoutPlanSchema = Yup.array()
   .min(1)
@@ -36,59 +30,57 @@ const WorkoutPlanSchema = Yup.array()
     })
   );
 
-interface WorkoutPlanProps {
-  exercises: IExercise[];
-  schedule: ISchedule | null;
-}
+interface WorkoutPlanProps {}
 
-export async function getServerSideProps(
-  context: GetServerSidePropsContext
-): Promise<GetServerSidePropsResult<WorkoutPlanProps>> {
-  const userId = await getUserId(context.req, context.res);
-  if (!userId) {
-    return { redirect: { destination: '/', permanent: false } };
-  }
-  if (await activeWorkoutExists(userId)) {
-    return { redirect: { destination: '/workout', permanent: false } };
-  }
-  const [exercises, schedule] = await Promise.all([
-    getExercises(userId).then((exercises) => convertToPlainObject(exercises)),
-    getSchedule(userId).then((schedule) => convertToPlainObject(schedule)),
-  ]);
-  return {
-    props: { exercises, schedule },
-  };
-}
+const WorkoutPlan: NextPageWithLayout = () => {
+  const fetcher = useFetchWith403Redirect();
 
-const WorkoutPlan: NextPageWithLayout<WorkoutPlanProps> = ({
-  exercises,
-  schedule,
-}: WorkoutPlanProps) => {
-  const exerciseMap: Map<string, IExercise> = useMemo(
+  const { data: exercises, error: fetchExercisesError } = useSWR<Exercise[]>(
+    '/api/exercises',
+    fetcher
+  );
+  const { data: schedule, error: fetchScheduleError } =
+    useSWR<ScheduleWithFullDetail | null>('/api/schedule', fetcher);
+
+  const exerciseMap: Map<number, Exercise> = useMemo(
     () =>
-      new Map<string, IExercise>(
-        exercises.map(({ _id, ...ex }) => [_id, { _id, ...ex }])
+      new Map<number, Exercise>(
+        exercises?.map(({ id, ...ex }) => [id, { id, ...ex }])
       ),
     [exercises]
   );
 
-  const days = useMemo(() => schedule?.days ?? [], [schedule?.days]);
+  const mapScheduleToDays = useCallback(
+    (
+      schedule: ScheduleWithFullDetail | null | undefined
+    ): DayWithExerciseIds[] => {
+      return (
+        schedule?.days.map((day) => ({
+          day: { nickname: day.nickname, orderNumber: day.orderNumber },
+          exerciseIds: day.exercises.map((exercise) => exercise.exerciseId),
+          guid: uuidv4(),
+        })) ?? []
+      );
+    },
+    []
+  );
 
-  const [workoutScheduleDays, setWorkoutScheduleDays] =
-    useState<IScheduleDay[]>(days);
+  const [days, setDays] = useState(mapScheduleToDays(schedule));
 
-  useEffect(() => setWorkoutScheduleDays(days), [days, schedule]);
+  useEffect(() => {
+    setDays(mapScheduleToDays(schedule));
+  }, [mapScheduleToDays, schedule]);
 
   const valid = useMemo(() => {
     try {
-      WorkoutPlanSchema.validateSync(workoutScheduleDays, {
+      WorkoutPlanSchema.validateSync(days, {
         strict: true,
       });
       return true;
     } catch (e) {
       return false;
     }
-  }, [workoutScheduleDays]);
+  }, [days]);
 
   const router = useRouter();
 
@@ -97,17 +89,28 @@ const WorkoutPlan: NextPageWithLayout<WorkoutPlanProps> = ({
   const save = useCallback(async () => {
     await fetch(`/api/schedule`, {
       method: 'PUT',
-      body: JSON.stringify({ days: workoutScheduleDays }),
+      body: JSON.stringify({ days }),
       headers: { 'content-type': 'application/json' },
       credentials: 'same-origin',
     });
     openSnackbar('Schedule saved successfully.');
     router.push('/dashboard');
-  }, [openSnackbar, router, workoutScheduleDays]);
+  }, [days, openSnackbar, router]);
 
   const [isReorderMode, setIsReorderMode] = useState(false);
 
   const head = useHeadWithTitle('Workout Plan');
+
+  if (typeof exercises === 'undefined' || typeof schedule === 'undefined') {
+    return <RouteLoader />;
+  }
+
+  if (fetchExercisesError) {
+    throw fetchExercisesError;
+  }
+  if (fetchScheduleError) {
+    throw fetchScheduleError;
+  }
 
   return (
     <div className={styles.wrapper}>
@@ -116,11 +119,11 @@ const WorkoutPlan: NextPageWithLayout<WorkoutPlanProps> = ({
       <div className={styles.root}>
         <WorkoutPlanEditor
           dayReorderModeEnabled={isReorderMode}
-          days={workoutScheduleDays}
+          days={days}
           exerciseMap={exerciseMap}
-          daysChanged={setWorkoutScheduleDays}
+          daysChanged={setDays}
         />
-        {!!workoutScheduleDays.length && (
+        {!!days.length && (
           <div className={styles.buttonBar}>
             <button
               onClick={() => setIsReorderMode(!isReorderMode)}
@@ -152,7 +155,9 @@ const WorkoutPlan: NextPageWithLayout<WorkoutPlanProps> = ({
 };
 
 WorkoutPlan.getLayout = (page) => (
-  <AppBarWithAppHeaderLayout>{page}</AppBarWithAppHeaderLayout>
+  <AppBarWithAppHeaderLayout>
+    <RouteGuard>{page}</RouteGuard>
+  </AppBarWithAppHeaderLayout>
 );
 
 export default WorkoutPlan;

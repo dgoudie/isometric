@@ -1,4 +1,3 @@
-import { signOut } from 'next-auth/react';
 import { useCallback } from 'react';
 import { useRouter } from 'next/router';
 

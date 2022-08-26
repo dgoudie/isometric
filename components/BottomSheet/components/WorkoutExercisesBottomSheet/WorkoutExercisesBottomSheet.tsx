@@ -1,15 +1,13 @@
-import { IExercise, IWorkoutExercise } from '@dgoudie/isometric-types';
-import React, { Suspense, useMemo } from 'react';
-
 import BottomSheet from '../../BottomSheet';
 import MuscleGroupTag from '../../../MuscleGroupTag/MuscleGroupTag';
-import { ReadableResource } from '../../../../utils/fetch-from-api';
 import RouteLoader from '../../../RouteLoader/RouteLoader';
+import { Suspense } from 'react';
+import { WorkoutExerciseWithSetsAndDetails } from '../../../../types';
 import classNames from 'classnames';
 import styles from './WorkoutExercisesBottomSheet.module.scss';
 
 interface Props {
-  exercises: IWorkoutExercise[];
+  workoutExercises: WorkoutExerciseWithSetsAndDetails[];
   onResult: (resultIndex: number | undefined | 'add') => void;
 }
 
@@ -40,10 +38,10 @@ interface WorkoutExercisesBottomSheetContentProps
 
 function WorkoutExercisesBottomSheetContent({
   onResult,
-  exercises,
+  workoutExercises,
 }: WorkoutExercisesBottomSheetContentProps) {
-  const exerciseElements = exercises.map((exercise, index) => {
-    const exerciseComplete = exercise.sets.every((set) => set.complete);
+  const exerciseElements = workoutExercises.map((workoutExercise, index) => {
+    const exerciseComplete = workoutExercise.sets.every((set) => set.complete);
     return (
       <button
         key={index}
@@ -56,8 +54,10 @@ function WorkoutExercisesBottomSheetContent({
         <i
           className={classNames('fa-solid', exerciseComplete && 'fa-check')}
         ></i>
-        <div className={styles.itemText}>{exercise.name}</div>
-        <MuscleGroupTag muscleGroup={exercise.primaryMuscleGroup} />
+        <div className={styles.itemText}>{workoutExercise.exercise.name}</div>
+        <MuscleGroupTag
+          muscleGroup={workoutExercise.exercise.primaryMuscleGroup}
+        />
       </button>
     );
   });

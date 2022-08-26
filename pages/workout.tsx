@@ -1,9 +1,3 @@
-import { GetServerSidePropsContext, GetServerSidePropsResult } from 'next';
-import {
-  IExerciseExtended,
-  IWorkout,
-  IWorkoutExercise,
-} from '@dgoudie/isometric-types';
 import {
   Suspense,
   useCallback,
@@ -12,14 +6,12 @@ import {
   useState,
   useTransition,
 } from 'react';
-import {
-  getMinifiedActiveWorkout,
-  getWorkoutInstancesByExerciseName,
-} from '../database/domains/workout';
 
 import ActiveExerciseView from '../components/ActiveExerciseView/ActiveExerciseView';
 import EndWorkoutBottomSheet from '../components/BottomSheet/components/EndWorkoutBottomSheet/EndWorkoutBottomSheet';
 import ExercisePickerBottomSheet from '../components/BottomSheet/components/ExercisePickerBottomSheet/ExercisePickerBottomSheet';
+import { FullWorkout } from '../types';
+import { GetServerSideProps } from 'next';
 import { NextPageWithLayout } from './_app';
 import RouteLoader from '../components/RouteLoader/RouteLoader';
 import { SnackbarContext } from '../providers/Snackbar/Snackbar';
@@ -27,72 +19,40 @@ import SwipeDeadZone from '../components/SwipeDeadZone/SwipeDeadZone';
 import { WorkoutContext } from '../providers/Workout/Workout';
 import WorkoutExercisesBottomSheet from '../components/BottomSheet/components/WorkoutExercisesBottomSheet/WorkoutExercisesBottomSheet';
 import classNames from 'classnames';
-import { convertToPlainObject } from '../utils/normalize-bson';
-import { getExercises } from '../database/domains/exercise';
+import { getActiveWorkoutId } from '../database/domains/workout';
 import { getUserId } from '../utils/get-user-id';
 import { requestNotificationPermission } from '../utils/notification';
 import styles from './Workout.module.scss';
+import useFetchWith403Redirect from '../utils/fetch-with-403-redirect';
 import { useHeadWithTitle } from '../utils/use-head-with-title';
-import { useRouter } from 'next/router';
+import useSWR from 'swr';
 
 export type ActiveExercise = {
   index: number;
   scrollIntoView: boolean;
 };
 
-type WorkoutProps = {
-  workout: IWorkout;
-  exercises: IExerciseExtended[];
-};
-
-export async function getServerSideProps(
-  context: GetServerSidePropsContext
-): Promise<GetServerSidePropsResult<WorkoutProps>> {
+export const getServerSideProps: GetServerSideProps = async (context) => {
   const userId = await getUserId(context.req, context.res);
   if (!userId) {
     return { redirect: { destination: '/', permanent: false } };
   }
-  const [exercises, workout] = await Promise.all([
-    getExercises(userId).then((exercises) => convertToPlainObject(exercises)),
-    getMinifiedActiveWorkout(userId).then((workout) =>
-      convertToPlainObject(workout)
-    ),
-  ]);
-  if (!workout) {
+  const activeWorkoutId = getActiveWorkoutId(userId);
+  if (!activeWorkoutId) {
     return { redirect: { destination: '/dashboard', permanent: false } };
   }
-  return {
-    props: { exercises, workout },
-  };
-}
+  return { props: {} };
+};
 
-const Workout: NextPageWithLayout<WorkoutProps> = ({
-  exercises,
-  workout: initialWorkout,
-}) => {
+const Workout: NextPageWithLayout = () => {
   useEffect(() => {
     requestNotificationPermission();
   }, []);
 
-  const [workout, setWorkout] = useState(initialWorkout);
-  const {
-    workout: workoutUpdates,
-    endWorkout,
-    discardWorkout,
-    addExercise,
-  } = useContext(WorkoutContext);
+  const { endWorkout, discardWorkout, addExercise } =
+    useContext(WorkoutContext);
 
-  const router = useRouter();
-
-  useEffect(() => {
-    if (typeof workoutUpdates !== 'undefined') {
-      if (workoutUpdates === null) {
-        router.replace('/dashboard');
-      } else {
-        setWorkout(workoutUpdates);
-      }
-    }
-  }, [workoutUpdates, router]);
+  const fetcher = useFetchWith403Redirect();
 
   const { openSnackbar } = useContext(SnackbarContext);
 
@@ -145,7 +105,7 @@ const Workout: NextPageWithLayout<WorkoutProps> = ({
   }, []);
 
   const onExeciseAdded = useCallback(
-    (exerciseId: string | undefined) => {
+    (exerciseId: number | undefined) => {
       if (typeof exerciseId !== 'undefined') {
         addExercise(exerciseId, activeExercise.index + 1);
         openSnackbar('Exercise Added.');
@@ -157,9 +117,10 @@ const Workout: NextPageWithLayout<WorkoutProps> = ({
 
   const head = useHeadWithTitle('Workout');
 
-  if (!workout) {
-    return <RouteLoader />;
-  }
+  const { data, error } = useSWR<FullWorkout>('/api/workout', fetcher);
+
+  if (error) throw error;
+  if (!data) return <RouteLoader />;
 
   return (
     <div className={styles.root}>
@@ -174,7 +135,7 @@ const Workout: NextPageWithLayout<WorkoutProps> = ({
         </button>
 
         <div className={styles.headerExerciseNumber}>
-          {exerciseIndexInView + 1} / {workout.exercises.length}
+          {exerciseIndexInView + 1} / {data.exercises.length}
         </div>
         <button
           type='button'
@@ -186,14 +147,13 @@ const Workout: NextPageWithLayout<WorkoutProps> = ({
       </header>
       <Suspense fallback={<RouteLoader className={styles.loader} />}>
         <ActiveExerciseView
-          exercises={workout.exercises}
-          exercisesExtended={exercises}
+          exercises={data.exercises}
           focusedExercise={activeExercise}
           focusedExerciseChanged={focusedExerciseChanged}
         />
       </Suspense>
       <div className={styles.paginator}>
-        {workout.exercises.map((exercise, index) => (
+        {data.exercises.map((exercise, index) => (
           <div
             key={index}
             className={classNames(
@@ -213,7 +173,7 @@ const Workout: NextPageWithLayout<WorkoutProps> = ({
       )}
       {showWorkoutExercisesBottomSheet && (
         <WorkoutExercisesBottomSheet
-          exercises={workout.exercises}
+          workoutExercises={data.exercises}
           onResult={onExeciseSelected}
         />
       )}

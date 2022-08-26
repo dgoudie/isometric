@@ -1,19 +1,11 @@
-import {
-  ReadableResource,
-  emptyReadableResource,
-  fetchFromApiAsReadableResource,
-} from '../../utils/fetch-from-api';
-import { Suspense, useEffect, useMemo, useState, useTransition } from 'react';
-
-import { IWorkoutExercise } from '@dgoudie/isometric-types';
+import { FinishedWorkoutExerciseWithSets } from '../../types';
 import RouteLoader from '../RouteLoader/RouteLoader';
 import SetView from '../SetView/SetView';
-import exercise from '../../database/models/exercise';
 import styles from './ActiveExerciseViewExerciseInstances.module.scss';
+import useFetchWith403Redirect from '../../utils/fetch-with-403-redirect';
+import useSWR from 'swr';
 
 const format = new Intl.DateTimeFormat('en-US');
-
-let initialInstancesResponse = emptyReadableResource();
 
 interface Props {
   exerciseName: string;
@@ -22,36 +14,13 @@ interface Props {
 export default function ActiveExerciseViewExerciseInstances({
   exerciseName,
 }: Props) {
-  const [instancesResource, setInstancesResource] = useState<
-    ReadableResource<IWorkoutExercise[]>
-  >(initialInstancesResponse);
-
-  const [_isPending, startTransaction] = useTransition();
-
-  useEffect(() => {
-    startTransaction(() => {
-      const updatedInstancesResource = fetchFromApiAsReadableResource<
-        IWorkoutExercise[]
-      >(`/api/workout-instances/${exerciseName}`);
-      setInstancesResource(updatedInstancesResource);
-    });
-  }, [exerciseName]);
-  return (
-    <Suspense fallback={<RouteLoader />}>
-      <Instances instancesResource={instancesResource} />
-    </Suspense>
+  const fetcher = useFetchWith403Redirect();
+  const { data: instances, error } = useSWR<FinishedWorkoutExerciseWithSets[]>(
+    `/api/workout-instances/${exerciseName}`,
+    fetcher
   );
-}
-
-interface InstancesProps {
-  instancesResource: ReadableResource<IWorkoutExercise[]>;
-}
-
-function Instances({ instancesResource }: InstancesProps) {
-  const instances = useMemo(
-    () => instancesResource.read(),
-    [instancesResource]
-  );
+  if (error) throw error;
+  if (!instances) return <RouteLoader />;
   return (
     <div className={styles.instances}>
       <div className={styles.instancesHeader}>Recent History</div>
@@ -59,7 +28,9 @@ function Instances({ instancesResource }: InstancesProps) {
         <div className={styles.instancesItems}>
           {instances.map((instance, index) => (
             <div className={styles.instancesItemsItem} key={index}>
-              <div>{format.format(new Date(instance.performedAt))}</div>
+              <div>
+                {format.format(new Date(instance.finishedWorkout.createdAt))}
+              </div>
               <SetView
                 key={index}
                 exerciseType={instance.exerciseType}

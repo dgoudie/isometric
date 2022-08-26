@@ -1,8 +1,4 @@
-import {
-  ExerciseMuscleGroup,
-  ExerciseMuscleGroups,
-} from '@dgoudie/isometric-types';
-
+import { ExerciseMuscleGroup } from '@prisma/client';
 import { NextApiHandler } from 'next';
 import { getExercises } from '../../database/domains/exercise';
 import { getUserId } from '../../utils/get-user-id';
@@ -29,7 +25,9 @@ const handler: NextApiHandler = async (req, res) => {
       if (typeof muscleGroup !== 'undefined') {
         if (
           typeof muscleGroup !== 'string' ||
-          !ExerciseMuscleGroups.includes(muscleGroup as ExerciseMuscleGroup)
+          !Object.keys(ExerciseMuscleGroup).includes(
+            muscleGroup as ExerciseMuscleGroup
+          )
         ) {
           res.status(400).end();
           return;
@@ -59,7 +57,7 @@ const handler: NextApiHandler = async (req, res) => {
       const exercises = await getExercises(
         userId,
         {
-          search,
+          name: { search },
           muscleGroup: muscleGroup as ExerciseMuscleGroup,
           ids,
           onlyNotPerformed,

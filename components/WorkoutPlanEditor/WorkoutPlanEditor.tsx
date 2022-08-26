@@ -1,22 +1,28 @@
 import { DragDropContext, DropResult, Droppable } from 'react-beautiful-dnd';
-import { IExercise, IScheduleDay } from '@dgoudie/isometric-types';
-import React, { useCallback, useEffect, useRef, useState } from 'react';
+import { Exercise, Prisma } from '@prisma/client';
 import {
   deleteItemFromArray,
   moveItemInArray,
   replaceItemInArray,
 } from '../../utils/array-helpers';
+import { useCallback, useEffect, useRef, useState } from 'react';
 
 import CopyDayBottomSheet from '../BottomSheet/components/CopyDayBottomSheet/CopyDayBottomSheet';
-import { ObjectId } from 'bson';
 import WorkoutPlanDayEditor from './components/WorkoutPlanDayEditor/WorkoutPlanDayEditor';
 import classNames from 'classnames';
 import styles from './WorkoutPlanEditor.module.scss';
+import { v4 as uuidv4 } from 'uuid';
+
+export interface DayWithExerciseIds {
+  day: Prisma.ScheduleDayCreateInput;
+  exerciseIds: number[];
+  guid: string;
+}
 
 interface Props {
-  days: IScheduleDay[];
-  daysChanged: (days: IScheduleDay[]) => void;
-  exerciseMap: Map<string, IExercise>;
+  days: DayWithExerciseIds[];
+  daysChanged: (days: DayWithExerciseIds[]) => void;
+  exerciseMap: Map<number, Exercise>;
   dayReorderModeEnabled?: boolean;
 }
 
@@ -40,13 +46,6 @@ export default function WorkoutPlanEditor({
     };
   }, [listRef, dayReorderModeEnabled]);
 
-  const updateAndReportDays = useCallback(
-    (updatedDays: IScheduleDay[]) => {
-      daysChanged(updatedDays);
-    },
-    [daysChanged]
-  );
-
   const onDragEnd = useCallback(
     ({ source, destination }: DropResult) => {
       if (!destination) {
@@ -55,39 +54,41 @@ export default function WorkoutPlanEditor({
       if (destination.index === source.index) {
         return;
       }
-      updateAndReportDays(
-        moveItemInArray(days, source.index, destination.index)
-      );
+      daysChanged(moveItemInArray(days, source.index, destination.index));
     },
-    [days, updateAndReportDays]
+    [days, daysChanged]
   );
 
   const handleAdd = useCallback(() => {
-    updateAndReportDays([
+    daysChanged([
       ...days,
-      { exerciseIds: [], nickname: '', _id: new ObjectId().toString() },
+      {
+        day: { nickname: '', orderNumber: days.length },
+        exerciseIds: [],
+        guid: uuidv4(),
+      },
     ]);
-  }, [days, updateAndReportDays]);
+  }, [days, daysChanged]);
 
   const handleDelete = useCallback(
     (index: number) => {
-      updateAndReportDays(deleteItemFromArray(days, index));
+      daysChanged(deleteItemFromArray(days, index));
     },
-    [days, updateAndReportDays]
+    [daysChanged, days]
   );
 
   const dayChanged = useCallback(
-    (day: IScheduleDay, index: number) => {
-      updateAndReportDays(replaceItemInArray(days, index, day));
+    (day: typeof days[0], index: number) => {
+      daysChanged(replaceItemInArray(days, index, day));
     },
-    [days, updateAndReportDays]
+    [days, daysChanged]
   );
 
   const onCopyDayResult = useCallback(
     (result: number | undefined) => {
       if (typeof result !== 'undefined') {
         const day = days[result];
-        daysChanged([...days, { ...day, _id: new ObjectId().toString() }]);
+        daysChanged([...days, { ...day, guid: uuidv4() }]);
       }
       setCopyDayVisible(false);
     },
@@ -115,11 +116,15 @@ export default function WorkoutPlanEditor({
         <Droppable droppableId='workout_plan_days'>
           {(provided) => (
             <div ref={provided.innerRef} {...provided.droppableProps}>
-              {days.map((day, index) => (
+              {days.map(({ day, exerciseIds, guid }, index) => (
                 <WorkoutPlanDayEditor
-                  key={day._id}
+                  key={guid}
                   day={day}
-                  dayChanged={(day) => dayChanged(day, index)}
+                  guid={guid}
+                  exerciseIds={exerciseIds}
+                  dayChanged={(day, exerciseIds) =>
+                    dayChanged({ day, exerciseIds, guid }, index)
+                  }
                   index={index}
                   exerciseMap={exerciseMap}
                   onDelete={() => handleDelete(index)}

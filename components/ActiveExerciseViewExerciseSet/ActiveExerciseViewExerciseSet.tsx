@@ -1,3 +1,4 @@
+import { Exercise, WorkoutExerciseSet } from '@prisma/client';
 import { IExercise, IWorkoutExerciseSet } from '@dgoudie/isometric-types';
 import {
   addMilliseconds,
@@ -16,8 +17,8 @@ import { showNotification } from '../../utils/notification';
 import styles from './ActiveExerciseViewExerciseSet.module.scss';
 
 interface Props {
-  set: IWorkoutExerciseSet;
-  data: IExercise;
+  set: WorkoutExerciseSet;
+  data: Exercise;
   exerciseSelected: boolean;
   setSelected: boolean;
   exerciseIndex: number;

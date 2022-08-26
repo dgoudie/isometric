@@ -1,17 +1,17 @@
 import ExerciseSearch, {
   HistoryOption,
 } from '../../../ExerciseSearch/ExerciseSearch';
-import React, { useState } from 'react';
 
 import BottomSheet from '../../BottomSheet';
-import { ExerciseMuscleGroup } from '@dgoudie/isometric-types';
+import { ExerciseMuscleGroup } from '@prisma/client';
 import styles from './ExercisePickerBottomSheet.module.scss';
+import { useState } from 'react';
 
 interface Props {
   search?: string;
   muscleGroup?: ExerciseMuscleGroup;
   history?: HistoryOption;
-  onResult: (result: string | undefined) => void;
+  onResult: (result: number | undefined) => void;
 }
 
 export default function ExercisePickerBottomSheet({

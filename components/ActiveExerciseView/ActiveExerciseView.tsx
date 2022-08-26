@@ -1,38 +1,23 @@
-import { IExerciseExtended, IWorkoutExercise } from '@dgoudie/isometric-types';
-import React, {
-  useCallback,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-} from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 
 import { ActiveExercise } from '../../pages/workout';
 import ActiveExerciseViewExercise from '../ActiveExerciseViewExercise/ActiveExerciseViewExercise';
 import { AfterExerciseTimerContext } from '../../providers/AfterExerciseTimer/AfterExerciseTimer';
+import { WorkoutExerciseWithSetsAndDetails } from '../../types';
 import classNames from 'classnames';
 import styles from './ActiveExerciseView.module.scss';
 import { usePageVisibility } from 'react-page-visibility';
 
 interface Props {
-  exercises: IWorkoutExercise[];
-  exercisesExtended: IExerciseExtended[];
+  exercises: WorkoutExerciseWithSetsAndDetails[];
   focusedExercise: ActiveExercise;
   focusedExerciseChanged: (exercise: ActiveExercise) => void;
 }
 export default function ActiveExerciseView({
   exercises,
-  exercisesExtended,
   focusedExercise,
   focusedExerciseChanged,
 }: Props) {
-  const exerciseMap: Map<string, IExerciseExtended> = useMemo(
-    () =>
-      new Map<string, IExerciseExtended>(
-        exercisesExtended.map(({ _id, ...ex }) => [_id, { _id, ...ex }])
-      ),
-    [exercisesExtended]
-  );
   const rootRef = useRef<HTMLDivElement>(null);
   const scrollExerciseIntoViewByIndex = useCallback(
     (index: number) => {
@@ -73,8 +58,9 @@ export default function ActiveExerciseView({
 
   const [nextNoncompleteExercise, setNextNoncompleteExercise] = useState<{
     index: number;
-    exerciseData: IExerciseExtended;
+    exercise: WorkoutExerciseWithSetsAndDetails;
   }>();
+
   useEffect(() => {
     let indexOfNextNonCompleteExercise = exercises.findIndex(
       (exercise, i) =>
@@ -84,14 +70,13 @@ export default function ActiveExerciseView({
     if (indexOfNextNonCompleteExercise >= 0) {
       setNextNoncompleteExercise({
         index: indexOfNextNonCompleteExercise,
-        exerciseData: exerciseMap.get(
-          exercises[indexOfNextNonCompleteExercise]._id
-        )!,
+        exercise: exercises[indexOfNextNonCompleteExercise],
       });
     } else {
       setNextNoncompleteExercise(undefined);
     }
-  }, [exercises, focusedExercise, exerciseMap]);
+  }, [exercises, focusedExercise]);
+
   const onSelected = useCallback(
     (index: number) => {
       focusedExerciseChanged({ index, scrollIntoView: false });
@@ -128,9 +113,8 @@ export default function ActiveExerciseView({
       {exercises.map((exercise, index) => (
         <ActiveExerciseViewExercise
           key={index}
-          data={exerciseMap.get(exercise._id)!}
-          exercise={exercise}
-          nextExercise={nextNoncompleteExercise?.exerciseData}
+          workoutExercise={exercise}
+          nextWorkoutExercise={nextNoncompleteExercise?.exercise}
           exerciseIndex={index}
           exerciseCount={exercises.length}
           onSelected={onSelected}

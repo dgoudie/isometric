@@ -4,8 +4,8 @@ import {
   DropResult,
   Droppable,
 } from 'react-beautiful-dnd';
-import { IExercise, IScheduleDay } from '@dgoudie/isometric-types';
-import { MouseEvent, useCallback, useState } from 'react';
+import { Exercise, Prisma } from '@prisma/client';
+import { MouseEvent, useCallback, useEffect, useState } from 'react';
 import {
   deleteItemFromArray,
   moveItemInArray,
@@ -17,16 +17,23 @@ import classNames from 'classnames';
 import styles from './WorkoutPlanDayEditor.module.scss';
 
 interface Props {
-  day: IScheduleDay;
-  dayChanged: (day: IScheduleDay) => void;
+  day: Prisma.ScheduleDayCreateInput;
+  exerciseIds: number[];
+  guid: string;
+  dayChanged: (
+    day: Prisma.ScheduleDayCreateInput,
+    exerciseIds: number[]
+  ) => void;
   index: number;
-  exerciseMap: Map<string, IExercise>;
+  exerciseMap: Map<number, Exercise>;
   onDelete: () => void;
   dayReorderModeEnabled: boolean;
 }
 
 export default function WorkoutPlanDayEditor({
   day,
+  exerciseIds,
+  guid,
   dayChanged,
   index,
   exerciseMap,
@@ -35,24 +42,19 @@ export default function WorkoutPlanDayEditor({
 }: Props) {
   const [exercisePickerVisible, setExercisePickerVisible] = useState(false);
 
-  const exercisesChanged = useCallback(
-    (exerciseIds: string[]) => dayChanged({ ...day, exerciseIds }),
-    [day, dayChanged]
-  );
-
   const nicknameChanged = useCallback(
-    (nickname: string) => dayChanged({ ...day, nickname }),
-    [day, dayChanged]
+    (nickname: string) => dayChanged({ ...day, nickname }, exerciseIds),
+    [day, dayChanged, exerciseIds]
   );
 
   const onExercisePickerResult = useCallback(
-    (result: string | undefined) => {
+    (result: number | undefined) => {
       setExercisePickerVisible(false);
-      if (!!result) {
-        exercisesChanged([...day.exerciseIds, result]);
+      if (typeof result !== 'undefined') {
+        dayChanged(day, [...exerciseIds, result]);
       }
     },
-    [day.exerciseIds, exercisesChanged]
+    [day, dayChanged, exerciseIds]
   );
 
   const deleteDayWrapped = useCallback(
@@ -71,22 +73,23 @@ export default function WorkoutPlanDayEditor({
       if (destination.index === source.index) {
         return;
       }
-      exercisesChanged(
-        moveItemInArray(day.exerciseIds, source.index, destination.index)
+      dayChanged(
+        day,
+        moveItemInArray(exerciseIds, source.index, destination.index)
       );
     },
-    [day.exerciseIds, exercisesChanged]
+    [day, dayChanged, exerciseIds]
   );
 
   const handleExerciseDelete = useCallback(
     (index: number) => {
-      exercisesChanged(deleteItemFromArray(day.exerciseIds, index));
+      dayChanged(day, deleteItemFromArray(exerciseIds, index));
     },
-    [day.exerciseIds, exercisesChanged]
+    [day, dayChanged, exerciseIds]
   );
 
   return (
-    <Draggable draggableId={day._id} index={index}>
+    <Draggable draggableId={guid} index={index}>
       {(provided) => (
         <div
           ref={provided.innerRef}
@@ -120,7 +123,7 @@ export default function WorkoutPlanDayEditor({
             </button>
           </div>
           <DragDropContext onDragEnd={onDragEnd}>
-            <Droppable droppableId={day._id}>
+            <Droppable droppableId={guid}>
               {(provided) => (
                 <div
                   className={classNames(
@@ -130,7 +133,7 @@ export default function WorkoutPlanDayEditor({
                   {...provided.droppableProps}
                   ref={provided.innerRef}
                 >
-                  {day.exerciseIds.map((exerciseId, index) => (
+                  {exerciseIds.map((exerciseId, index) => (
                     <WorkoutPlanDayExerciseEditor
                       index={index}
                       key={`day_${index}_${exerciseId}_${index}`}
@@ -145,7 +148,7 @@ export default function WorkoutPlanDayEditor({
               )}
             </Droppable>
           </DragDropContext>
-          {day.exerciseIds.length === 0 && (
+          {exerciseIds.length === 0 && (
             <div
               className={classNames(
                 styles.noExercises,

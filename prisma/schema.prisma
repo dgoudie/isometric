@@ -3,7 +3,7 @@
 
 generator client {
   provider        = "prisma-client-js"
-  previewFeatures = ["fullTextSearch"]
+  previewFeatures = ["fullTextSearch", "interactiveTransactions"]
 }
 
 datasource db {
@@ -39,18 +39,20 @@ enum ExerciseType {
 }
 
 model User {
-  userId    String     @id
-  exercises Exercise[]
-  workouts  Workout[]
-  createdAt DateTime   @default(now())
-  updatedAt DateTime   @default(now())
+  userId           String            @id
+  exercises        Exercise[]
+  workout          Workout?
+  schedule         Schedule?
+  createdAt        DateTime          @default(now())
+  updatedAt        DateTime          @default(now())
+  finishedWorkouts FinishedWorkout[]
 }
 
 model Exercise {
   id                            Int                   @id @default(sequence())
   userId                        String
   user                          User                  @relation(fields: [userId], references: [userId])
-  name                          String                @unique
+  name                          String
   breakTimeInSeconds            Int
   setCount                      Int
   timePerSetInSeconds           Int?
@@ -61,48 +63,114 @@ model Exercise {
   exerciseType                  ExerciseType
   createdAt                     DateTime              @default(now())
   updatedAt                     DateTime              @default(now())
-  WorkoutExercise               WorkoutExercise[]
+  activeInstances               WorkoutExercise[]
+  inScheduledDays               ExerciseInSchedule[]
+
+  @@unique([userId, name(sort: Asc)])
+}
+
+model Schedule {
+  id        Int           @id @default(sequence())
+  userId    String        @unique
+  user      User          @relation(fields: [userId], references: [userId])
+  days      ScheduleDay[]
+  createdAt DateTime      @default(now())
+  updatedAt DateTime      @default(now())
+}
+
+model ScheduleDay {
+  id          Int                  @id @default(sequence())
+  nickname    String
+  exercises   ExerciseInSchedule[]
+  schedule    Schedule?            @relation(fields: [scheduleId], references: [id])
+  scheduleId  Int?
+  orderNumber Int
+
+  @@unique([scheduleId, orderNumber])
+}
+
+model ExerciseInSchedule {
+  exercise      Exercise    @relation(fields: [exerciseId], references: [id])
+  exerciseId    Int
+  scheduleDay   ScheduleDay @relation(fields: [scheduleDayId], references: [id])
+  scheduleDayId Int
+  orderNumber   Int
+
+  @@id([exerciseId, scheduleDayId])
+  @@unique([exerciseId, orderNumber])
 }
 
 model Workout {
-  id                Int               @id @default(sequence())
-  userId            String
-  user              User              @relation(fields: [userId], references: [userId])
-  endedAt           DateTime?
-  dayNumber         Int
-  nickname          String
-  durationInSeconds Int
-  checkins          WorkoutCheckin[]
-  exercises         WorkoutExercise[]
-  createdAt         DateTime          @default(now())
-  updatedAt         DateTime          @default(now())
+  id        Int               @id @default(sequence())
+  userId    String            @unique
+  user      User              @relation(fields: [userId], references: [userId])
+  dayNumber Int
+  nickname  String
+  checkins  WorkoutCheckin[]
+  exercises WorkoutExercise[]
+  createdAt DateTime          @default(now())
+  updatedAt DateTime          @default(now())
 }
 
 model WorkoutExercise {
   id                 Int                  @id @default(sequence())
   workoutId          Int
-  workout            Workout              @relation(fields: [workoutId], references: [id])
-  name               String
-  exercise           Exercise?            @relation(fields: [name], references: [name])
+  workout            Workout              @relation(fields: [workoutId], references: [id], onDelete: Cascade)
+  exerciseId         Int
+  exercise           Exercise             @relation(fields: [exerciseId], references: [id])
   exerciseType       ExerciseType
   primaryMuscleGroup ExerciseMuscleGroup
-  performedAt        DateTime             @default(now())
   sets               WorkoutExerciseSet[]
+  orderNumber        Int
 }
 
 model WorkoutExerciseSet {
   id                 Int             @id @default(sequence())
   workoutExerciseId  Int
-  workoutExercise    WorkoutExercise @relation(fields: [workoutExerciseId], references: [id])
+  workoutExercise    WorkoutExercise @relation(fields: [workoutExerciseId], references: [id], onDelete: Cascade)
   resistanceInPounds Int?
   repetitions        Int?
   timeInSeconds      Int?
   complete           Boolean
+  orderNumber        Int
 }
 
 model WorkoutCheckin {
   id        Int      @id @default(sequence())
   at        DateTime @default(now())
   workoutId Int
-  workout   Workout  @relation(fields: [workoutId], references: [id])
+  workout   Workout  @relation(fields: [workoutId], references: [id], onDelete: Cascade)
+}
+
+model FinishedWorkout {
+  id                Int                       @id @default(sequence())
+  userId            String
+  user              User?                     @relation(fields: [userId], references: [userId])
+  dayNumber         Int
+  endedAt           DateTime
+  nickname          String
+  durationInSeconds Int
+  exercises         FinishedWorkoutExercise[]
+  createdAt         DateTime                  @default(now())
+}
+
+model FinishedWorkoutExercise {
+  id                 Int                          @id @default(sequence())
+  finishedWorkoutId  Int
+  finishedWorkout    FinishedWorkout              @relation(fields: [finishedWorkoutId], references: [id], onDelete: Cascade)
+  name               String
+  exerciseType       ExerciseType
+  primaryMuscleGroup ExerciseMuscleGroup
+  orderNumber        Int
+  sets               FinishedWorkoutExerciseSet[]
+}
+
+model FinishedWorkoutExerciseSet {
+  id                        Int                     @id @default(sequence())
+  finishedWorkoutExerciseId Int
+  finishedWorkoutExercise   FinishedWorkoutExercise @relation(fields: [finishedWorkoutExerciseId], references: [id], onDelete: Cascade)
+  resistanceInPounds        Int?
+  repetitions               Int?
+  timeInSeconds             Int?
+  orderNumber               Int
 }

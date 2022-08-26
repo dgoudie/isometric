@@ -1,7 +1,7 @@
 import { FieldHookConfig, useField } from 'formik';
 import SetCountPicker, { SetCount } from '../SetCountPicker/SetCountPicker';
 
-import { ExerciseMuscleGroup } from '@dgoudie/isometric-types';
+import { ExerciseMuscleGroup } from '@prisma/client';
 import MuscleGroupPicker from '../MuscleGroupPicker/MuscleGroupPicker';
 import React from 'react';
 

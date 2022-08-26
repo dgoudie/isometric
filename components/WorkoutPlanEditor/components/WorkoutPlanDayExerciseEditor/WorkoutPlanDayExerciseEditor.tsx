@@ -1,15 +1,15 @@
-import React, { MouseEvent, useCallback } from 'react';
+import { MouseEvent, useCallback } from 'react';
 
 import { Draggable } from 'react-beautiful-dnd';
-import { IExercise } from '@dgoudie/isometric-types';
+import { Exercise } from '@prisma/client';
 import MuscleGroupTag from '../../../MuscleGroupTag/MuscleGroupTag';
 import classNames from 'classnames';
 import styles from './WorkoutPlanDayExerciseEditor.module.scss';
 
 interface Props {
   index: number;
-  exerciseId: string;
-  exerciseMap: Map<string, IExercise>;
+  exerciseId: number;
+  exerciseMap: Map<number, Exercise>;
   onDelete: () => void;
   dayReorderModeEnabled: boolean;
 }
@@ -31,7 +31,7 @@ export default function WorkoutPlanDayExerciseEditor({
 
   const exercise = exerciseMap.get(exerciseId)!;
   return (
-    <Draggable draggableId={exerciseId} index={index}>
+    <Draggable draggableId={exerciseId.toString()} index={index}>
       {(provided) => (
         <div
           className={classNames(
