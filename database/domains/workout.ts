@@ -1,4 +1,8 @@
-import { FinishedWorkoutExerciseWithSets, FullWorkout } from '../../types';
+import {
+  FinishedWorkoutExerciseWithSets,
+  FinishedWorkoutWithExerciseWithSets,
+  FullWorkout,
+} from '../../types';
 import {
   differenceInMilliseconds,
   millisecondsToSeconds,
@@ -9,7 +13,10 @@ import { getExerciseById } from './exercise';
 import { getNextDaySchedule } from './schedule';
 import prisma from '../prisma';
 
-export async function getCompletedWorkouts(userId: string, page?: number) {
+export async function getCompletedWorkouts(
+  userId: string,
+  page?: number
+): Promise<FinishedWorkoutWithExerciseWithSets[]> {
   let take: number | undefined = undefined;
   let skip: number | undefined = undefined;
   if (typeof page !== 'undefined') {

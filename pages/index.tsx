@@ -7,6 +7,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { NextPageWithLayout } from './_app';
 import { SnackbarContext } from '../providers/Snackbar/Snackbar';
+import ThreeDotLoader from '../components/ThreeDotLoader/ThreeDotLoader';
 import activeWorkoutExists from '../utils/active-workout-exists';
 import classNames from 'classnames';
 import { getUserId } from '../utils/get-user-id';
@@ -91,6 +92,11 @@ const Landing: NextPageWithLayout = () => {
               Go to Workout Dashboard
             </a>
           </Link>
+        )}
+        {status === 'loading' && (
+          <div className={styles.loading}>
+            <ThreeDotLoader />
+          </div>
         )}
       </div>
       <div className={classNames(styles.marketingImages, styles.carousel)}>

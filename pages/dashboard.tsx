@@ -1,4 +1,8 @@
 import type { GetServerSidePropsContext, GetServerSidePropsResult } from 'next';
+import {
+  NextDaySchedule,
+  getNextDaySchedule,
+} from '../database/domains/schedule';
 import { useContext, useMemo } from 'react';
 
 import AppBarWithAppHeaderLayout from '../layouts/AppBarWithAppHeaderLayout/AppBarWithAppHeaderLayout';
@@ -6,49 +10,34 @@ import { Exercise } from '@prisma/client';
 import Link from 'next/link';
 import MuscleGroupTag from '../components/MuscleGroupTag/MuscleGroupTag';
 import { NextPageWithLayout } from './_app';
+import RouteLoader from '../components/RouteLoader/RouteLoader';
 import { ScheduleWithFullDetail } from '../types';
 import { WorkoutContext } from '../providers/Workout/Workout';
 import activeWorkoutExists from '../utils/active-workout-exists';
 import classNames from 'classnames';
 import { convertToPlainObject } from '../utils/normalize-bson';
 import { getGreeting } from '../utils/get-greeting';
-import { getNextDaySchedule } from '../database/domains/schedule';
 import { getUserId } from '../utils/get-user-id';
 import { secondsToMinutes } from 'date-fns';
 import styles from './Dashboard.module.scss';
+import useFetchWith403Redirect from '../utils/fetch-with-403-redirect';
 import { useHeadWithTitle } from '../utils/use-head-with-title';
+import useSWR from 'swr';
 
 const TIME_PER_SET = 60;
 
-interface HomeProps {
-  schedule: {
-    day: ScheduleWithFullDetail['days'][0] | null;
-    dayCount: number;
-  };
-}
-
-export async function getServerSideProps(
-  context: GetServerSidePropsContext
-): Promise<GetServerSidePropsResult<HomeProps>> {
-  const userId = await getUserId(context.req, context.res);
-  if (!userId) {
-    return { redirect: { destination: '/', permanent: false } };
-  }
-  if (await activeWorkoutExists(userId)) {
-    return { redirect: { destination: '/workout', permanent: false } };
-  }
-  return {
-    props: getNextDaySchedule(userId)
-      .then((schedule) => convertToPlainObject(schedule))
-      .then((schedule) => ({ schedule })),
-  };
-}
-
-const Dashboard: NextPageWithLayout<HomeProps> = ({ schedule }) => {
+const Dashboard: NextPageWithLayout = () => {
   const greeting = useMemo(() => getGreeting(), []);
 
+  const fetcher = useFetchWith403Redirect();
+
+  const { data: schedule, error } = useSWR<NextDaySchedule>(
+    `/api/schedule/upcoming`,
+    fetcher
+  );
+
   const dayDurationInSeconds = useMemo(() => {
-    if (!schedule.day) {
+    if (!schedule?.day) {
       return 0;
     }
     return schedule.day.exercises
@@ -60,7 +49,7 @@ const Dashboard: NextPageWithLayout<HomeProps> = ({ schedule }) => {
   }, [schedule]);
 
   const setCount = useMemo(() => {
-    if (!schedule.day) {
+    if (!schedule?.day) {
       return 0;
     }
     return schedule.day.exercises
@@ -76,6 +65,17 @@ const Dashboard: NextPageWithLayout<HomeProps> = ({ schedule }) => {
   const { startWorkout } = useContext(WorkoutContext);
 
   const head = useHeadWithTitle('Dashboard');
+
+  if (error) throw error;
+
+  if (!schedule)
+    return (
+      <>
+        {head}
+        <h1>{greeting}</h1>
+        <RouteLoader />
+      </>
+    );
 
   if (!schedule.day) {
     return (

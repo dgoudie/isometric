@@ -12,7 +12,7 @@ interface Props {
 }
 
 export default function ProfileBadgeAndOptions({ className }: Props) {
-  const { data: session } = useSession();
+  const { data: session, status } = useSession();
   const router = useRouter();
   const detailsRef = useRef<HTMLDetailsElement | null>(null);
 
@@ -20,7 +20,11 @@ export default function ProfileBadgeAndOptions({ className }: Props) {
     detailsRef.current && (detailsRef.current.open = false);
   }, [detailsRef]);
 
-  if (!session) {
+  if (status === 'loading') {
+    return <></>;
+  }
+
+  if (status === 'unauthenticated' || !session) {
     return (
       <button
         className={classNames(className, styles.button)}

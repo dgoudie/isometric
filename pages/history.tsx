@@ -1,3 +1,7 @@
+import {
+  FinishedWorkoutExerciseWithSets,
+  FinishedWorkoutWithExerciseWithSets,
+} from '../types';
 import { formatDistance, formatDuration, intervalToDuration } from 'date-fns';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 
@@ -24,23 +28,22 @@ const format = new Intl.DateTimeFormat('en-US', {
 
 const History: NextPageWithLayout = ({}) => {
   const [workouts, setWorkouts] = useState<
-    Awaited<ReturnType<typeof getCompletedWorkouts>>
+    FinishedWorkoutWithExerciseWithSets[]
   >([]);
-  const [moreWorkouts, setMoreWorkouts] = useState(
-    workouts && workouts.length >= 10
-  );
+  const [moreWorkouts, setMoreWorkouts] = useState(false);
   const [page, setPage] = useState(2);
 
   const fetcher = useFetchWith403Redirect();
 
-  const { data, error } = useSWR<
-    Awaited<ReturnType<typeof getCompletedWorkouts>>
-  >('/api/workouts?page=1', fetcher);
+  const { data, error } = useSWR<FinishedWorkoutWithExerciseWithSets[]>(
+    '/api/workouts?page=1',
+    fetcher
+  );
 
   useEffect(() => {
     if (!!data) {
       setWorkouts(data);
-      setMoreWorkouts(data.length < 10);
+      setMoreWorkouts(data.length === 10);
       setPage(2);
     }
   }, [data]);
@@ -90,7 +93,7 @@ const History: NextPageWithLayout = ({}) => {
 };
 
 interface WorkoutProps {
-  workout: Awaited<ReturnType<typeof getCompletedWorkouts>>[0];
+  workout: FinishedWorkoutWithExerciseWithSets;
 }
 
 function Workout({ workout }: WorkoutProps) {

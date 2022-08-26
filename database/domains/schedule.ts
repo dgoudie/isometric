@@ -39,10 +39,14 @@ export async function saveSchedule(userId: string, schedule: Schedule) {
   // );
 }
 
-export async function getNextDaySchedule(userId: string): Promise<{
+export type NextDaySchedule = {
   day: ScheduleWithFullDetail['days'][0] | null;
   dayCount: number;
-}> {
+};
+
+export async function getNextDaySchedule(
+  userId: string
+): Promise<NextDaySchedule> {
   let dayNumber = 0;
   const lastWorkout = await getMostRecentCompletedWorkout(userId);
   if (!!lastWorkout) {

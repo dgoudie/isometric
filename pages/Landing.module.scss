@@ -9,6 +9,13 @@
   margin: 2rem;
 }
 
+.loading {
+  height: 3rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
 .intro {
   margin: 1rem;
   background: var(--background-alt);

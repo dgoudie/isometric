@@ -1,5 +1,6 @@
 import Loader from '../Loader/Loader';
 import React from 'react';
+import ThreeDotLoader from '../ThreeDotLoader/ThreeDotLoader';
 import classNames from 'classnames';
 import styles from './RouteLoader.module.scss';
 
@@ -10,7 +11,7 @@ interface Props {
 export default function RouteLoader({ className }: Props) {
   return (
     <div className={classNames(styles.routeLoader, className)}>
-      <Loader />
+      <ThreeDotLoader />
     </div>
   );
 }

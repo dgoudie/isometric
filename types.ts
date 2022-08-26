@@ -47,6 +47,22 @@ export type ScheduleWithFullDetail = Prisma.ScheduleGetPayload<
 
 // ***************
 
+const FinishedWorkoutWithExerciseWithSets =
+  Prisma.validator<Prisma.FinishedWorkoutArgs>()({
+    include: {
+      exercises: {
+        include: {
+          sets: true,
+        },
+      },
+    },
+  });
+
+export type FinishedWorkoutWithExerciseWithSets =
+  Prisma.FinishedWorkoutGetPayload<typeof FinishedWorkoutWithExerciseWithSets>;
+
+// ***************
+
 const FinishedWorkoutExerciseWithSets =
   Prisma.validator<Prisma.FinishedWorkoutExerciseArgs>()({
     include: {
