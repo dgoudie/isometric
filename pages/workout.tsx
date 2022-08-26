@@ -10,7 +10,7 @@ import {
 import ActiveExerciseView from '../components/ActiveExerciseView/ActiveExerciseView';
 import EndWorkoutBottomSheet from '../components/BottomSheet/components/EndWorkoutBottomSheet/EndWorkoutBottomSheet';
 import ExercisePickerBottomSheet from '../components/BottomSheet/components/ExercisePickerBottomSheet/ExercisePickerBottomSheet';
-import { FullWorkout } from '../types';
+import { FullWorkout } from '../example_type';
 import { GetServerSideProps } from 'next';
 import { NextPageWithLayout } from './_app';
 import RouteLoader from '../components/RouteLoader/RouteLoader';

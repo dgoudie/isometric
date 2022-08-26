@@ -2,7 +2,7 @@ import BottomSheet from '../../BottomSheet';
 import MuscleGroupTag from '../../../MuscleGroupTag/MuscleGroupTag';
 import RouteLoader from '../../../RouteLoader/RouteLoader';
 import { Suspense } from 'react';
-import { WorkoutExerciseWithSetsAndDetails } from '../../../../types';
+import { WorkoutExerciseWithSetsAndDetails } from '../../../../example_type';
 import classNames from 'classnames';
 import styles from './WorkoutExercisesBottomSheet.module.scss';
 

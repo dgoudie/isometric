@@ -7,7 +7,7 @@ import ExercisePickerBottomSheet from '../BottomSheet/components/ExercisePickerB
 import MuscleGroupTag from '../MuscleGroupTag/MuscleGroupTag';
 import { SnackbarContext } from '../../providers/Snackbar/Snackbar';
 import { WorkoutContext } from '../../providers/Workout/Workout';
-import { WorkoutExerciseWithSetsAndDetails } from '../../types';
+import { WorkoutExerciseWithSetsAndDetails } from '../../example_type';
 import classNames from 'classnames';
 import dynamic from 'next/dynamic';
 import equal from 'deep-equal';

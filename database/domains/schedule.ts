@@ -1,85 +1,28 @@
-import { DayWithExerciseIds } from '../../components/WorkoutPlanEditor/WorkoutPlanEditor';
-import { Schedule } from '@prisma/client';
-import { ScheduleWithFullDetail } from '../../types';
+import { ScheduleDayWithExerciseInSchedulesWithExercise } from '../../types/ScheduleDay';
 import { getMostRecentCompletedWorkout } from './workout';
 import prisma from '../prisma';
 
-export async function createSchedule(userId: string) {
-  return prisma.schedule.create({
-    data: {
-      user: {
-        connect: {
-          userId,
-        },
-      },
-    },
-  });
-}
-
-export async function getSchedule(userId: string) {
-  return prisma.schedule.findUnique({
+export async function getScheduledDays(
+  userId: string
+): Promise<ScheduleDayWithExerciseInSchedulesWithExercise[]> {
+  return prisma.scheduleDay.findMany({
     where: { userId },
     include: {
-      days: {
-        include: {
-          exercises: {
-            include: { exercise: true },
-            orderBy: {
-              orderNumber: 'asc',
-            },
-          },
-        },
+      exercises: {
+        include: { exercise: true },
         orderBy: {
           orderNumber: 'asc',
         },
       },
     },
-  });
-}
-
-export async function saveSchedule(
-  userId: string,
-  days: Omit<DayWithExerciseIds, 'guid'>[]
-) {
-  const schedule = await prisma.schedule.upsert({
-    where: {
-      userId,
-    },
-    update: {},
-    create: {
-      userId,
+    orderBy: {
+      orderNumber: 'asc',
     },
   });
-  await prisma.scheduleDay.deleteMany({
-    where: {
-      schedule: {
-        userId,
-      },
-    },
-  });
-  await Promise.all(
-    days.map(({ day, exerciseIds }) =>
-      prisma.scheduleDay.create({
-        data: {
-          scheduleId: schedule.id,
-          nickname: day.nickname,
-          orderNumber: day.orderNumber,
-          exercises: {
-            createMany: {
-              data: exerciseIds.map((exerciseId, index) => ({
-                exerciseId,
-                orderNumber: index,
-              })),
-            },
-          },
-        },
-      })
-    )
-  );
 }
 
 export type NextDaySchedule = {
-  day: ScheduleWithFullDetail['days'][0] | null;
+  day: ScheduleDayWithExerciseInSchedulesWithExercise | null;
   dayCount: number;
 };
 
@@ -93,9 +36,7 @@ export async function getNextDaySchedule(
   }
   const dayCount = await prisma.scheduleDay.count({
     where: {
-      schedule: {
-        userId,
-      },
+      userId,
     },
   });
   if (dayCount === 0) {
@@ -107,9 +48,7 @@ export async function getNextDaySchedule(
   const day = await prisma.scheduleDay.findFirst({
     where: {
       orderNumber: dayNumber,
-      schedule: {
-        userId,
-      },
+      userId,
     },
     include: {
       exercises: {

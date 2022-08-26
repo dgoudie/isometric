@@ -39,71 +39,62 @@ enum ExerciseType {
 }
 
 model User {
-  userId           String            @id
+  id               String            @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  userId           String            @unique
   exercises        Exercise[]
   workout          Workout?
-  schedule         Schedule?
   createdAt        DateTime          @default(now())
   updatedAt        DateTime          @default(now())
   finishedWorkouts FinishedWorkout[]
+  scheduleDays     ScheduleDay[]
 }
 
 model Exercise {
-  id                            Int                       @id @default(sequence())
-  userId                        String
-  user                          User                      @relation(fields: [userId], references: [userId])
-  name                          String
-  breakTimeInSeconds            Int
-  setCount                      Int
-  timePerSetInSeconds           Int?
-  minimumRecommendedRepetitions Int?
-  maximumRecommendedRepetitions Int?
-  primaryMuscleGroup            ExerciseMuscleGroup
-  secondaryMuscleGroups         ExerciseMuscleGroup[]
-  exerciseType                  ExerciseType
-  createdAt                     DateTime                  @default(now())
-  updatedAt                     DateTime                  @default(now())
-  activeInstances               WorkoutExercise[]
-  finishedInstances             FinishedWorkoutExercise[]
-  inScheduledDays               ExerciseInSchedule[]
+  id                    String                    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  userId                String
+  user                  User                      @relation(fields: [userId], references: [userId])
+  name                  String
+  primaryMuscleGroup    ExerciseMuscleGroup
+  secondaryMuscleGroups ExerciseMuscleGroup[]
+  exerciseType          ExerciseType
+  createdAt             DateTime                  @default(now())
+  updatedAt             DateTime                  @default(now())
+  activeInstances       WorkoutExercise[]
+  finishedInstances     FinishedWorkoutExercise[]
+  inScheduledDays       ExerciseInSchedule[]
 
   @@unique([userId, name(sort: Asc)])
 }
 
-model Schedule {
-  id        Int           @id @default(sequence())
-  userId    String        @unique
-  user      User          @relation(fields: [userId], references: [userId])
-  days      ScheduleDay[]
-  createdAt DateTime      @default(now())
-  updatedAt DateTime      @default(now())
-}
-
 model ScheduleDay {
-  id          Int                  @id @default(sequence())
+  id          String               @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   nickname    String
   exercises   ExerciseInSchedule[]
-  schedule    Schedule             @relation(fields: [scheduleId], references: [id])
-  scheduleId  Int
+  userId      String
+  user        User                 @relation(fields: [userId], references: [userId])
   orderNumber Int
+  createdAt   DateTime             @default(now())
+  updatedAt   DateTime             @default(now())
 
-  @@unique([scheduleId, orderNumber])
+  @@unique([userId, orderNumber])
 }
 
 model ExerciseInSchedule {
-  exercise      Exercise    @relation(fields: [exerciseId], references: [id])
-  exerciseId    Int
-  scheduleDay   ScheduleDay @relation(fields: [scheduleDayId], references: [id], onDelete: Cascade)
-  scheduleDayId Int
-  orderNumber   Int
+  exercise               Exercise    @relation(fields: [exerciseId], references: [id])
+  exerciseId             String      @db.Uuid
+  scheduleDay            ScheduleDay @relation(fields: [scheduleDayUser, scheduleDayOrderNumber], references: [userId, orderNumber], onDelete: Cascade)
+  scheduleDayUser        String
+  scheduleDayOrderNumber Int
+  orderNumber            Int
+  setCount               Int
+  timePerSetInSeconds    Int?
+  recommendedRepetitions Int?
 
-  @@id([exerciseId, scheduleDayId])
-  @@unique([exerciseId, orderNumber])
+  @@id([scheduleDayUser, scheduleDayOrderNumber, orderNumber])
 }
 
 model Workout {
-  id        Int               @id @default(sequence())
-  userId    String            @unique
+  userId    String            @id
   user      User              @relation(fields: [userId], references: [userId])
   dayNumber Int
   nickname  String
@@ -114,50 +105,56 @@ model Workout {
 }
 
 model WorkoutExercise {
-  id                 Int                  @id @default(sequence())
-  workoutId          Int
-  workout            Workout              @relation(fields: [workoutId], references: [id], onDelete: Cascade)
-  exerciseId         Int
-  exercise           Exercise             @relation(fields: [exerciseId], references: [id])
   exerciseType       ExerciseType
   primaryMuscleGroup ExerciseMuscleGroup
   sets               WorkoutExerciseSet[]
   orderNumber        Int
+  workoutUserId      String
+  workout            Workout              @relation(fields: [workoutUserId], references: [userId], onDelete: Cascade)
+  exerciseId         String               @db.Uuid
+  exercise           Exercise             @relation(fields: [exerciseId], references: [id])
+
+  @@id([workoutUserId, orderNumber])
 }
 
 model WorkoutExerciseSet {
-  id                 Int             @id @default(sequence())
-  workoutExerciseId  Int
-  workoutExercise    WorkoutExercise @relation(fields: [workoutExerciseId], references: [id], onDelete: Cascade)
-  resistanceInPounds Int?
-  repetitions        Int?
-  timeInSeconds      Int?
-  complete           Boolean
-  orderNumber        Int
+  workoutExerciseUserId      String
+  workoutExerciseOrderNumber Int
+  workoutExercise            WorkoutExercise @relation(fields: [workoutExerciseUserId, workoutExerciseOrderNumber], references: [workoutUserId, orderNumber], onDelete: Cascade)
+  resistanceInPounds         Int?
+  repetitions                Int?
+  timeInSeconds              Int?
+  complete                   Boolean
+  orderNumber                Int
+
+  @@id([workoutExerciseUserId, workoutExerciseOrderNumber, orderNumber])
 }
 
 model WorkoutCheckin {
-  id        Int      @id @default(sequence())
-  at        DateTime @default(now())
-  workoutId Int
-  workout   Workout  @relation(fields: [workoutId], references: [id], onDelete: Cascade)
+  at            DateTime @id @default(now())
+  workoutUserId String
+  workout       Workout  @relation(fields: [workoutUserId], references: [userId], onDelete: Cascade)
+
+  @@index([at(sort: Asc)])
 }
 
 model FinishedWorkout {
-  id                Int                       @id @default(sequence())
+  id                String                    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   userId            String
-  user              User?                     @relation(fields: [userId], references: [userId])
+  user              User                      @relation(fields: [userId], references: [userId])
   dayNumber         Int
-  endedAt           DateTime
+  endedAt           DateTime                  @unique
   nickname          String
   durationInSeconds Int
   exercises         FinishedWorkoutExercise[]
-  createdAt         DateTime                  @default(now())
+  createdAt         DateTime                  @unique @default(now())
+
+  @@index([createdAt(sort: Desc)])
 }
 
 model FinishedWorkoutExercise {
-  id                 Int                          @id @default(sequence())
-  finishedWorkoutId  Int
+  id                 String                       @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  finishedWorkoutId  String                       @db.Uuid
   finishedWorkout    FinishedWorkout              @relation(fields: [finishedWorkoutId], references: [id], onDelete: Cascade)
   name               String
   exerciseType       ExerciseType
@@ -165,12 +162,12 @@ model FinishedWorkoutExercise {
   orderNumber        Int
   sets               FinishedWorkoutExerciseSet[]
   exercise           Exercise?                    @relation(fields: [exerciseId], references: [id])
-  exerciseId         Int?
+  exerciseId         String?                      @db.Uuid
 }
 
 model FinishedWorkoutExerciseSet {
-  id                        Int                     @id @default(sequence())
-  finishedWorkoutExerciseId Int
+  id                        String                  @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  finishedWorkoutExerciseId String                  @db.Uuid
   finishedWorkoutExercise   FinishedWorkoutExercise @relation(fields: [finishedWorkoutExerciseId], references: [id], onDelete: Cascade)
   resistanceInPounds        Int?
   repetitions               Int?

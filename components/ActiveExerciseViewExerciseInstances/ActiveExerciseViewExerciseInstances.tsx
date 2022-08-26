@@ -1,4 +1,4 @@
-import { FinishedWorkoutExerciseWithSets } from '../../types';
+import { FinishedWorkoutExerciseWithSets } from '../../example_type';
 import RouteLoader from '../RouteLoader/RouteLoader';
 import SetView from '../SetView/SetView';
 import styles from './ActiveExerciseViewExerciseInstances.module.scss';

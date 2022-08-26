@@ -1,7 +1,7 @@
 import {
   FinishedWorkoutExerciseWithSets,
   FinishedWorkoutWithExerciseWithSets,
-} from '../types';
+} from '../example_type';
 import { formatDistance, formatDuration, intervalToDuration } from 'date-fns';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 

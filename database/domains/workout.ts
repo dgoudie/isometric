@@ -2,7 +2,7 @@ import {
   FinishedWorkoutExerciseWithSets,
   FinishedWorkoutWithExerciseWithSets,
   FullWorkout,
-} from '../../types';
+} from '../../example_type';
 import {
   differenceInMilliseconds,
   millisecondsToSeconds,

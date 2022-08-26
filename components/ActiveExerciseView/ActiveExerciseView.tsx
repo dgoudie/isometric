@@ -3,7 +3,7 @@ import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { ActiveExercise } from '../../pages/workout';
 import ActiveExerciseViewExercise from '../ActiveExerciseViewExercise/ActiveExerciseViewExercise';
 import { AfterExerciseTimerContext } from '../../providers/AfterExerciseTimer/AfterExerciseTimer';
-import { WorkoutExerciseWithSetsAndDetails } from '../../types';
+import { WorkoutExerciseWithSetsAndDetails } from '../../example_type';
 import classNames from 'classnames';
 import styles from './ActiveExerciseView.module.scss';
 import { usePageVisibility } from 'react-page-visibility';
