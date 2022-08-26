@@ -1,6 +1,7 @@
 import GoogleOneTapProvider from './google-one-tap-provider';
 import GoogleProvider from 'next-auth/providers/google';
 import { NextAuthOptions } from 'next-auth';
+import { initializeUserDataIfNecessary } from '../database/initialize-user';
 
 const nextAuthOptions: NextAuthOptions = {
   providers: [
@@ -18,11 +19,15 @@ const nextAuthOptions: NextAuthOptions = {
     }),
   ],
   callbacks: {
-    async signIn({ account, profile }) {
+    async signIn({ user, account, profile }) {
+      let verified = false;
       if (account.provider === 'google') {
-        return profile.email_verified as boolean;
+        verified = profile.email_verified as boolean;
       }
-      return true; // Do different verification for other providers that don't have `email_verified`
+      if (verified) {
+        await initializeUserDataIfNecessary(user.email!);
+      }
+      return verified;
     },
   },
   pages: {
