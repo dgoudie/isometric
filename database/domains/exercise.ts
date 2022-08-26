@@ -5,7 +5,7 @@ import prisma from '../prisma';
 
 type GetExerciseOptions = {
   muscleGroup?: ExerciseMuscleGroup;
-  ids?: string[];
+  ids?: number[];
   onlyPerformed?: boolean;
   onlyNotPerformed?: boolean;
   name?: XOR<{ search?: string }, { equals?: string }>;
@@ -34,6 +34,13 @@ export async function getExercises(
       filters.push({ name: options.name.equals });
     }
   }
+  if (options.ids) {
+    filters.push({
+      id: {
+        in: options.ids,
+      },
+    });
+  }
   if (options.muscleGroup) {
     filters.push({
       OR: [
@@ -45,6 +52,63 @@ export async function getExercises(
         },
       ],
     });
+  }
+  if (options.onlyPerformed || options.onlyNotPerformed) {
+    const completedExercises = await prisma.finishedWorkoutExercise.findMany({
+      where: {
+        AND: [
+          {
+            finishedWorkout: {
+              userId,
+            },
+          },
+        ],
+      },
+      select: {
+        exerciseId: true,
+        name: true,
+      },
+      distinct: ['exerciseId', 'name'],
+    });
+    const completedIds = new Set<number>(
+      completedExercises
+        .filter(({ exerciseId }) => exerciseId !== null)
+        .map((exercise) => exercise.exerciseId as number)
+    );
+    const completedNames = new Set(
+      completedExercises.map((exercise) => exercise.name)
+    );
+    if (options.onlyPerformed) {
+      filters.push({
+        OR: [
+          {
+            name: {
+              in: Array.from(completedNames),
+            },
+          },
+          {
+            id: {
+              in: Array.from(completedIds),
+            },
+          },
+        ],
+      });
+    } else if (options.onlyNotPerformed) {
+      filters.push({
+        AND: [
+          {
+            name: {
+              notIn: Array.from(completedNames),
+            },
+          },
+          {
+            id: {
+              notIn: Array.from(completedIds),
+            },
+          },
+        ],
+      });
+    }
   }
   return prisma.exercise.findMany({
     where: {

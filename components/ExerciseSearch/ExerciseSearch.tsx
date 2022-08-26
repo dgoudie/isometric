@@ -24,6 +24,8 @@ import MuscleGroupTag from '../MuscleGroupTag/MuscleGroupTag';
 import RouteLoader from '../RouteLoader/RouteLoader';
 import classNames from 'classnames';
 import styles from './ExerciseSearch.module.scss';
+import useFetchWith403Redirect from '../../utils/fetch-with-403-redirect';
+import useSWR from 'swr';
 
 export const HistoryOptions = literals(
   'all',
@@ -32,8 +34,6 @@ export const HistoryOptions = literals(
 );
 
 export type HistoryOption = ElementOf<typeof HistoryOptions>;
-
-let initialExercisesResponse = emptyReadableResource();
 
 interface Props {
   search: string | undefined;
@@ -46,77 +46,16 @@ interface Props {
   onSelect?: (exerciseId: number) => void;
 }
 
-export default function ExerciseSearch(props: Props) {
-  const [exercisesResponse, setExercisesResponse] = useState(
-    initialExercisesResponse
-  );
-
-  const searchParams = useMemo(() => {
-    const searchParams = new URLSearchParams();
-    !!props.search && searchParams.set('search', props.search);
-    !!props.muscleGroup && searchParams.set('muscleGroup', props.muscleGroup);
-    props.history === 'only_performed' &&
-      searchParams.set('onlyPerformed', '1');
-    props.history === 'not_performed' &&
-      searchParams.set('onlyNotPerformed', '1');
-    return searchParams;
-  }, [props.muscleGroup, props.search, props.history]);
-
-  const [isPending, startTransaction] = useTransition();
-
-  useEffect(() => {
-    startTransaction(() => {
-      const params = new URLSearchParams(searchParams);
-      params.set('page', '1');
-      const newResource = fetchFromApiAsReadableResource<Exercise[]>(
-        `/api/exercises`,
-        params
-      );
-      setExercisesResponse(newResource);
-    });
-  }, [searchParams]);
-
-  return (
-    <Suspense fallback={<RouteLoader />}>
-      <ExerciseSearchContent exercisesResponse={exercisesResponse} {...props} />
-    </Suspense>
-  );
-}
-
-interface ExerciseSearchContentProps extends Props {
-  exercisesResponse: ReadableResource<Exercise[]>;
-}
-
-function ExerciseSearchContent({
-  exercisesResponse,
-  className,
+export default function ExerciseSearch({
   search,
   muscleGroup,
+  history,
+  className,
   searchChanged,
   muscleGroupChanged,
-  history,
   historyChanged,
   onSelect,
-}: ExerciseSearchContentProps) {
-  const itemsRef = useRef<HTMLDivElement>(null);
-  const inputRef = useRef<HTMLInputElement>(null);
-
-  useEffect(() => {
-    inputRef.current?.focus();
-  }, [inputRef]);
-
-  const [exercises, setExercises] = useState(exercisesResponse.read());
-  const [moreExercises, setMoreExercises] = useState(exercises.length >= 10);
-  const [page, setPage] = useState(2);
-
-  useEffect(() => {
-    const exs = exercisesResponse.read();
-    setExercises(exs);
-    setMoreExercises(exs.length >= 10);
-    setPage(2);
-    itemsRef?.current?.scrollTo({ top: 0 });
-  }, [exercisesResponse]);
-
+}: Props) {
   const searchParams = useMemo(() => {
     const searchParams = new URLSearchParams();
     !!search && searchParams.set('search', search);
@@ -126,25 +65,49 @@ function ExerciseSearchContent({
     return searchParams;
   }, [muscleGroup, search, history]);
 
+  const itemsRef = useRef<HTMLDivElement>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    inputRef.current?.focus();
+  }, [inputRef]);
+
+  const [exercises, setExercises] = useState<Exercise[]>([]);
+  const [moreExercises, setMoreExercises] = useState(exercises.length >= 10);
+  const [page, setPage] = useState(2);
+
+  const fetcher = useFetchWith403Redirect();
+
+  const { data, error } = useSWR<Exercise[]>(
+    `/api/exercises?${searchParams.toString()}`,
+    fetcher
+  );
+
+  const [_pending, startTransition] = useTransition();
+
+  useEffect(() => {
+    if (!!data) {
+      startTransition(() => {
+        setExercises(data);
+        setMoreExercises(data.length === 10);
+        setPage(2);
+      });
+    }
+  }, [data]);
+
   const loadMore = useCallback(async () => {
-    const params = new URLSearchParams(searchParams);
+    const params = new URLSearchParams();
     params.set('page', page.toString());
     const nextPage = await fetchFromApi<Exercise[]>(`/api/exercises`, params);
-    if (!nextPage.length) {
+    if (nextPage.length < 10) {
       setMoreExercises(false);
-    } else {
-      setExercises([...exercises, ...nextPage]);
     }
+    setExercises([...exercises!, ...nextPage]);
     setPage(page + 1);
-  }, [searchParams, exercises, setExercises, setMoreExercises, page]);
+  }, [exercises, page]);
 
-  const items = useMemo(
-    () =>
-      exercises.map((ex) => (
-        <ExerciseButton key={ex.name} exercise={ex} onSelect={onSelect} />
-      )),
-    [exercises, onSelect]
-  );
+  if (error) throw error;
+
   return (
     <div className={classNames(styles.root, className)}>
       <div className={styles.filters}>
@@ -194,7 +157,9 @@ function ExerciseSearchContent({
           hasMore={moreExercises}
           useWindow={false}
         >
-          {items}
+          {exercises.map((ex) => (
+            <ExerciseButton key={ex.name} exercise={ex} onSelect={onSelect} />
+          ))}
         </InfiniteScroll>
       </div>
     </div>
@@ -230,7 +195,7 @@ const ExerciseButton = ({ exercise, onSelect }: ExerciseButtonProps) => {
         <ExerciseMetadata exercise={exercise} />
       </>
     ),
-    [exercise.name, muscleGroupTags]
+    [exercise, muscleGroupTags]
   );
 
   if (!!onSelect) {

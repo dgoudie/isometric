@@ -39,15 +39,19 @@ const handler: NextApiHandler = async (req, res) => {
           return;
         }
       }
+      let idsAsNumbers: number[] | undefined;
       if (typeof ids !== 'undefined') {
         if (typeof ids === 'string') {
           ids = [ids];
         }
         ids = ids as string[];
-        if (!ids.every((id) => typeof id === 'string')) {
+        if (
+          !ids.every((id) => typeof id === 'string' && !isNaN(parseInt(id)))
+        ) {
           res.status(400).end();
           return;
         }
+        idsAsNumbers = ids.map(parseInt);
       }
       const userId = await getUserId(req, res);
       if (!userId) {
@@ -59,7 +63,7 @@ const handler: NextApiHandler = async (req, res) => {
         {
           name: { search },
           muscleGroup: muscleGroup as ExerciseMuscleGroup,
-          ids,
+          ids: idsAsNumbers,
           onlyNotPerformed,
           onlyPerformed,
         },
