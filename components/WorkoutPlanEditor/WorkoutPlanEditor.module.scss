@@ -1,28 +1,27 @@
 .noDays {
-    display: grid;
-    align-items: start;
-    justify-items: center;
-    grid-template-rows: max-content max-content;
-    gap: 1rem;
-    margin-top: 1rem;
+  display: grid;
+  align-items: start;
+  justify-items: center;
+  grid-template-rows: max-content max-content;
+  gap: 1rem;
+  margin-top: 1rem;
 }
 
 .list {
-    overflow-y: auto;
-    border-radius: 8px;
-    i {
-        font-size: 1.2rem;
-    }
+  overflow-y: auto;
+  border-radius: 8px;
+  i {
+    font-size: 1.2rem;
+  }
 }
 
 .addDay {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    margin-bottom: 25vh;
-    margin-bottom: 25dvh;
-    gap: 0.5rem;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  margin-bottom: 25vh;
+  gap: 0.5rem;
 
-    &.reorder {
-        display: none;
-    }
+  &.reorder {
+    display: none;
+  }
 }

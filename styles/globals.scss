@@ -41,9 +41,6 @@ body {
   --between-bars: calc(
     100vh - calc(var(--top-bar-height) + var(--bottom-bar-height))
   );
-  // --between-bars: calc(
-  //   100dvh - calc(var(--top-bar-height) + var(--bottom-bar-height))
-  // );
   @media (prefers-color-scheme: dark) {
     --color: white;
     --secondary-color: hsl(0, 0%, 65%);
