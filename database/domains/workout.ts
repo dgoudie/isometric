@@ -1,6 +1,5 @@
 import {
   FinishedWorkoutExerciseWithSets,
-  FinishedWorkoutWithExerciseWithSets,
   FullWorkout,
 } from '../../example_type';
 import {
@@ -9,6 +8,7 @@ import {
   minutesToMilliseconds,
 } from 'date-fns';
 
+import { FinishedWorkoutWithExerciseWithSets } from '../../types/FinishedWorkout';
 import { getExerciseById } from './exercise';
 import { getNextDaySchedule } from './schedule';
 import prisma from '../prisma';
@@ -32,26 +32,26 @@ export async function getFinishedWorkouts(
       },
     },
     where: { userId },
-    orderBy: { createdAt: 'desc' },
+    orderBy: { startedAt: 'desc' },
     take,
     skip,
   });
 }
 
-export async function getActiveWorkoutId(userId: string) {
-  const onlyId = await prisma.workout.findUnique({
+export async function getActiveWorkoutId(userId: string): Promise<boolean> {
+  const activeWorkout = await prisma.activeWorkout.findUnique({
     where: {
       userId,
     },
     select: {
-      id: true,
+      userId: true,
     },
   });
-  return onlyId?.id;
+  return !!activeWorkout;
 }
 
 export async function getMinifiedActiveWorkout(userId: string) {
-  return prisma.workout.findUnique({
+  return prisma.activeWorkout.findUnique({
     where: {
       userId,
     },
@@ -61,7 +61,7 @@ export async function getMinifiedActiveWorkout(userId: string) {
 export async function getFullActiveWorkout(
   userId: string
 ): Promise<FullWorkout | null> {
-  return prisma.workout.findUnique({
+  return prisma.activeWorkout.findUnique({
     where: {
       userId,
     },
@@ -82,12 +82,12 @@ export async function addCheckInToActiveWorkout(userId: string) {
   if (activeWorkoutId === null) {
     return;
   }
-  await prisma.workoutCheckin.create({
+  await prisma.activeWorkoutCheckin.create({
     data: {
       at: new Date(),
       workout: {
         connect: {
-          id: activeWorkoutId,
+          userId,
         },
       },
     },
@@ -108,10 +108,10 @@ export async function startWorkout(userId: string) {
 
   const { nickname, orderNumber, exercises } = nextDaySchedule.day;
 
-  const workout = await prisma.workout.create({
+  const workout = await prisma.activeWorkout.create({
     data: {
       userId,
-      dayNumber: orderNumber,
+      orderNumber,
       nickname,
       checkins: {
         create: {
@@ -122,9 +122,10 @@ export async function startWorkout(userId: string) {
   });
   await Promise.all(
     exercises.map(async (exerciseInSchedule) => {
-      return prisma.workoutExercise.create({
+      return prisma.activeWorkoutExercise.create({
         data: {
-          workout: {
+          orderNumber: exerciseInSchedule.orderNumber,
+          activeWorkout: {
             connect: workout,
           },
           exercise: {
@@ -132,9 +133,6 @@ export async function startWorkout(userId: string) {
               id: exerciseInSchedule.exerciseId,
             },
           },
-          orderNumber: exerciseInSchedule.orderNumber,
-          exerciseType: exerciseInSchedule.exercise.exerciseType,
-          primaryMuscleGroup: exerciseInSchedule.exercise.primaryMuscleGroup,
           sets: {
             createMany: {
               data: new Array(exerciseInSchedule.exercise.setCount).fill({
@@ -159,7 +157,7 @@ export async function persistSetComplete(
   setIndex: number,
   complete: boolean
 ) {
-  await prisma.workoutExerciseSet.updateMany({
+  await prisma.activeWorkoutExerciseSet.updateMany({
     data: {
       complete: true,
     },
@@ -167,15 +165,13 @@ export async function persistSetComplete(
       orderNumber: {
         lt: complete ? setIndex : setIndex - 1,
       },
-      workoutExercise: {
+      activeWorkoutExercise: {
+        userId,
         orderNumber: exerciseIndex,
-        workout: {
-          userId,
-        },
       },
     },
   });
-  await prisma.workoutExerciseSet.updateMany({
+  await prisma.activeWorkoutExerciseSet.updateMany({
     data: {
       complete: false,
     },
@@ -183,15 +179,12 @@ export async function persistSetComplete(
       orderNumber: {
         lt: complete ? setIndex + 1 : setIndex,
       },
-      workoutExercise: {
+      activeWorkoutExercise: {
+        userId,
         orderNumber: exerciseIndex,
-        workout: {
-          userId,
-        },
       },
     },
   });
-  return getMinifiedActiveWorkout(userId);
 }
 
 export async function persistSetRepetitions(
@@ -200,21 +193,20 @@ export async function persistSetRepetitions(
   setIndex: number,
   repetitions: number | undefined
 ) {
-  await prisma.workoutExerciseSet.updateMany({
+  await prisma.activeWorkoutExerciseSet.updateMany({
     data: {
       repetitions,
     },
     where: {
       orderNumber: setIndex,
-      workoutExercise: {
+      activeWorkoutExercise: {
         orderNumber: exerciseIndex,
-        workout: {
+        activeWorkout: {
           userId,
         },
       },
     },
   });
-  return getMinifiedActiveWorkout(userId);
 }
 
 export async function persistSetResistance(
@@ -223,7 +215,7 @@ export async function persistSetResistance(
   setIndex: number,
   resistanceInPounds: number | undefined
 ) {
-  await prisma.workoutExerciseSet.updateMany({
+  await prisma.activeWorkoutExerciseSet.updateMany({
     data: {
       resistanceInPounds,
     },
@@ -242,43 +234,41 @@ export async function persistSetResistance(
           ],
         },
       ],
-      workoutExercise: {
+      activeWorkoutExercise: {
+        userId,
         orderNumber: exerciseIndex,
-        workout: {
-          userId,
-        },
       },
     },
   });
-  return getMinifiedActiveWorkout(userId);
 }
 
 export async function replaceExercise(
   userId: string,
   exerciseIndex: number,
-  newExerciseId: number
+  newExerciseId: string
 ) {
-  const activeWorkoutId = await getActiveWorkoutId(userId);
-  if (activeWorkoutId === null) {
+  const activeWorkout = await getMinifiedActiveWorkout(userId);
+  if (activeWorkout === null) {
     return;
   }
   const newExercise = await getExerciseById(userId, newExerciseId);
   if (!newExercise) {
     return;
   }
-  await prisma.workoutExercise.deleteMany({
+  await prisma.activeWorkoutExercise.deleteMany({
     where: {
-      workout: {
+      activeWorkout: {
         userId,
       },
       orderNumber: exerciseIndex,
     },
   });
-  await prisma.workoutExercise.create({
+  await prisma.activeWorkoutExercise.create({
     data: {
-      workout: {
+      orderNumber: exerciseIndex,
+      activeWorkout: {
         connect: {
-          id: activeWorkoutId,
+          userId,
         },
       },
       exercise: {
@@ -286,9 +276,6 @@ export async function replaceExercise(
           id: newExercise.id,
         },
       },
-      orderNumber: exerciseIndex,
-      exerciseType: newExercise.exerciseType,
-      primaryMuscleGroup: newExercise.primaryMuscleGroup,
       sets: {
         createMany: {
           data: new Array(newExercise.setCount).fill({
@@ -307,7 +294,7 @@ export async function replaceExercise(
 
 export async function addExercise(
   userId: string,
-  exerciseId: number,
+  exerciseId: string,
   index: number
 ) {
   const activeWorkoutId = await getActiveWorkoutId(userId);
@@ -318,14 +305,14 @@ export async function addExercise(
   if (!newExercise) {
     return;
   }
-  await prisma.workoutExercise.updateMany({
+  await prisma.activeWorkoutExercise.updateMany({
     data: {
       orderNumber: {
         increment: 1,
       },
     },
     where: {
-      workout: {
+      activeWorkout: {
         userId,
       },
       orderNumber: {
@@ -333,11 +320,11 @@ export async function addExercise(
       },
     },
   });
-  await prisma.workoutExercise.create({
+  await prisma.activeWorkoutExercise.create({
     data: {
-      workout: {
+      activeWorkout: {
         connect: {
-          id: activeWorkoutId,
+          userId,
         },
       },
       exercise: {
@@ -346,8 +333,6 @@ export async function addExercise(
         },
       },
       orderNumber: index,
-      exerciseType: newExercise.exerciseType,
-      primaryMuscleGroup: newExercise.primaryMuscleGroup,
       sets: {
         createMany: {
           data: new Array(newExercise.setCount).fill({
@@ -361,26 +346,25 @@ export async function addExercise(
       },
     },
   });
-  return getMinifiedActiveWorkout(userId);
 }
 
 export async function deleteExercise(userId: string, index: number) {
-  await prisma.workoutExercise.deleteMany({
+  await prisma.activeWorkoutExercise.deleteMany({
     where: {
-      workout: {
+      activeWorkout: {
         userId,
       },
       orderNumber: index,
     },
   });
-  await prisma.workoutExercise.updateMany({
+  await prisma.activeWorkoutExercise.updateMany({
     data: {
       orderNumber: {
         decrement: 1,
       },
     },
     where: {
-      workout: {
+      activeWorkout: {
         userId,
       },
       orderNumber: {
@@ -388,7 +372,6 @@ export async function deleteExercise(userId: string, index: number) {
       },
     },
   });
-  return getMinifiedActiveWorkout(userId);
 }
 
 export async function endWorkout(userId: string) {
@@ -417,11 +400,11 @@ export async function endWorkout(userId: string) {
   await prisma.$transaction(async (prisma) => {
     const finishedWorkout = await prisma.finishedWorkout.create({
       data: {
-        dayNumber: activeWorkout.dayNumber,
+        orderNumber: activeWorkout.orderNumber,
         endedAt: new Date(),
         nickname: activeWorkout.nickname,
         durationInSeconds,
-        createdAt: activeWorkout.createdAt,
+        startedAt: activeWorkout.createdAt,
         user: {
           connect: {
             userId,
@@ -454,18 +437,9 @@ export async function endWorkout(userId: string) {
 }
 
 export async function discardWorkout(userId: string) {
-  return prisma.workout.delete({
+  return prisma.activeWorkout.delete({
     where: {
       userId,
-    },
-  });
-}
-
-export async function getMostRecentCompletedWorkout(userId: string) {
-  return prisma.finishedWorkout.findFirst({
-    where: { userId },
-    orderBy: {
-      createdAt: 'desc',
     },
   });
 }

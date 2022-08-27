@@ -11,7 +11,7 @@ interface Props {
   search?: string;
   muscleGroup?: ExerciseMuscleGroup;
   history?: HistoryOption;
-  onResult: (result: number | undefined) => void;
+  onResult: (result: string | undefined) => void;
 }
 
 export default function ExercisePickerBottomSheet({

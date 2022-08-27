@@ -8,6 +8,7 @@ import {
 } from 'react';
 
 import ActiveExerciseView from '../components/ActiveExerciseView/ActiveExerciseView';
+import { ActiveWorkoutWithExercisesWithExerciseWithSetsAndDetails } from '../types/ActiveWorkout';
 import EndWorkoutBottomSheet from '../components/BottomSheet/components/EndWorkoutBottomSheet/EndWorkoutBottomSheet';
 import ExercisePickerBottomSheet from '../components/BottomSheet/components/ExercisePickerBottomSheet/ExercisePickerBottomSheet';
 import { FullWorkout } from '../example_type';
@@ -107,7 +108,7 @@ const Workout: NextPageWithLayout = () => {
   }, []);
 
   const onExeciseAdded = useCallback(
-    (exerciseId: number | undefined) => {
+    (exerciseId: string | undefined) => {
       if (typeof exerciseId !== 'undefined') {
         addExercise(exerciseId, activeExercise.index + 1);
         openSnackbar('Exercise Added.');
@@ -119,7 +120,11 @@ const Workout: NextPageWithLayout = () => {
 
   const head = useHeadWithTitle('Workout');
 
-  const { data, error } = useSWR<FullWorkout>('/api/workout', fetcher);
+  const { data, error } =
+    useSWR<ActiveWorkoutWithExercisesWithExerciseWithSetsAndDetails>(
+      '/api/workout',
+      fetcher
+    );
 
   if (error) throw error;
   if (!data) return <RouteLoader />;
@@ -149,7 +154,7 @@ const Workout: NextPageWithLayout = () => {
       </header>
       <Suspense fallback={<RouteLoader className={styles.loader} />}>
         <ActiveExerciseView
-          exercises={data.exercises}
+          activeWorkoutExercises={data.exercises}
           focusedExercise={activeExercise}
           focusedExerciseChanged={focusedExerciseChanged}
         />
@@ -175,7 +180,7 @@ const Workout: NextPageWithLayout = () => {
       )}
       {showWorkoutExercisesBottomSheet && (
         <WorkoutExercisesBottomSheet
-          workoutExercises={data.exercises}
+          activeWorkoutExercises={data.exercises}
           onResult={onExeciseSelected}
         />
       )}

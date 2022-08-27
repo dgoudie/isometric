@@ -10258,6 +10258,7 @@ const DATA = [
 ];
 
 async function main() {
+  const emailToUserIdMap = new Map<string, string>();
   const workouts = DATA.map((item) => ({
     ...item,
     createdAt: new Date(parseInt(item.createdAt.$date.$numberLong)),
@@ -10266,14 +10267,28 @@ async function main() {
   }));
 
   workouts.forEach(async ({ exercises, ...workout }) => {
+    let userId = emailToUserIdMap.get(workout.userId);
+    if (!userId) {
+      const user = await prisma.user.findUnique({
+        where: { email: workout.userId },
+      });
+      if (!!user) {
+        userId = user.userId;
+        emailToUserIdMap.set(workout.userId, userId);
+      } else {
+        userId = (await prisma.user.create({ data: { email: workout.userId } }))
+          .userId;
+        emailToUserIdMap.set(workout.userId, userId);
+      }
+    }
     const insertedWorkout = await prisma.finishedWorkout.create({
       data: {
-        userId: workout.userId,
-        dayNumber: workout.dayNumber,
+        orderNumber: workout.dayNumber,
+        userId: userId,
         endedAt: workout.endedAt,
         nickname: workout.nickname,
         durationInSeconds: workout.durationInSeconds,
-        createdAt: workout.createdAt,
+        startedAt: workout.createdAt,
       },
     });
     console.log('insertedWorkout.id', insertedWorkout.id);

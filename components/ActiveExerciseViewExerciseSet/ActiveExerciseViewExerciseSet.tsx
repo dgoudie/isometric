@@ -1,4 +1,8 @@
-import { Exercise, WorkoutExerciseSet } from '@prisma/client';
+import {
+  ActiveWorkoutExercise,
+  ActiveWorkoutExerciseSet,
+  Exercise,
+} from '@prisma/client';
 import { IExercise, IWorkoutExerciseSet } from '@dgoudie/isometric-types';
 import {
   addMilliseconds,
@@ -17,8 +21,8 @@ import { showNotification } from '../../utils/notification';
 import styles from './ActiveExerciseViewExerciseSet.module.scss';
 
 interface Props {
-  set: WorkoutExerciseSet;
-  data: Exercise;
+  exercise: Exercise;
+  set: ActiveWorkoutExerciseSet;
   exerciseSelected: boolean;
   setSelected: boolean;
   exerciseIndex: number;
@@ -26,9 +30,9 @@ interface Props {
 }
 export default function ActiveExerciseViewExerciseSet(props: Props) {
   let children = <WeightedSet {...props} />;
-  if (props.data.exerciseType === 'timed') {
+  if (props.exercise.exerciseType === 'timed') {
     children = <TimedSet {...props} />;
-  } else if (props.data.exerciseType === 'rep_based') {
+  } else if (props.exercise.exerciseType === 'rep_based') {
     children = <RepBasedSet {...props} />;
   }
   return (
@@ -45,9 +49,9 @@ export default function ActiveExerciseViewExerciseSet(props: Props) {
 }
 
 function WeightedSet({
+  exercise,
   set,
   setSelected,
-  data,
   exerciseSelected,
   exerciseIndex,
   setIndex,
@@ -105,7 +109,7 @@ function WeightedSet({
             ref={repCountInput}
             type='number'
             inputMode='numeric'
-            placeholder={`${set.minimumRecommendedRepetitions}-${data.maximumRecommendedRepetitions}`}
+            placeholder={`${exercise.maximumRecommendedRepetitions}-${exercise.maximumRecommendedRepetitions}`}
             onFocus={inputSelectAllOnFocus}
             onInput={inputForceInteger}
             onBlur={(e) =>
@@ -133,12 +137,18 @@ function WeightedSet({
   );
 }
 
-function TimedSet({ set, data, exerciseIndex, setIndex, setSelected }: Props) {
+function TimedSet({
+  exercise,
+  set,
+  exerciseIndex,
+  setIndex,
+  setSelected,
+}: Props) {
   const { persistSetComplete } = useContext(WorkoutContext);
 
   const millisecondsPerSet = useMemo(
-    () => secondsToMilliseconds(data.timePerSetInSeconds!),
-    [data]
+    () => secondsToMilliseconds(exercise.timePerSetInSeconds!),
+    [exercise.timePerSetInSeconds]
   );
 
   const [millisecondsRemaining, setMillisecondsRemaining] =

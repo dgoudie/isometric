@@ -1,4 +1,7 @@
-import { FinishedWorkoutExerciseSet, WorkoutExerciseSet } from '@prisma/client';
+import {
+  ActiveWorkoutExerciseSet,
+  FinishedWorkoutExerciseSet,
+} from '@prisma/client';
 import { intervalToDuration, secondsToMilliseconds } from 'date-fns';
 
 import { ExerciseType } from '@dgoudie/isometric-types';
@@ -8,7 +11,7 @@ import { useMemo } from 'react';
 
 interface Props {
   exerciseType: ExerciseType;
-  sets: (FinishedWorkoutExerciseSet | WorkoutExerciseSet)[];
+  sets: (FinishedWorkoutExerciseSet | ActiveWorkoutExerciseSet)[];
   className?: string;
 }
 
@@ -25,7 +28,7 @@ export default function SetView({ exerciseType, sets, className }: Props) {
 }
 
 interface SetBadgeProps {
-  set: FinishedWorkoutExerciseSet | WorkoutExerciseSet;
+  set: FinishedWorkoutExerciseSet | ActiveWorkoutExerciseSet;
 }
 
 function SetBadge({

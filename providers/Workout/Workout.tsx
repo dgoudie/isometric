@@ -24,8 +24,8 @@ export const WorkoutContext = createContext<{
     setIndex: number,
     resistanceInPounds: number | undefined
   ) => void;
-  replaceExercise: (exerciseIndex: number, newExerciseId: number) => void;
-  addExercise: (exerciseId: number, index: number) => void;
+  replaceExercise: (exerciseIndex: number, newExerciseId: string) => void;
+  addExercise: (exerciseId: string, index: number) => void;
   deleteExercise: (index: number) => void;
 }>({
   workout: undefined,
@@ -68,7 +68,7 @@ export default function WorkoutProvider({
     []
   );
   const replaceExercise = useCallback(
-    (exerciseIndex: number, newExerciseId: number) => {
+    (exerciseIndex: number, newExerciseId: string) => {
       // sendJsonMessage(
       //   verifyType<WSWorkoutUpdate>({
       //     type: 'REPLACE_EXERCISE',
@@ -79,7 +79,7 @@ export default function WorkoutProvider({
     },
     []
   );
-  const addExercise = useCallback((exerciseId: number, index: number) => {
+  const addExercise = useCallback((exerciseId: string, index: number) => {
     // sendJsonMessage(
     //   verifyType<WSWorkoutUpdate>({
     //     type: 'ADD_EXERCISE',

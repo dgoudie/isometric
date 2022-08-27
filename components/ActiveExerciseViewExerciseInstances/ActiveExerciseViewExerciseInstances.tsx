@@ -16,7 +16,7 @@ export default function ActiveExerciseViewExerciseInstances({
 }: Props) {
   const fetcher = useFetchWith403Redirect();
   const { data: instances, error } = useSWR<FinishedWorkoutExerciseWithSets[]>(
-    `/api/workout-instances/${exerciseName}`,
+    `/api/exercise/instances/${exerciseName}`,
     fetcher
   );
   if (error) throw error;
@@ -29,7 +29,7 @@ export default function ActiveExerciseViewExerciseInstances({
           {instances.map((instance, index) => (
             <div className={styles.instancesItemsItem} key={index}>
               <div>
-                {format.format(new Date(instance.finishedWorkout.createdAt))}
+                {format.format(new Date(instance.finishedWorkout.startedAt))}
               </div>
               <SetView
                 key={index}

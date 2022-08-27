@@ -3,7 +3,7 @@ import { NextPageWithLayout } from './_app';
 import PageWrapper from '../components/PageWrapper/PageWrapper';
 import RouteGuard from '../components/RouteGuard/RouteGuard';
 import RouteLoader from '../components/RouteLoader/RouteLoader';
-import { ScheduledWorkoutWithExerciseInSchedules } from '../types/ScheduleDay';
+import { ScheduledWorkoutWithExerciseInSchedules } from '../types/ScheduledWorkout';
 import styles from './Schedule.module.scss';
 import { useCallback } from 'react';
 import useFetchWith403Redirect from '../utils/fetch-with-403-redirect';
@@ -16,7 +16,7 @@ const WorkoutPlan: NextPageWithLayout = () => {
 
   const { data: days, error: fetchScheduleError } = useSWR<
     ScheduledWorkoutWithExerciseInSchedules[]
-  >('/api/schedule/days', fetcher);
+  >('/api/schedule/workouts', fetcher);
 
   const head = useHeadWithTitle(`Schedule`);
 

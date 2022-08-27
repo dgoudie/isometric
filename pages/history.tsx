@@ -1,11 +1,8 @@
-import {
-  FinishedWorkoutExerciseWithSets,
-  FinishedWorkoutWithExerciseWithSets,
-} from '../example_type';
 import { formatDistance, formatDuration, intervalToDuration } from 'date-fns';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 
 import AppBarWithAppHeaderLayout from '../layouts/AppBarWithAppHeaderLayout/AppBarWithAppHeaderLayout';
+import { FinishedWorkoutWithExerciseWithSets } from '../types/FinishedWorkout';
 import InfiniteScroll from '../components/InfiniteScroll/InfiniteScroll';
 import MuscleGroupTag from '../components/MuscleGroupTag/MuscleGroupTag';
 import { NextPageWithLayout } from './_app';

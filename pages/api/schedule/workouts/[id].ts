@@ -15,7 +15,7 @@ const handler: NextApiHandler = async (req, res) => {
         res.status(400).end();
         return;
       }
-      let day = await prisma.scheduleDay.findFirst({
+      let day = await prisma.scheduledWorkout.findFirst({
         where: {
           id,
           userId,

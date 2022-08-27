@@ -1,21 +1,23 @@
 import BottomSheet from '../../BottomSheet';
-import { DayWithExerciseIds } from '../../../WorkoutPlanEditor/WorkoutPlanEditor';
-import { IScheduleDay } from '@dgoudie/isometric-types';
-import styles from './CopyDayBottomSheet.module.scss';
+import { ScheduledWorkout } from '@prisma/client';
+import styles from './CopyScheduledWorkoutBottomSheet.module.scss';
 
 interface Props {
-  days: DayWithExerciseIds[];
+  days: ScheduledWorkout[];
   onResult: (result: number | undefined) => void;
 }
 
-export default function CopyDayBottomSheet({ days, onResult }: Props) {
+export default function CopyScheduledWorkoutBottomSheet({
+  days,
+  onResult,
+}: Props) {
   return (
     <BottomSheet onResult={onResult} title='Select a Day to Copy'>
       {(onResult) => {
         const dayElements = days.map((day, index) => (
-          <CopyDayBottomSheetButton
+          <CopyScheduledWorkoutBottomSheetButton
             key={index}
-            day={day}
+            scheduledWorkout={day}
             index={index}
             onSelected={() => onResult(index)}
           />
@@ -26,23 +28,23 @@ export default function CopyDayBottomSheet({ days, onResult }: Props) {
   );
 }
 
-interface CopyDayBottomSheetButtonProps {
+interface CopyScheduledWorkoutBottomSheetButtonProps {
   index: number;
-  day: DayWithExerciseIds;
+  scheduledWorkout: ScheduledWorkout;
   onSelected: () => void;
 }
 
-function CopyDayBottomSheetButton({
+function CopyScheduledWorkoutBottomSheetButton({
   index,
-  day,
+  scheduledWorkout,
   onSelected,
-}: CopyDayBottomSheetButtonProps) {
+}: CopyScheduledWorkoutBottomSheetButtonProps) {
   return (
     <button type='button' onClick={onSelected}>
       <div>
         Day {index + 1} -{' '}
-        {!!day.day.nickname ? (
-          day.day.nickname
+        {!!scheduledWorkout.nickname ? (
+          scheduledWorkout.nickname
         ) : (
           <span className={styles.noNickname}>No Name</span>
         )}

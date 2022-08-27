@@ -56,14 +56,18 @@ model User {
 
 /// Represents an exercise and its attributes.
 model Exercise {
-  id                    String                @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  userId                String                @db.Uuid
-  createdAt             DateTime              @default(now())
-  updatedAt             DateTime              @default(now())
-  name                  String
-  primaryMuscleGroup    ExerciseMuscleGroup
-  secondaryMuscleGroups ExerciseMuscleGroup[]
-  exerciseType          ExerciseType
+  id                            String                @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  userId                        String                @db.Uuid
+  createdAt                     DateTime              @default(now())
+  updatedAt                     DateTime              @default(now())
+  name                          String
+  primaryMuscleGroup            ExerciseMuscleGroup
+  secondaryMuscleGroups         ExerciseMuscleGroup[]
+  exerciseType                  ExerciseType
+  setCount                      Int
+  minimumRecommendedRepetitions Int?
+  maximumRecommendedRepetitions Int?
+  timePerSetInSeconds           Int?
 
   /// user who owns this exercise
   user User @relation(fields: [userId], references: [userId])
@@ -92,10 +96,8 @@ model ScheduledWorkout {
   /// user who own this scheduled workout
   user User @relation(fields: [userId], references: [userId])
 
-  /// active workout created from this scheduled workout, if a workout is in progress.
-  activeInstance ActiveWorkout?
   /// exercises that are a part of this workout
-  exercises      ScheduledWorkoutExercise[]
+  exercises ScheduledWorkoutExercise[]
 
   @@unique([userId, orderNumber])
 }
@@ -106,51 +108,41 @@ model ScheduledWorkoutExercise {
   scheduledWorkoutUserId      String @db.Uuid
   scheduledWorkoutOrderNumber Int
   orderNumber                 Int
-  setCount                    Int
-  timePerSetInSeconds         Int?
-  recommendedRepetitions      Int?
 
   exercise         Exercise         @relation(fields: [exerciseId], references: [id])
   scheduledWorkout ScheduledWorkout @relation(fields: [scheduledWorkoutUserId, scheduledWorkoutOrderNumber], references: [userId, orderNumber], onDelete: Cascade)
-
-  /// active workout exercise instance created from this scheduled workout, if a workout is in progress.
-  activeInstance ActiveWorkoutExercise?
 
   @@id([scheduledWorkoutUserId, scheduledWorkoutOrderNumber, orderNumber])
 }
 
 /// represents a user's single active workout.
 model ActiveWorkout {
-  userId                 String   @id @db.Uuid
-  nickname               String
-  scheduleDayOrderNumber Int
-  createdAt              DateTime @default(now())
-  updatedAt              DateTime @default(now())
+  userId    String   @id @db.Uuid
+  nickname  String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now())
 
-  user                   User             @relation(fields: [userId], references: [userId])
-  scheduleDayCreatedFrom ScheduledWorkout @relation(fields: [userId, scheduleDayOrderNumber], references: [userId, orderNumber])
+  /// order number from the scheduled days. Saved to the FinishedWorkout, used to determine next workout day
+  orderNumber Int
+
+  user User @relation(fields: [userId], references: [userId])
 
   exercises ActiveWorkoutExercise[]
   checkins  ActiveWorkoutCheckin[]
-
-  @@unique([userId, scheduleDayOrderNumber])
 }
 
 /// represents an exercise that's a part of a user's active workout
 model ActiveWorkoutExercise {
-  userId                      String @db.Uuid
-  scheduledWorkoutOrderNumber Int
-  orderNumber                 Int
-  exerciseId                  String @db.Uuid
+  userId      String @db.Uuid
+  orderNumber Int
+  exerciseId  String @db.Uuid
 
-  workout     ActiveWorkout            @relation(fields: [userId], references: [userId], onDelete: Cascade)
-  exercise    Exercise                 @relation(fields: [exerciseId], references: [id])
-  createdFrom ScheduledWorkoutExercise @relation(fields: [userId, scheduledWorkoutOrderNumber, orderNumber], references: [scheduledWorkoutUserId, scheduledWorkoutOrderNumber, orderNumber])
+  activeWorkout ActiveWorkout @relation(fields: [userId], references: [userId], onDelete: Cascade)
+  exercise      Exercise      @relation(fields: [exerciseId], references: [id])
 
   sets ActiveWorkoutExerciseSet[]
 
   @@id([userId, orderNumber])
-  @@unique([userId, scheduledWorkoutOrderNumber, orderNumber])
 }
 
 model ActiveWorkoutExerciseSet {
@@ -162,7 +154,7 @@ model ActiveWorkoutExerciseSet {
   complete                   Boolean
   orderNumber                Int
 
-  workoutExercise ActiveWorkoutExercise @relation(fields: [workoutExerciseUserId, workoutExerciseOrderNumber], references: [userId, orderNumber], onDelete: Cascade)
+  activeWorkoutExercise ActiveWorkoutExercise @relation(fields: [workoutExerciseUserId, workoutExerciseOrderNumber], references: [userId, orderNumber], onDelete: Cascade)
 
   @@id([workoutExerciseUserId, workoutExerciseOrderNumber, orderNumber])
 }

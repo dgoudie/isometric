@@ -9,20 +9,22 @@ const handler: NextApiHandler = async (req, res) => {
     return;
   }
   switch (req.method) {
-    case 'PUT': {
-      let dayCount = await prisma.scheduleDay.count({
+    case 'GET': {
+      const days = await prisma.scheduledWorkout.findMany({
         where: { userId },
-      });
-      let day = await prisma.scheduleDay.create({
-        data: {
-          user: {
-            connect: { userId },
+        include: {
+          exercises: {
+            include: { exercise: true },
+            orderBy: {
+              orderNumber: 'asc',
+            },
           },
-          orderNumber: dayCount,
-          nickname: '',
+        },
+        orderBy: {
+          orderNumber: 'asc',
         },
       });
-      res.send(day.id);
+      res.send(days);
       return;
     }
     default: {

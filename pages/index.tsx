@@ -8,7 +8,6 @@ import Link from 'next/link';
 import { NextPageWithLayout } from './_app';
 import { SnackbarContext } from '../providers/Snackbar/Snackbar';
 import ThreeDotLoader from '../components/ThreeDotLoader/ThreeDotLoader';
-import activeWorkoutExists from '../utils/active-workout-exists';
 import classNames from 'classnames';
 import { getUserId } from '../utils/get-user-id';
 import marketingImage1 from '../public/images/marketing_1.png';
@@ -55,9 +54,11 @@ const Landing: NextPageWithLayout = () => {
   const { openSnackbar } = useContext(SnackbarContext);
 
   useEffect(() => {
-    if (router.query.reason === 'loggedoff')
-      openSnackbar('Please sign in to continue...');
-    router.replace('/');
+    if (router.query.reason) {
+      if (router.query.reason === 'loggedoff')
+        openSnackbar('Please sign in to continue...');
+      router.replace('/');
+    }
   }, [openSnackbar, router]);
 
   const head = useHeadWithTitle('Welcome');

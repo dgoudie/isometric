@@ -9,7 +9,7 @@ const ScheduleDay: NextPageWithLayout = () => {
 
   const dayId = router.query.id as string;
 
-  const day = useSWR(`/api/schedule/day`);
+  const day = useSWR(`/api/schedule/workout/${dayId}`);
 
   return <div></div>;
 };

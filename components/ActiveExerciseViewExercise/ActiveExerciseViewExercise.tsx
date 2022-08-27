@@ -1,30 +1,24 @@
 import { useCallback, useContext, useEffect, useRef, useState } from 'react';
 
+import ActiveExerciseViewExerciseInstances from '../ActiveExerciseViewExerciseInstances/ActiveExerciseViewExerciseInstances';
 import ActiveExerciseViewExerciseSet from '../ActiveExerciseViewExerciseSet/ActiveExerciseViewExerciseSet';
+import { ActiveWorkoutExerciseWithSetsAndDetails } from '../../types/ActiveWorkoutExercise';
 import { AfterExerciseTimerContext } from '../../providers/AfterExerciseTimer/AfterExerciseTimer';
 import ConfirmationBottomSheet from '../BottomSheet/components/ConfirmationBottomSheet/ConfirmationBottomSheet';
 import ExercisePickerBottomSheet from '../BottomSheet/components/ExercisePickerBottomSheet/ExercisePickerBottomSheet';
 import MuscleGroupTag from '../MuscleGroupTag/MuscleGroupTag';
 import { SnackbarContext } from '../../providers/Snackbar/Snackbar';
 import { WorkoutContext } from '../../providers/Workout/Workout';
-import { WorkoutExerciseWithSetsAndDetails } from '../../example_type';
 import classNames from 'classnames';
-import dynamic from 'next/dynamic';
 import equal from 'deep-equal';
 import styles from './ActiveExerciseViewExercise.module.scss';
 import { useInView } from 'react-intersection-observer';
 
-const ActiveExerciseViewExerciseInstances = dynamic(
-  () =>
-    import(
-      '../ActiveExerciseViewExerciseInstances/ActiveExerciseViewExerciseInstances'
-    ),
-  { ssr: false }
-);
-
 interface Props {
-  workoutExercise: WorkoutExerciseWithSetsAndDetails;
-  nextWorkoutExercise: WorkoutExerciseWithSetsAndDetails | undefined;
+  activeWorkoutExercise: ActiveWorkoutExerciseWithSetsAndDetails;
+  nextActiveWorkoutExercise:
+    | ActiveWorkoutExerciseWithSetsAndDetails
+    | undefined;
   exerciseIndex: number;
   exerciseCount: number;
   onSelected: (i: number) => void;
@@ -32,31 +26,31 @@ interface Props {
 }
 
 export default function ActiveExerciseViewExercise({
-  workoutExercise: workoutExerciseUnmemoized,
+  activeWorkoutExercise: activeWorkoutExerciseUnmemoized,
   exerciseIndex,
-  nextWorkoutExercise,
+  nextActiveWorkoutExercise,
   exerciseCount,
   onSelected,
   onCompleted,
 }: Props) {
-  const [workoutExercise, setWorkoutExercise] = useState(
-    workoutExerciseUnmemoized
+  const [activeWorkoutExercise, setActiveWorkoutExercise] = useState(
+    activeWorkoutExerciseUnmemoized
   );
 
   useEffect(() => {
-    if (!equal(workoutExercise, workoutExerciseUnmemoized)) {
-      setWorkoutExercise(workoutExerciseUnmemoized);
+    if (!equal(activeWorkoutExercise, activeWorkoutExerciseUnmemoized)) {
+      setActiveWorkoutExercise(activeWorkoutExerciseUnmemoized);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [workoutExerciseUnmemoized]);
+  }, [activeWorkoutExerciseUnmemoized]);
 
   const { show, showAfterLastExercise, showAfterLastSet, cancel } = useContext(
     AfterExerciseTimerContext
   );
 
   const getNumberOfCompletedSets = useCallback(
-    () => workoutExercise.sets.filter((set) => set.complete).length,
-    [workoutExercise]
+    () => activeWorkoutExercise.sets.filter((set) => set.complete).length,
+    [activeWorkoutExercise]
   );
 
   const previousNumberOfCompletedSets = useRef(getNumberOfCompletedSets());
@@ -66,12 +60,12 @@ export default function ActiveExerciseViewExercise({
   useEffect(() => {
     if (numberOfCompletedSets > previousNumberOfCompletedSets.current) {
       let allSetsCompleted =
-        numberOfCompletedSets === workoutExercise.sets.length;
+        numberOfCompletedSets === activeWorkoutExercise.sets.length;
       if (allSetsCompleted) {
-        if (!!nextWorkoutExercise) {
+        if (!!nextActiveWorkoutExercise) {
           showAfterLastSet(
-            nextWorkoutExercise.exercise.name,
-            nextWorkoutExercise.exercise.primaryMuscleGroup,
+            nextActiveWorkoutExercise.exercise.name,
+            nextActiveWorkoutExercise.exercise.primaryMuscleGroup,
             onCompleted
           );
         } else {
@@ -83,7 +77,7 @@ export default function ActiveExerciseViewExercise({
     }
     previousNumberOfCompletedSets.current = numberOfCompletedSets;
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [workoutExercise, nextWorkoutExercise]);
+  }, [activeWorkoutExercise, nextActiveWorkoutExercise]);
 
   const { ref, inView } = useInView({
     threshold: 0.55,
@@ -127,7 +121,7 @@ export default function ActiveExerciseViewExercise({
   const { openSnackbar } = useContext(SnackbarContext);
 
   const newExerciseSelected = useCallback(
-    (exerciseId: number | undefined) => {
+    (exerciseId: string | undefined) => {
       if (!!exerciseId) {
         replaceExercise(exerciseIndex, exerciseId);
         openSnackbar(`Exercise replaced.`, 2000);
@@ -155,11 +149,13 @@ export default function ActiveExerciseViewExercise({
       <div className={styles.sectionInner} ref={sectionInnerRef}>
         <div className={styles.main}>
           <div className={styles.mainContent}>
-            <div className={styles.header}>{workoutExercise.exercise.name}</div>
+            <div className={styles.header}>
+              {activeWorkoutExercise.exercise.name}
+            </div>
             <div className={styles.groups}>
               {[
-                workoutExercise.exercise.primaryMuscleGroup,
-                ...(workoutExercise.exercise.secondaryMuscleGroups ?? []),
+                activeWorkoutExercise.exercise.primaryMuscleGroup,
+                ...(activeWorkoutExercise.exercise.secondaryMuscleGroups ?? []),
               ].map((group) => (
                 <MuscleGroupTag key={group} muscleGroup={group} />
               ))}
@@ -168,11 +164,11 @@ export default function ActiveExerciseViewExercise({
               <ExerciseMetadata className={styles.metadata} exercise={data} />
             )} */}
             <div className={styles.sets}>
-              {workoutExercise.sets.map((set, index) => (
+              {activeWorkoutExercise.sets.map((set, index) => (
                 <ActiveExerciseViewExerciseSet
                   key={index}
+                  exercise={activeWorkoutExercise.exercise}
                   set={set}
-                  data={workoutExercise.exercise}
                   exerciseSelected={inView}
                   setSelected={numberOfCompletedSets === index}
                   exerciseIndex={exerciseIndex}
@@ -182,7 +178,7 @@ export default function ActiveExerciseViewExercise({
             </div>
             {showExercisePicker && (
               <ExercisePickerBottomSheet
-                muscleGroup={workoutExercise.exercise.primaryMuscleGroup}
+                muscleGroup={activeWorkoutExercise.exercise.primaryMuscleGroup}
                 onResult={newExerciseSelected}
               />
             )}
@@ -224,7 +220,7 @@ export default function ActiveExerciseViewExercise({
             )}
           </div>
           <ActiveExerciseViewExerciseInstances
-            exerciseName={workoutExercise.exercise.name}
+            exerciseName={activeWorkoutExercise.exercise.name}
           />
         </div>
       </div>

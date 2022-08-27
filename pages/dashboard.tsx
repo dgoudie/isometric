@@ -40,7 +40,7 @@ const Dashboard: NextPageWithLayout = () => {
     return schedule.day.exercises
       .map(
         (exerciseInSchedule) =>
-          (BREAK_TIME + TIME_PER_SET) * exerciseInSchedule.setCount
+          (BREAK_TIME + TIME_PER_SET) * exerciseInSchedule.exercise.setCount
       )
       .reduce((sum, exerciseDuration) => sum + exerciseDuration, 0);
   }, [schedule]);
@@ -50,7 +50,7 @@ const Dashboard: NextPageWithLayout = () => {
       return 0;
     }
     return schedule.day.exercises
-      .map((exerciseInSchedule) => exerciseInSchedule.setCount)
+      .map((exerciseInSchedule) => exerciseInSchedule.exercise.setCount)
       .reduce((sum, exerciseDuration) => sum + exerciseDuration, 0);
   }, [schedule]);
 
@@ -200,14 +200,14 @@ function ExerciseItem({ scheduledWorkoutWithExercise }: ExerciseItemProps) {
   const duration = useMemo(() => {
     switch (scheduledWorkoutWithExercise.exercise.exerciseType) {
       case 'rep_based': {
-        return <>{scheduledWorkoutWithExercise.setCount} sets</>;
+        return <>{scheduledWorkoutWithExercise.exercise.setCount} sets</>;
       }
       case 'timed': {
-        if (scheduledWorkoutWithExercise.setCount < 2) {
+        if (scheduledWorkoutWithExercise.exercise.setCount < 2) {
           return (
             <>
               {secondsToMinutes(
-                scheduledWorkoutWithExercise.timePerSetInSeconds!
+                scheduledWorkoutWithExercise.exercise.timePerSetInSeconds!
               )}{' '}
               minutes
             </>
@@ -215,9 +215,9 @@ function ExerciseItem({ scheduledWorkoutWithExercise }: ExerciseItemProps) {
         }
         return (
           <>
-            {scheduledWorkoutWithExercise.setCount} sets —{' '}
+            {scheduledWorkoutWithExercise.exercise.setCount} sets —{' '}
             {secondsToMinutes(
-              scheduledWorkoutWithExercise.timePerSetInSeconds!
+              scheduledWorkoutWithExercise.exercise.timePerSetInSeconds!
             )}{' '}
             Minutes
           </>
@@ -226,8 +226,16 @@ function ExerciseItem({ scheduledWorkoutWithExercise }: ExerciseItemProps) {
       default: {
         return (
           <>
-            {scheduledWorkoutWithExercise.setCount} sets,{' '}
-            {scheduledWorkoutWithExercise.recommendedRepetitions}
+            {scheduledWorkoutWithExercise.exercise.setCount} sets,{' '}
+            {
+              scheduledWorkoutWithExercise.exercise
+                .minimumRecommendedRepetitions
+            }{' '}
+            -{' '}
+            {
+              scheduledWorkoutWithExercise.exercise
+                .maximumRecommendedRepetitions
+            }
           </>
         );
       }

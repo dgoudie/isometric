@@ -1,13 +1,13 @@
+import { ActiveWorkoutExerciseWithSetsAndDetails } from '../../../../types/ActiveWorkoutExercise';
 import BottomSheet from '../../BottomSheet';
 import MuscleGroupTag from '../../../MuscleGroupTag/MuscleGroupTag';
 import RouteLoader from '../../../RouteLoader/RouteLoader';
 import { Suspense } from 'react';
-import { WorkoutExerciseWithSetsAndDetails } from '../../../../example_type';
 import classNames from 'classnames';
 import styles from './WorkoutExercisesBottomSheet.module.scss';
 
 interface Props {
-  workoutExercises: WorkoutExerciseWithSetsAndDetails[];
+  activeWorkoutExercises: ActiveWorkoutExerciseWithSetsAndDetails[];
   onResult: (resultIndex: number | undefined | 'add') => void;
 }
 
@@ -38,29 +38,35 @@ interface WorkoutExercisesBottomSheetContentProps
 
 function WorkoutExercisesBottomSheetContent({
   onResult,
-  workoutExercises,
+  activeWorkoutExercises,
 }: WorkoutExercisesBottomSheetContentProps) {
-  const exerciseElements = workoutExercises.map((workoutExercise, index) => {
-    const exerciseComplete = workoutExercise.sets.every((set) => set.complete);
-    return (
-      <button
-        key={index}
-        className={classNames(
-          styles.item,
-          exerciseComplete && styles.itemComplete
-        )}
-        onClick={() => onResult(index)}
-      >
-        <i
-          className={classNames('fa-solid', exerciseComplete && 'fa-check')}
-        ></i>
-        <div className={styles.itemText}>{workoutExercise.exercise.name}</div>
-        <MuscleGroupTag
-          muscleGroup={workoutExercise.exercise.primaryMuscleGroup}
-        />
-      </button>
-    );
-  });
+  const exerciseElements = activeWorkoutExercises.map(
+    (activeWorkoutExercise, index) => {
+      const exerciseComplete = activeWorkoutExercise.sets.every(
+        (set) => set.complete
+      );
+      return (
+        <button
+          key={index}
+          className={classNames(
+            styles.item,
+            exerciseComplete && styles.itemComplete
+          )}
+          onClick={() => onResult(index)}
+        >
+          <i
+            className={classNames('fa-solid', exerciseComplete && 'fa-check')}
+          ></i>
+          <div className={styles.itemText}>
+            {activeWorkoutExercise.exercise.name}
+          </div>
+          <MuscleGroupTag
+            muscleGroup={activeWorkoutExercise.exercise.primaryMuscleGroup}
+          />
+        </button>
+      );
+    }
+  );
 
   return (
     <div className={styles.items}>

@@ -1,11 +1,10 @@
-import { ScheduledWorkoutWithExerciseInSchedulesWithExercise } from '../../types/ScheduleDay';
-import { getMostRecentCompletedWorkout } from './workout';
+import { ScheduledWorkoutWithExerciseInSchedulesWithExercise } from '../../types/ScheduledWorkout';
 import prisma from '../prisma';
 
 export async function getScheduledDays(
   userId: string
 ): Promise<ScheduledWorkoutWithExerciseInSchedulesWithExercise[]> {
-  return prisma.scheduleDay.findMany({
+  return prisma.scheduledWorkout.findMany({
     where: { userId },
     include: {
       exercises: {
@@ -30,11 +29,16 @@ export async function getNextDaySchedule(
   userId: string
 ): Promise<NextDaySchedule> {
   let dayNumber = 0;
-  const lastWorkout = await getMostRecentCompletedWorkout(userId);
+  const lastWorkout = await prisma.finishedWorkout.findFirst({
+    where: { userId },
+    orderBy: {
+      startedAt: 'desc',
+    },
+  });
   if (!!lastWorkout) {
-    dayNumber = lastWorkout.dayNumber + 1;
+    dayNumber = lastWorkout.orderNumber + 1;
   }
-  const dayCount = await prisma.scheduleDay.count({
+  const dayCount = await prisma.scheduledWorkout.count({
     where: {
       userId,
     },
@@ -45,7 +49,7 @@ export async function getNextDaySchedule(
   if (dayNumber >= dayCount) {
     dayNumber = 0;
   }
-  const day = await prisma.scheduleDay.findFirst({
+  const day = await prisma.scheduledWorkout.findFirst({
     where: {
       orderNumber: dayNumber,
       userId,

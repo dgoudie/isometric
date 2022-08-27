@@ -7,16 +7,11 @@ export default function RouteGuard({ children }: PropsWithChildren<{}>) {
   const router = useRouter();
   const session = useSession();
 
-  const loggedIn = useMemo(
-    () => session.status !== 'unauthenticated',
-    [session]
-  );
-
   useEffect(() => {
-    if (!loggedIn) {
+    if (session.status === 'unauthenticated') {
       router.replace('/?reason=loggedoff');
     }
-  }, [loggedIn, router]);
+  }, [router, session.status]);
 
   return <>{children}</>;
 }

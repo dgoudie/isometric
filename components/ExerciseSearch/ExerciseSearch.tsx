@@ -43,7 +43,7 @@ interface Props {
   searchChanged: (search: string | undefined) => void;
   muscleGroupChanged: (muscleGroup: ExerciseMuscleGroup | undefined) => void;
   historyChanged: (option: HistoryOption) => void;
-  onSelect?: (exerciseId: number) => void;
+  onSelect?: (exerciseId: string) => void;
 }
 
 export default function ExerciseSearch({
@@ -168,7 +168,7 @@ export default function ExerciseSearch({
 
 interface ExerciseButtonProps {
   exercise: Exercise;
-  onSelect?: (exerciseId: number) => void;
+  onSelect?: (exerciseId: string) => void;
 }
 
 const ExerciseButton = ({ exercise, onSelect }: ExerciseButtonProps) => {
