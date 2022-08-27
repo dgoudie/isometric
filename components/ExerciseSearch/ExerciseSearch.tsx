@@ -149,18 +149,22 @@ export default function ExerciseSearch({
         </div>
       </div>
       <div className={styles.items} ref={itemsRef}>
-        <InfiniteScroll
-          //@ts-ignore
-          className={styles.itemsInfiniteScroll}
-          pageStart={1}
-          loadMore={loadMore}
-          hasMore={moreExercises}
-          useWindow={false}
-        >
-          {exercises.map((ex) => (
-            <ExerciseButton key={ex.name} exercise={ex} onSelect={onSelect} />
-          ))}
-        </InfiniteScroll>
+        {!!data ? (
+          <InfiniteScroll
+            //@ts-ignore
+            className={styles.itemsInfiniteScroll}
+            pageStart={1}
+            loadMore={loadMore}
+            hasMore={moreExercises}
+            useWindow={false}
+          >
+            {exercises.map((ex) => (
+              <ExerciseButton key={ex.name} exercise={ex} onSelect={onSelect} />
+            ))}
+          </InfiniteScroll>
+        ) : (
+          <RouteLoader />
+        )}
       </div>
     </div>
   );

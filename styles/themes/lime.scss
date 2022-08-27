@@ -1,10 +1,10 @@
-.edge {
+.lime {
   --background-dark-hs: 210, 12%;
-  --accent-color-hs: 212, 100%;
-  --background-light-hs: 0, 0%;
-  --pop-color: hsl(212, 100%, 60%);
+  --accent-color-hs: 150, 100%;
+  --background-light-hs: 150, 20%;
+  --pop-color: hsl(150, 100%, 50%);
 
-  --accent-color: hsl(var(--accent-color-hs), 40%);
+  --accent-color: hsl(var(--accent-color-hs), 30%);
   --background: hsl(var(--background-light-hs), 80%);
   --background-alt: hsl(var(--background-light-hs), 75%);
   --background-alt-2: hsl(var(--background-light-hs), 70%);
@@ -15,11 +15,11 @@
   @media (prefers-color-scheme: dark) {
     --secondary-color: hsl(0, 0%, 65%);
     --accent-color: hsl(var(--accent-color-hs), 70%);
-    --background: hsla(var(--background-dark-hs), 9%);
-    --background-alt: hsla(var(--background-dark-hs), 17%);
-    --background-alt-2: hsla(var(--background-dark-hs), 25%);
+    --background: hsla(var(--background-dark-hs), 5%);
+    --background-alt: hsla(var(--background-dark-hs), 9%);
+    --background-alt-2: hsla(var(--background-dark-hs), 15%);
     --divider: hsl(var(--accent-color-hs), 40%);
-    --header-background: hsla(var(--background-dark-hs), 9%, 80%);
+    --header-background: hsla(var(--background-dark-hs), 5%, 80%);
     --background-inverse: hsl(var(--background-light-hs), 80%);
   }
 }

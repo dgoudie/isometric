@@ -13,12 +13,28 @@ body {
   color: var(--color);
   background-color: var(--background);
 
+  --color: black;
+  --color-inverse: white;
+  --placeholder: #00000055;
+  --completed-color: #00b359;
+  --error: crimson;
+  --warn: #ffe16b;
+
   --max-width: 540px;
   --top-bar-height: 3rem;
   --bottom-bar-height: 5.5rem;
   --between-bars: calc(
     100vh - calc(var(--top-bar-height) + var(--bottom-bar-height))
   );
+
+  @media (prefers-color-scheme: dark) {
+    --color: white;
+    --color-inverse: black;
+    --placeholder: #ffffff55;
+    --completed-color: springgreen;
+    --error: #e23737;
+    --warn: #fc0;
+  }
 }
 
 #isometric_portal {

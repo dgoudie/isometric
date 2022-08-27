@@ -10,13 +10,9 @@ import themes from '../utils/themes';
 import { useHeadWithTitle } from '../utils/use-head-with-title';
 import styles from './Settings.module.scss';
 import { NextPageWithLayout } from './_app';
+import classNames from 'classnames';
 
 const themeLocalStorageKey = `isometric.theme_name`;
-
-const format = new Intl.DateTimeFormat('en-US', {
-  dateStyle: 'medium',
-  timeStyle: 'short',
-});
 
 const Settings: NextPageWithLayout = ({}) => {
   const fetcher = useFetchWith403Redirect();
@@ -56,6 +52,10 @@ Settings.getLayout = (page) => (
 
 function ThemeSetting({ current }: { current: string }) {
   const [themeName, setThemeName] = useState(current);
+
+  useEffect(() => {
+    setThemeName(current);
+  }, [current]);
 
   const initialRender = useRef(true);
 
@@ -117,7 +117,7 @@ function Setting({
   children,
 }: PropsWithChildren<SettingProps>) {
   return (
-    <div className={styles.setting}>
+    <div className={classNames(styles.setting, 'fade-in')}>
       <div className={styles.settingNameAndChildren}>
         <div>{name}</div>
         <div>{children}</div>
