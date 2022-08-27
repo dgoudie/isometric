@@ -20,6 +20,13 @@ const handler: NextApiHandler = async (req, res) => {
           id,
           userId,
         },
+        include: {
+          exercises: {
+            include: {
+              exercise: true,
+            },
+          },
+        },
       });
       if (!day) {
         res.status(404).end();

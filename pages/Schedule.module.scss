@@ -6,3 +6,66 @@
   gap: 1rem;
   margin: 1rem;
 }
+
+.root {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+
+  h1 i {
+    font-size: 1rem;
+    padding: 0 0.25rem;
+  }
+}
+.workouts {
+  flex: 1;
+  margin: 0 1rem;
+  position: relative;
+  overflow-y: auto;
+}
+.workout {
+  height: 3rem;
+  position: absolute;
+  left: 0;
+  right: 0;
+  display: grid;
+  grid-template-columns: 3rem auto;
+  gap: 0.75rem;
+
+  &Handle {
+    touch-action: none;
+    background-color: var(--background-alt-2);
+    border-radius: 8px;
+    height: 3rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  &Body {
+    background-color: var(--background-alt);
+    border-radius: 8px;
+  }
+}
+.actions {
+  display: flex;
+  justify-content: space-between;
+  padding: 0.75rem;
+  align-items: center;
+  gap: 0.75rem;
+
+  .autoSaveTip {
+    flex: 1;
+    color: var(--color-secondary);
+    font-size: 0.8rem;
+    background: var(--background-alt);
+    padding: 0.25rem;
+    border-radius: 8px;
+    display: flex;
+    justify-content: center;
+    padding: 0 0.5rem;
+    height: 2.5rem;
+    align-items: center;
+    gap: 0.4rem;
+  }
+}
