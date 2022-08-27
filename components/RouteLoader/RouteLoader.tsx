@@ -1,4 +1,3 @@
-import Loader from '../Loader/Loader';
 import React from 'react';
 import ThreeDotLoader from '../ThreeDotLoader/ThreeDotLoader';
 import classNames from 'classnames';

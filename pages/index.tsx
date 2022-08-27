@@ -57,9 +57,8 @@ const Landing: NextPageWithLayout = () => {
     if (router.query.reason) {
       if (router.query.reason === 'loggedoff')
         openSnackbar('Please sign in to continue...');
-      router.replace('/');
     }
-  }, [openSnackbar, router]);
+  }, [openSnackbar, router.query]);
 
   const head = useHeadWithTitle('Welcome');
   useOneTapSignin();

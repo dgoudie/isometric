@@ -1,6 +1,8 @@
 @import '@fortawesome/fontawesome-free/css/fontawesome.css';
 @import '@fortawesome/fontawesome-free/css/solid.css';
 
+@import './themes.scss';
+
 html,
 body {
   padding: 0;
@@ -11,53 +13,12 @@ body {
   color: var(--color);
   background-color: var(--background);
 
-  --oxford-blue-hs: 225, 59%;
-  --space-cadet-hs: 225, 40%;
-  --y-in-mn-blue-hs: 213, 30%;
-  --maximum-blue-green-hs: 179, 44%;
-
-  --oxford-blue: hsla(var(--oxford-blue-hs), 11%);
-  --space-cadet: hsla(var(--space-cadet-hs), 18%);
-  --y-in-mn-blue: hsla(var(--y-in-mn-blue-hs), 32%);
-  --maximum-blue-green: hsla(var(--maximum-blue-green-hs), 55%);
-
-  --color: black;
-  --secondary-color: #555;
-  --accent-color: hsl(var(--space-cadet-hs), 40%);
-  --background: hsl(var(--y-in-mn-blue-hs), 80%);
-  --background-alt: hsl(var(--y-in-mn-blue-hs), 75%);
-  --background-alt-2: hsl(var(--y-in-mn-blue-hs), 70%);
-  --divider: hsl(var(--y-in-mn-blue-hs), 60%);
-  --header-background: hsl(var(--y-in-mn-blue-hs), 80%, 80%);
-  --color-inverse: white;
-  --background-inverse: hsl(var(--space-cadet-hs), 30%);
-  --placeholder: #00000055;
-  --completed-color: #00b359;
-  --error: crimson;
-  --warn: #ffe16b;
-
   --max-width: 540px;
   --top-bar-height: 3rem;
   --bottom-bar-height: 5.5rem;
   --between-bars: calc(
     100vh - calc(var(--top-bar-height) + var(--bottom-bar-height))
   );
-  @media (prefers-color-scheme: dark) {
-    --color: white;
-    --secondary-color: hsl(0, 0%, 65%);
-    --accent-color: hsl(var(--space-cadet-hs), 70%);
-    --background: hsla(var(--oxford-blue-hs), 9%);
-    --background-alt: hsla(var(--oxford-blue-hs), 17%);
-    --background-alt-2: hsla(var(--oxford-blue-hs), 25%);
-    --divider: hsl(var(--space-cadet-hs), 40%);
-    --header-background: hsla(var(--oxford-blue-hs), 9%, 80%);
-    --color-inverse: black;
-    --background-inverse: hsl(var(--y-in-mn-blue-hs), 80%);
-    --placeholder: #ffffff55;
-    --completed-color: springgreen;
-    --error: #e23737;
-    --warn: #fc0;
-  }
 }
 
 #isometric_portal {

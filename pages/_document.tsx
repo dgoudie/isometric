@@ -1,6 +1,7 @@
 import { Head, Html, Main, NextScript } from 'next/document';
 
 import Script from 'next/script';
+import themes from '../utils/themes';
 
 export default function Document() {
   return (
@@ -52,6 +53,12 @@ export default function Document() {
           src='https://accounts.google.com/gsi/client'
           strategy='afterInteractive'
         />
+        <Script strategy='beforeInteractive' id='define_themes'>{`
+          window.isometric = {
+            themes: new Map(${JSON.stringify(Array.from(themes))})
+          }
+      `}</Script>
+        <Script strategy='beforeInteractive' src='/scripts/apply_theme.js' />
       </Head>
       <body>
         <Main />

@@ -15,6 +15,15 @@ CREATE TABLE "User" (
 );
 
 -- CreateTable
+CREATE TABLE "Setting" (
+    "userId" UUID NOT NULL,
+    "key" STRING NOT NULL,
+    "setting" JSONB NOT NULL,
+
+    CONSTRAINT "Setting_pkey" PRIMARY KEY ("userId","key")
+);
+
+-- CreateTable
 CREATE TABLE "Exercise" (
     "id" UUID NOT NULL DEFAULT gen_random_uuid(),
     "userId" UUID NOT NULL,
@@ -155,10 +164,13 @@ CREATE UNIQUE INDEX "FinishedWorkout_startedAt_key" ON "FinishedWorkout"("starte
 CREATE INDEX "FinishedWorkout_startedAt_idx" ON "FinishedWorkout"("startedAt" DESC);
 
 -- AddForeignKey
-ALTER TABLE "Exercise" ADD CONSTRAINT "Exercise_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("userId") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "Setting" ADD CONSTRAINT "Setting_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("userId") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "ScheduledWorkout" ADD CONSTRAINT "ScheduledWorkout_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("userId") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "Exercise" ADD CONSTRAINT "Exercise_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("userId") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "ScheduledWorkout" ADD CONSTRAINT "ScheduledWorkout_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("userId") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "ScheduledWorkoutExercise" ADD CONSTRAINT "ScheduledWorkoutExercise_exerciseId_fkey" FOREIGN KEY ("exerciseId") REFERENCES "Exercise"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
@@ -167,7 +179,7 @@ ALTER TABLE "ScheduledWorkoutExercise" ADD CONSTRAINT "ScheduledWorkoutExercise_
 ALTER TABLE "ScheduledWorkoutExercise" ADD CONSTRAINT "ScheduledWorkoutExercise_scheduledWorkoutUserId_scheduledW_fkey" FOREIGN KEY ("scheduledWorkoutUserId", "scheduledWorkoutOrderNumber") REFERENCES "ScheduledWorkout"("userId", "orderNumber") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "ActiveWorkout" ADD CONSTRAINT "ActiveWorkout_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("userId") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "ActiveWorkout" ADD CONSTRAINT "ActiveWorkout_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("userId") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "ActiveWorkoutExercise" ADD CONSTRAINT "ActiveWorkoutExercise_userId_fkey" FOREIGN KEY ("userId") REFERENCES "ActiveWorkout"("userId") ON DELETE CASCADE ON UPDATE CASCADE;
@@ -182,7 +194,7 @@ ALTER TABLE "ActiveWorkoutExerciseSet" ADD CONSTRAINT "ActiveWorkoutExerciseSet_
 ALTER TABLE "ActiveWorkoutCheckin" ADD CONSTRAINT "ActiveWorkoutCheckin_workoutUserId_fkey" FOREIGN KEY ("workoutUserId") REFERENCES "ActiveWorkout"("userId") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "FinishedWorkout" ADD CONSTRAINT "FinishedWorkout_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("userId") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "FinishedWorkout" ADD CONSTRAINT "FinishedWorkout_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("userId") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "FinishedWorkoutExercise" ADD CONSTRAINT "FinishedWorkoutExercise_finishedWorkoutId_fkey" FOREIGN KEY ("finishedWorkoutId") REFERENCES "FinishedWorkout"("id") ON DELETE CASCADE ON UPDATE CASCADE;

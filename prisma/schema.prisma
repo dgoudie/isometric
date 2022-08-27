@@ -52,6 +52,19 @@ model User {
   finishedWorkouts FinishedWorkout[]
   /// days of the user's workout schedule
   scheduleDays     ScheduledWorkout[]
+
+  settings Setting[]
+}
+
+model Setting {
+  userId  String @db.Uuid
+  key     String
+  setting Json
+
+  /// user who owns this setting
+  user User @relation(fields: [userId], references: [userId], onDelete: Cascade)
+
+  @@id([userId, key])
 }
 
 /// Represents an exercise and its attributes.
@@ -70,7 +83,7 @@ model Exercise {
   timePerSetInSeconds           Int?
 
   /// user who owns this exercise
-  user User @relation(fields: [userId], references: [userId])
+  user User @relation(fields: [userId], references: [userId], onDelete: Cascade)
 
   /// any instances of this exercise that are a part of a user's current active workout
   activeInstances ActiveWorkoutExercise[]
@@ -94,7 +107,7 @@ model ScheduledWorkout {
   updatedAt   DateTime @default(now())
 
   /// user who own this scheduled workout
-  user User @relation(fields: [userId], references: [userId])
+  user User @relation(fields: [userId], references: [userId], onDelete: Cascade)
 
   /// exercises that are a part of this workout
   exercises ScheduledWorkoutExercise[]
@@ -125,7 +138,7 @@ model ActiveWorkout {
   /// order number from the scheduled days. Saved to the FinishedWorkout, used to determine next workout day
   orderNumber Int
 
-  user User @relation(fields: [userId], references: [userId])
+  user User @relation(fields: [userId], references: [userId], onDelete: Cascade)
 
   exercises ActiveWorkoutExercise[]
   checkins  ActiveWorkoutCheckin[]
@@ -171,7 +184,7 @@ model ActiveWorkoutCheckin {
 model FinishedWorkout {
   id                String                    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   userId            String                    @db.Uuid
-  user              User                      @relation(fields: [userId], references: [userId])
+  user              User                      @relation(fields: [userId], references: [userId], onDelete: Cascade)
   orderNumber       Int
   endedAt           DateTime                  @unique @default(now())
   nickname          String

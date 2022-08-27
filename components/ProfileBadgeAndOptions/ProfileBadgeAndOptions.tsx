@@ -62,6 +62,14 @@ export default function ProfileBadgeAndOptions({ className }: Props) {
             </a>
           </Link>
         )}
+        {router.pathname !== '/settings' && (
+          <Link href='/settings'>
+            <a onClick={() => closeDetails()}>
+              <i className='fa-solid fa-gear'></i>
+              User Settings
+            </a>
+          </Link>
+        )}
         <button
           onClick={() => {
             signOut();

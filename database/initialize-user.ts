@@ -4,7 +4,7 @@ import prisma from './prisma';
 export const initializeUserDataIfNecessary = async (
   email: string
 ): Promise<void> => {
-  const user = await prisma.user.findUnique({
+  let user = await prisma.user.findUnique({
     where: {
       email,
     },
@@ -12,11 +12,21 @@ export const initializeUserDataIfNecessary = async (
   if (!!user) {
     return;
   }
-  await prisma.user.create({
+  let newUser = await prisma.user.create({
     data: {
       email,
       exercises: {
         create: DEFAULT_EXERCISES,
+      },
+    },
+  });
+  await prisma.setting.createMany({
+    data: {
+      userId: newUser.userId,
+      key: 'theme',
+      setting: {
+        key: 'theme',
+        value: 'default',
       },
     },
   });
