@@ -1,7 +1,6 @@
 import React, { useLayoutEffect } from 'react';
 
 import { createPortal } from 'react-dom';
-import dynamic from 'next/dynamic';
 
 const DEFAULT_PORTAL_CONTAINER_NAME = '__default__';
 
@@ -47,7 +46,7 @@ export default function PortalInner({
     return () => {
       parentElement.removeChild(element);
     };
-  }, [elementRef]);
+  }, [_containerName, elementRef, onMount]);
 
   return createPortal(children, elementRef.current);
 }

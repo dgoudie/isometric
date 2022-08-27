@@ -35,7 +35,7 @@ export default function DurationInputField({
     if (isNaN(mins)) mins = 0;
     if (isNaN(seconds)) seconds = 0;
     setValue(mins * 60 + seconds);
-  }, [minsInputRef, secondsInputRef]);
+  }, [setValue]);
 
   return (
     <div className={styles.root}>

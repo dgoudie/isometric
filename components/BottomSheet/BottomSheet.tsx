@@ -50,7 +50,7 @@ export default function BottomSheet<T>({
         paneRef.current?.destroy({ animate: true });
       }
     },
-    [onResult, locked, paneRef]
+    [locked, paneRef]
   );
 
   const paneDismissed = useRef<() => void>(() => null);
@@ -68,7 +68,7 @@ export default function BottomSheet<T>({
       paneRef.current?.hide();
       paneRef.current?.destroy({ animate: true });
     },
-    [onResult, paneRef]
+    [paneRef]
   );
 
   useEffect(() => {
@@ -89,7 +89,7 @@ export default function BottomSheet<T>({
     if (!!locked) {
       paneRef.current.preventDismiss(true);
     }
-  }, []);
+  }, [locked]);
 
   return (
     <Portal>
