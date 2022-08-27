@@ -1,4 +1,4 @@
-import { PropsWithChildren, useEffect, useMemo, useState } from 'react';
+import { PropsWithChildren, useEffect, useMemo, useRef, useState } from 'react';
 
 import { Setting } from '@prisma/client';
 import useSWR from 'swr';
@@ -57,7 +57,13 @@ Settings.getLayout = (page) => (
 function ThemeSetting({ current }: { current: string }) {
   const [themeName, setThemeName] = useState(current);
 
+  const initialRender = useRef(true);
+
   useEffect(() => {
+    if (initialRender.current) {
+      initialRender.current = false;
+      return;
+    }
     localStorage.setItem(themeLocalStorageKey, themeName);
     const theme = themes.get(themeName)!;
     document.body.classList.value = themeName;
@@ -67,6 +73,13 @@ function ThemeSetting({ current }: { current: string }) {
     document.head.querySelector<HTMLMetaElement>(
       '[name="theme-color"][media="(prefers-color-scheme: dark)"]'
     )!.content = theme.dark;
+    fetch(`/api/settings/theme`, {
+      method: 'PUT',
+      headers: {
+        'content-type': 'application/json',
+      },
+      body: JSON.stringify({ key: 'theme', value: themeName }),
+    });
   }, [themeName]);
 
   return (
