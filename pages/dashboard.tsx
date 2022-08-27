@@ -78,11 +78,15 @@ const Dashboard: NextPageWithLayout = () => {
       <div className={styles.wrapper}>
         {head}
         <h1 className='fade-in'>{greeting}</h1>
-        <div className={styles.root}>
+        <div className={classNames(styles.root, 'fade-in')}>
           <div className={styles.noSchedule}>
+            <i className='fa-solid fa-warning'></i>
             <span>
-              You have not yet built a workout plan. Start by creating one.
+              You have not yet built a workout schedule. To create one, click
+              the &apos;Edit Schedule&apos; button below.
             </span>
+          </div>
+          <div className={styles.actions}>
             <Link href={'/schedule'}>
               <a className={'standard-button primary'} draggable={false}>
                 <i className='fa-solid fa-calendar-week'></i>
