@@ -55,11 +55,9 @@ const Landing: NextPageWithLayout = () => {
   const { openSnackbar } = useContext(SnackbarContext);
 
   useEffect(() => {
-    if (router.query.reason) {
-      if (router.query.reason === 'loggedoff')
-        openSnackbar('Please sign in to continue...');
-      router.replace('/');
-    }
+    if (router.query.reason === 'loggedoff')
+      openSnackbar('Please sign in to continue...');
+    router.replace('/');
   }, [openSnackbar, router]);
 
   const head = useHeadWithTitle('Welcome');

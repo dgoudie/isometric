@@ -1,6 +1,6 @@
 import { Prisma } from '@prisma/client';
 
-const FullWorkout = Prisma.validator<Prisma.WorkoutArgs>()({
+const FullWorkout = Prisma.validator<Prisma.ActiveWorkoutArgs>()({
   include: {
     exercises: {
       include: {
@@ -12,12 +12,12 @@ const FullWorkout = Prisma.validator<Prisma.WorkoutArgs>()({
   },
 });
 
-export type FullWorkout = Prisma.WorkoutGetPayload<typeof FullWorkout>;
+export type FullWorkout = Prisma.ActiveWorkoutGetPayload<typeof FullWorkout>;
 
 // ***************
 
 const WorkoutExerciseWithSetsAndDetails =
-  Prisma.validator<Prisma.WorkoutExerciseArgs>()({
+  Prisma.validator<Prisma.ActiveWorkoutExerciseArgs>()({
     include: {
       exercise: true,
       sets: true,
@@ -25,25 +25,9 @@ const WorkoutExerciseWithSetsAndDetails =
   });
 
 export type WorkoutExerciseWithSetsAndDetails =
-  Prisma.WorkoutExerciseGetPayload<typeof WorkoutExerciseWithSetsAndDetails>;
-
-// ***************
-
-const ScheduleWithFullDetail = Prisma.validator<Prisma.ScheduleArgs>()({
-  include: {
-    days: {
-      include: {
-        exercises: {
-          include: { exercise: true },
-        },
-      },
-    },
-  },
-});
-
-export type ScheduleWithFullDetail = Prisma.ScheduleGetPayload<
-  typeof ScheduleWithFullDetail
->;
+  Prisma.ActiveWorkoutExerciseGetPayload<
+    typeof WorkoutExerciseWithSetsAndDetails
+  >;
 
 // ***************
 

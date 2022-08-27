@@ -1,18 +1,19 @@
 import { Prisma } from '@prisma/client';
 
-const ScheduleDayWithExerciseInSchedules =
-  Prisma.validator<Prisma.ScheduleDayArgs>()({
+const ScheduledWorkoutWithExerciseInSchedules =
+  Prisma.validator<Prisma.ScheduledWorkoutArgs>()({
     include: {
       exercises: true,
     },
   });
 
-export type ScheduleDayWithExerciseInSchedules = Prisma.ScheduleDayGetPayload<
-  typeof ScheduleDayWithExerciseInSchedules
->;
+export type ScheduledWorkoutWithExerciseInSchedules =
+  Prisma.ScheduledWorkoutGetPayload<
+    typeof ScheduledWorkoutWithExerciseInSchedules
+  >;
 
-const ScheduleDayWithExerciseInSchedulesWithExercise =
-  Prisma.validator<Prisma.ScheduleDayArgs>()({
+const ScheduledWorkoutWithExerciseInSchedulesWithExercise =
+  Prisma.validator<Prisma.ScheduledWorkoutArgs>()({
     include: {
       exercises: {
         include: {
@@ -22,7 +23,7 @@ const ScheduleDayWithExerciseInSchedulesWithExercise =
     },
   });
 
-export type ScheduleDayWithExerciseInSchedulesWithExercise =
-  Prisma.ScheduleDayGetPayload<
-    typeof ScheduleDayWithExerciseInSchedulesWithExercise
+export type ScheduledWorkoutWithExerciseInSchedulesWithExercise =
+  Prisma.ScheduledWorkoutGetPayload<
+    typeof ScheduledWorkoutWithExerciseInSchedulesWithExercise
   >;

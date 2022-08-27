@@ -15,6 +15,7 @@ import {
   secondsToMilliseconds,
 } from 'date-fns';
 
+import { BREAK_TIME } from '../../pages/dashboard';
 import { CSSTransition } from 'react-transition-group';
 import { ExerciseMuscleGroup } from '@prisma/client';
 import FocusTrap from 'focus-trap-react';
@@ -26,17 +27,13 @@ import { showNotification } from '../../utils/notification';
 import styles from './AfterExerciseTimer.module.scss';
 
 type AfterExerciseTimerContextType = {
-  show: (durationInSeconds: number, onFinished?: () => void) => void;
+  show: (onFinished?: () => void) => void;
   showAfterLastSet: (
-    durationInSeconds: number,
     nextExerciseName: string,
     nextExerciseMuscleGroup: ExerciseMuscleGroup,
     onFinished?: () => void
   ) => void;
-  showAfterLastExercise: (
-    durationInSeconds: number,
-    onFinished?: () => void
-  ) => void;
+  showAfterLastExercise: (onFinished?: () => void) => void;
   cancel: () => void;
   isOpenAndMinimized: boolean;
 };
@@ -121,8 +118,8 @@ export default function AfterExerciseTimerProvider({
   }, [secondsRemaining]);
 
   const commonShow = useCallback(
-    (durationInSeconds: number, onFinished?: () => void) => {
-      setEndDate(addSeconds(new Date(), durationInSeconds));
+    (onFinished?: () => void) => {
+      setEndDate(addSeconds(new Date(), BREAK_TIME));
       setMinimized(false);
       if (!!onFinished) {
         setOnFinishedCallbacks([...onFinishedCallbacks, onFinished]);
@@ -132,8 +129,8 @@ export default function AfterExerciseTimerProvider({
   );
 
   const show = useCallback<AfterExerciseTimerContextType['show']>(
-    (durationInSeconds, onFinished) => {
-      commonShow(durationInSeconds, onFinished);
+    (onFinished) => {
+      commonShow(onFinished);
       setType('AFTER_SET');
     },
     [commonShow]
@@ -142,8 +139,8 @@ export default function AfterExerciseTimerProvider({
   const showAfterLastSet = useCallback<
     AfterExerciseTimerContextType['showAfterLastSet']
   >(
-    (durationInSeconds, nextName, nextMuscleGroup, onFinished) => {
-      commonShow(durationInSeconds, onFinished);
+    (nextName, nextMuscleGroup, onFinished) => {
+      commonShow(onFinished);
       setNextExerciseName(nextName);
       setNextExerciseMuscleGroup(nextMuscleGroup);
       setType('AFTER_EXERCISE');
@@ -154,8 +151,8 @@ export default function AfterExerciseTimerProvider({
   const showAfterLastExercise = useCallback<
     AfterExerciseTimerContextType['showAfterLastExercise']
   >(
-    (durationInSeconds, onFinished) => {
-      commonShow(durationInSeconds, onFinished);
+    (onFinished) => {
+      commonShow(onFinished);
       setType('END_OF_WORKOUT');
     },
     [commonShow]

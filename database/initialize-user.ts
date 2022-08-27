@@ -2,11 +2,11 @@ import { Prisma } from '@prisma/client';
 import prisma from './prisma';
 
 export const initializeUserDataIfNecessary = async (
-  userId: string
+  email: string
 ): Promise<void> => {
   const user = await prisma.user.findUnique({
     where: {
-      userId,
+      email,
     },
   });
   if (!!user) {
@@ -14,7 +14,7 @@ export const initializeUserDataIfNecessary = async (
   }
   await prisma.user.create({
     data: {
-      userId,
+      email,
       exercises: {
         create: DEFAULT_EXERCISES,
       },

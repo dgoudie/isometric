@@ -1,5 +1,5 @@
 import { NextApiHandler } from 'next';
-import { getCompletedWorkouts } from '../../database/domains/workout';
+import { getFinishedWorkouts } from '../../database/domains/workout';
 import { getUserId } from '../../utils/get-user-id';
 
 const handler: NextApiHandler = async (req, res) => {
@@ -17,7 +17,7 @@ const handler: NextApiHandler = async (req, res) => {
           return;
         }
       }
-      const workouts = await getCompletedWorkouts(
+      const workouts = await getFinishedWorkouts(
         userId,
         !!page ? parseInt(page) : undefined
       );

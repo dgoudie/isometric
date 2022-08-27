@@ -105,7 +105,7 @@ function WeightedSet({
             ref={repCountInput}
             type='number'
             inputMode='numeric'
-            placeholder={`${data.minimumRecommendedRepetitions}-${data.maximumRecommendedRepetitions}`}
+            placeholder={`${set.minimumRecommendedRepetitions}-${data.maximumRecommendedRepetitions}`}
             onFocus={inputSelectAllOnFocus}
             onInput={inputForceInteger}
             onBlur={(e) =>

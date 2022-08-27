@@ -5,7 +5,7 @@ import prisma from '../prisma';
 
 type GetExerciseOptions = {
   muscleGroup?: ExerciseMuscleGroup;
-  ids?: number[];
+  ids?: string[];
   onlyPerformed?: boolean;
   onlyNotPerformed?: boolean;
   name?: XOR<{ search?: string }, { equals?: string }>;
@@ -70,10 +70,10 @@ export async function getExercises(
       },
       distinct: ['exerciseId', 'name'],
     });
-    const completedIds = new Set<number>(
+    const completedIds = new Set<string>(
       completedExercises
         .filter(({ exerciseId }) => exerciseId !== null)
-        .map((exercise) => exercise.exerciseId as number)
+        .map((exercise) => exercise.exerciseId as string)
     );
     const completedNames = new Set(
       completedExercises.map((exercise) => exercise.name)
@@ -120,47 +120,8 @@ export async function getExercises(
     take,
     skip,
   });
-  // await connectMongo();
-  // let query: object = { userId };
-  // if (!!options.search) {
-  //   options.search = options.search.replace(/(\w+)/g, '"$1"');
-  //   query = {
-  //     ...query,
-  //     $text: { $search: options.search },
-  //   };
-  // }
-  // if (!!options.muscleGroup) {
-  //   query = {
-  //     ...query,
-  //     $or: [
-  //       { primaryMuscleGroup: options.muscleGroup },
-  //       { secondaryMuscleGroups: options.muscleGroup },
-  //     ],
-  //   };
-  // }
-  // if (!!options.ids) {
-  //   query = {
-  //     ...query,
-  //     _id: {
-  //       $in: options.ids.map((id) => new mongoose.Types.ObjectId(id)),
-  //     },
-  //   };
-  // }
-  // if (!!options.name) {
-  //   query = {
-  //     ...query,
-  //     name: options.name,
-  //   };
-  // }
-  // let pipeline = buildFindExercisesWithBasicHistoryQuery(
-  //   query,
-  //   options.onlyPerformed ?? false,
-  //   options.onlyNotPerformed ?? false,
-  //   page
-  // );
-  // return Exercise.aggregate<IExerciseExtended>(pipeline);
 }
-export async function getExerciseById(userId: string, id: number) {
+export async function getExerciseById(userId: string, id: string) {
   return prisma.exercise.findFirst({ where: { userId, id } });
 }
 
@@ -170,7 +131,7 @@ export async function getExerciseByName(userId: string, name: string) {
 
 export async function saveExercise(
   userId: string,
-  exerciseId: number,
+  exerciseId: string,
   exercise: Prisma.ExerciseUpdateInput
 ) {
   await prisma.exercise.updateMany({

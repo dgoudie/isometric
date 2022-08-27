@@ -70,16 +70,15 @@ export default function ActiveExerciseViewExercise({
       if (allSetsCompleted) {
         if (!!nextWorkoutExercise) {
           showAfterLastSet(
-            workoutExercise.exercise!.breakTimeInSeconds,
             nextWorkoutExercise.exercise.name,
             nextWorkoutExercise.exercise.primaryMuscleGroup,
             onCompleted
           );
         } else {
-          showAfterLastExercise(workoutExercise.exercise.breakTimeInSeconds);
+          showAfterLastExercise();
         }
       } else {
-        show(workoutExercise.exercise.breakTimeInSeconds);
+        show();
       }
     }
     previousNumberOfCompletedSets.current = numberOfCompletedSets;

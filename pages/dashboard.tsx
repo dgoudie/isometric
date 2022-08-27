@@ -1,15 +1,11 @@
-import { Exercise, ExerciseInSchedule, Prisma } from '@prisma/client';
-import type { GetServerSidePropsContext, GetServerSidePropsResult } from 'next';
-import {
-  NextDaySchedule,
-  getNextDaySchedule,
-} from '../database/domains/schedule';
 import { useContext, useEffect, useMemo, useState } from 'react';
 
 import AppBarWithAppHeaderLayout from '../layouts/AppBarWithAppHeaderLayout/AppBarWithAppHeaderLayout';
 import Link from 'next/link';
 import MuscleGroupTag from '../components/MuscleGroupTag/MuscleGroupTag';
+import { NextDaySchedule } from '../database/domains/schedule';
 import { NextPageWithLayout } from './_app';
+import { Prisma } from '@prisma/client';
 import RouteLoader from '../components/RouteLoader/RouteLoader';
 import { WorkoutContext } from '../providers/Workout/Workout';
 import classNames from 'classnames';
@@ -21,7 +17,7 @@ import { useHeadWithTitle } from '../utils/use-head-with-title';
 import useSWR from 'swr';
 
 const TIME_PER_SET = 60;
-const BREAK_TIME = 120;
+export const BREAK_TIME = 120;
 
 const Dashboard: NextPageWithLayout = () => {
   const [greeting, setGreeting] = useState('...');
@@ -129,7 +125,7 @@ const Dashboard: NextPageWithLayout = () => {
             {schedule.day.exercises.map((exerciseInSchedule) => (
               <ExerciseItem
                 key={exerciseInSchedule.exerciseId}
-                exerciseInSchedule={exerciseInSchedule}
+                scheduledWorkoutWithExercise={exerciseInSchedule}
               />
             ))}
           </div>
@@ -184,61 +180,68 @@ function HeaderItem({ title, value, suffix }: HeaderItemProps) {
   );
 }
 
-const ExerciseInScheduleWithExercise =
-  Prisma.validator<Prisma.ExerciseInScheduleArgs>()({
+const ScheduledWorkoutWithExercise =
+  Prisma.validator<Prisma.ScheduledWorkoutExerciseArgs>()({
     include: {
       exercise: true,
     },
   });
 
-export type ExerciseInScheduleWithExercise =
-  Prisma.ExerciseInScheduleGetPayload<typeof ExerciseInScheduleWithExercise>;
+export type ScheduledWorkoutWithExercise =
+  Prisma.ScheduledWorkoutExerciseGetPayload<
+    typeof ScheduledWorkoutWithExercise
+  >;
 
 interface ExerciseItemProps {
-  exerciseInSchedule: ExerciseInScheduleWithExercise;
+  scheduledWorkoutWithExercise: ScheduledWorkoutWithExercise;
 }
 
-function ExerciseItem({ exerciseInSchedule }: ExerciseItemProps) {
+function ExerciseItem({ scheduledWorkoutWithExercise }: ExerciseItemProps) {
   const duration = useMemo(() => {
-    switch (exerciseInSchedule.exercise.exerciseType) {
+    switch (scheduledWorkoutWithExercise.exercise.exerciseType) {
       case 'rep_based': {
-        return <>{exerciseInSchedule.setCount} sets</>;
+        return <>{scheduledWorkoutWithExercise.setCount} sets</>;
       }
       case 'timed': {
-        if (exerciseInSchedule.setCount < 2) {
+        if (scheduledWorkoutWithExercise.setCount < 2) {
           return (
             <>
-              {secondsToMinutes(exerciseInSchedule.timePerSetInSeconds!)}{' '}
+              {secondsToMinutes(
+                scheduledWorkoutWithExercise.timePerSetInSeconds!
+              )}{' '}
               minutes
             </>
           );
         }
         return (
           <>
-            {exerciseInSchedule.setCount} sets —{' '}
-            {secondsToMinutes(exerciseInSchedule.timePerSetInSeconds!)} Minutes
+            {scheduledWorkoutWithExercise.setCount} sets —{' '}
+            {secondsToMinutes(
+              scheduledWorkoutWithExercise.timePerSetInSeconds!
+            )}{' '}
+            Minutes
           </>
         );
       }
       default: {
         return (
           <>
-            {exerciseInSchedule.setCount} sets,{' '}
-            {exerciseInSchedule.recommendedRepetitions}
+            {scheduledWorkoutWithExercise.setCount} sets,{' '}
+            {scheduledWorkoutWithExercise.recommendedRepetitions}
           </>
         );
       }
     }
-  }, [exerciseInSchedule]);
+  }, [scheduledWorkoutWithExercise]);
 
   return (
     <div className={styles.exercise}>
       <div className={styles.exerciseName}>
-        {exerciseInSchedule.exercise.name}
+        {scheduledWorkoutWithExercise.exercise.name}
       </div>
       <div className={styles.exerciseGroup}>
         <MuscleGroupTag
-          muscleGroup={exerciseInSchedule.exercise.primaryMuscleGroup}
+          muscleGroup={scheduledWorkoutWithExercise.exercise.primaryMuscleGroup}
         />
       </div>
       <div className={styles.exerciseDuration}>{duration}</div>

@@ -13,7 +13,7 @@ import { getExerciseById } from './exercise';
 import { getNextDaySchedule } from './schedule';
 import prisma from '../prisma';
 
-export async function getCompletedWorkouts(
+export async function getFinishedWorkouts(
   userId: string,
   page?: number
 ): Promise<FinishedWorkoutWithExerciseWithSets[]> {

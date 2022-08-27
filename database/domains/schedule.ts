@@ -1,10 +1,10 @@
-import { ScheduleDayWithExerciseInSchedulesWithExercise } from '../../types/ScheduleDay';
+import { ScheduledWorkoutWithExerciseInSchedulesWithExercise } from '../../types/ScheduleDay';
 import { getMostRecentCompletedWorkout } from './workout';
 import prisma from '../prisma';
 
 export async function getScheduledDays(
   userId: string
-): Promise<ScheduleDayWithExerciseInSchedulesWithExercise[]> {
+): Promise<ScheduledWorkoutWithExerciseInSchedulesWithExercise[]> {
   return prisma.scheduleDay.findMany({
     where: { userId },
     include: {
@@ -22,7 +22,7 @@ export async function getScheduledDays(
 }
 
 export type NextDaySchedule = {
-  day: ScheduleDayWithExerciseInSchedulesWithExercise | null;
+  day: ScheduledWorkoutWithExerciseInSchedulesWithExercise | null;
   dayCount: number;
 };
 

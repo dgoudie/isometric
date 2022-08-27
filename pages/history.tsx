@@ -14,7 +14,7 @@ import RouteLoader from '../components/RouteLoader/RouteLoader';
 import SetView from '../components/SetView/SetView';
 import classNames from 'classnames';
 import { fetchFromApi } from '../utils/fetch-from-api';
-import { getCompletedWorkouts } from '../database/domains/workout';
+import { getFinishedWorkouts } from '../database/domains/workout';
 import { secondsToMilliseconds } from 'date-fns';
 import styles from './History.module.scss';
 import useFetchWith403Redirect from '../utils/fetch-with-403-redirect';
@@ -58,7 +58,7 @@ const History: NextPageWithLayout = ({}) => {
     const params = new URLSearchParams();
     params.set('page', page.toString());
     const nextPage = await fetchFromApi<
-      Awaited<ReturnType<typeof getCompletedWorkouts>>
+      Awaited<ReturnType<typeof getFinishedWorkouts>>
     >(`/api/workouts`, params);
     if (nextPage.length < 10) {
       setMoreWorkouts(false);
@@ -99,7 +99,7 @@ interface WorkoutProps {
 function Workout({ workout }: WorkoutProps) {
   const howLongAgo = useMemo(
     () =>
-      formatDistance(new Date(workout.createdAt), new Date(), {
+      formatDistance(new Date(workout.startedAt), new Date(), {
         addSuffix: true,
       }),
     [workout]
@@ -146,7 +146,7 @@ function Workout({ workout }: WorkoutProps) {
       </div>
       <div className={styles.item}>
         <label>Date</label>
-        <div>{format.format(new Date(workout.createdAt))}</div>
+        <div>{format.format(new Date(workout.startedAt))}</div>
         <div className={styles.suffix}>{howLongAgo}</div>
       </div>
       <div className={styles.item}>

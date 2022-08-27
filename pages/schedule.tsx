@@ -1,8 +1,9 @@
 import AppBarWithAppHeaderLayout from '../layouts/AppBarWithAppHeaderLayout/AppBarWithAppHeaderLayout';
 import { NextPageWithLayout } from './_app';
+import PageWrapper from '../components/PageWrapper/PageWrapper';
 import RouteGuard from '../components/RouteGuard/RouteGuard';
 import RouteLoader from '../components/RouteLoader/RouteLoader';
-import { ScheduleDayWithExerciseInSchedules } from '../types/ScheduleDay';
+import { ScheduledWorkoutWithExerciseInSchedules } from '../types/ScheduleDay';
 import styles from './Schedule.module.scss';
 import { useCallback } from 'react';
 import useFetchWith403Redirect from '../utils/fetch-with-403-redirect';
@@ -14,7 +15,7 @@ const WorkoutPlan: NextPageWithLayout = () => {
   const fetcher = useFetchWith403Redirect();
 
   const { data: days, error: fetchScheduleError } = useSWR<
-    ScheduleDayWithExerciseInSchedules[]
+    ScheduledWorkoutWithExerciseInSchedules[]
   >('/api/schedule/days', fetcher);
 
   const head = useHeadWithTitle(`Schedule`);
@@ -56,7 +57,9 @@ const WorkoutPlan: NextPageWithLayout = () => {
 
 WorkoutPlan.getLayout = (page) => (
   <AppBarWithAppHeaderLayout>
-    <RouteGuard>{page}</RouteGuard>
+    <RouteGuard>
+      <PageWrapper>{page}</PageWrapper>
+    </RouteGuard>
   </AppBarWithAppHeaderLayout>
 );
 
