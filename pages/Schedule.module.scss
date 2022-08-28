@@ -46,6 +46,11 @@
     background-color: var(--background-alt);
     border-radius: 8px;
     overflow-y: hidden;
+    button {
+      margin: 0;
+      width: 100%;
+      text-align: unset;
+    }
     &Upper {
       display: flex;
       padding: 0.5rem 1rem;
@@ -71,13 +76,15 @@
         }
       }
 
-      &Button {
+      &Arrow {
         border-radius: 1000px;
         margin-top: 0.5rem;
         width: 2rem;
         height: 2rem;
         background-color: var(--background-alt-2);
-
+        display: flex;
+        align-items: center;
+        justify-content: center;
         i {
           transition: transform 200ms;
         }

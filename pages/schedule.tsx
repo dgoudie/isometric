@@ -232,31 +232,32 @@ function ScheduledWorkouts({
                       <i className='fa-solid fa-grip-lines'></i>
                     </div>
                     <div className={classNames(styles.workoutBody, 'fade-in')}>
-                      <div className={styles.workoutBodyUpper}>
-                        <div className={styles.workoutBodyUpperLeft}>
-                          <div className={styles.numberAndName}>
-                            Day {index + 1} -{' '}
-                            {scheduledWorkout.nickname ? (
-                              scheduledWorkout.nickname
-                            ) : (
-                              <i>No Name</i>
-                            )}
+                      <button onClick={() => expand(scheduledWorkout.id)}>
+                        <div className={styles.workoutBodyUpper}>
+                          <div className={styles.workoutBodyUpperLeft}>
+                            <div className={styles.numberAndName}>
+                              Day {index + 1} -{' '}
+                              {scheduledWorkout.nickname ? (
+                                scheduledWorkout.nickname
+                              ) : (
+                                <i>No Name</i>
+                              )}
+                            </div>
+                            <ScheduledWorkoutMuscleGroups
+                              scheduledWorkout={scheduledWorkout}
+                            />
                           </div>
-                          <ScheduledWorkoutMuscleGroups
-                            scheduledWorkout={scheduledWorkout}
-                          />
+                          <div
+                            className={classNames(
+                              styles.workoutBodyUpperArrow,
+                              expandedWorkoutIds.has(scheduledWorkout.id) &&
+                                styles.expanded
+                            )}
+                          >
+                            <i className='fa-solid fa-chevron-left'></i>
+                          </div>
                         </div>
-                        <button
-                          className={classNames(
-                            styles.workoutBodyUpperButton,
-                            expandedWorkoutIds.has(scheduledWorkout.id) &&
-                              styles.expanded
-                          )}
-                          onClick={() => expand(scheduledWorkout.id)}
-                        >
-                          <i className='fa-solid fa-chevron-left'></i>
-                        </button>
-                      </div>
+                      </button>
 
                       <div className={styles.workoutBodyLower}>
                         <Link href={`/schedule/${scheduledWorkout.id}`}>
