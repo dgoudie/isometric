@@ -15,31 +15,31 @@ const handler: NextApiHandler = async (req, res) => {
         res.status(400).end();
         return;
       }
-      await prisma.$transaction(async () => {
-        // increment every item by the total count. This is to avoid unique constraint.
-        // order numbers 0,1,2 will become 3,4,5
-        await prisma.scheduledWorkout.updateMany({
+      // await prisma.$transaction(async () => {
+      // increment every item by the total count. This is to avoid unique constraint.
+      // order numbers 0,1,2 will become 3,4,5
+      await prisma.scheduledWorkout.updateMany({
+        where: {
+          userId,
+        },
+        data: {
+          orderNumber: {
+            increment: scheduledWorkoutIds.length,
+          },
+        },
+      });
+      for (let i = 0; i < scheduledWorkoutIds.length; i++) {
+        const id = scheduledWorkoutIds[i];
+        await prisma.scheduledWorkout.update({
           where: {
-            userId,
+            id,
           },
           data: {
-            orderNumber: {
-              increment: scheduledWorkoutIds.length,
-            },
+            orderNumber: i,
           },
         });
-        for (let i = 0; i < scheduledWorkoutIds.length; i++) {
-          const id = scheduledWorkoutIds[i];
-          await prisma.scheduledWorkout.update({
-            where: {
-              id,
-            },
-            data: {
-              orderNumber: i,
-            },
-          });
-        }
-      });
+      }
+      // });
       res.status(204).end();
       return;
     }
