@@ -2,7 +2,7 @@
 
 import '../styles/globals.scss';
 
-import type { ReactElement, ReactNode } from 'react';
+import { ReactElement, ReactNode, useEffect, useRef } from 'react';
 
 import AfterExerciseTimerProvider from '../providers/AfterExerciseTimer/AfterExerciseTimer';
 import type { AppProps } from 'next/app';
@@ -11,6 +11,8 @@ import PageWrapper from '../components/PageWrapper/PageWrapper';
 import { SessionProvider } from 'next-auth/react';
 import SnackbarProvider from '../providers/Snackbar/Snackbar';
 import WorkoutProvider from '../providers/Workout/Workout';
+import useBuildId from '../utils/use-build-id';
+import { useRouter } from 'next/router';
 
 export type NextPageWithLayout<P = {}, IP = P> = NextPage<P, IP> & {
   getLayout?: (page: ReactElement) => ReactNode;
@@ -24,6 +26,15 @@ export default function MyApp({
   Component,
   pageProps: { session, ...pageProps },
 }: AppPropsWithLayout) {
+  const buildId = useBuildId(); // useSWR under the hood
+  const prevBuildId = useRef<string | undefined>(buildId);
+  const router = useRouter();
+  useEffect(() => {
+    if (prevBuildId.current && buildId && prevBuildId.current !== buildId) {
+      router.reload();
+    }
+    prevBuildId.current = buildId;
+  }, [buildId, router]);
   // Use the layout defined at the page level, if available
   const getLayout = Component.getLayout ?? ((page) => page);
   const pageWithLayout = getLayout(<Component {...pageProps} />);
