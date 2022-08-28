@@ -22,6 +22,9 @@ const handler: NextApiHandler = async (req, res) => {
               include: {
                 exercise: true,
               },
+              orderBy: {
+                orderNumber: 'asc',
+              },
             },
           },
         });
@@ -39,10 +42,9 @@ const handler: NextApiHandler = async (req, res) => {
           },
         });
         await prisma.scheduledWorkoutExercise.createMany({
-          data: dayToCopy.exercises.map((scheduledWorkoutExercise) => ({
-            scheduledWorkoutUserId: userId,
-            scheduledWorkoutOrderNumber: dayCount,
-            orderNumber: scheduledWorkoutExercise.orderNumber,
+          data: dayToCopy.exercises.map((scheduledWorkoutExercise, index) => ({
+            scheduledWorkoutId: day.id,
+            orderNumber: index,
             exerciseId: scheduledWorkoutExercise.exerciseId,
           })),
         });

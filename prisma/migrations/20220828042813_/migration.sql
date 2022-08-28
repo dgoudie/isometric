@@ -55,12 +55,12 @@ CREATE TABLE "ScheduledWorkout" (
 
 -- CreateTable
 CREATE TABLE "ScheduledWorkoutExercise" (
+    "id" UUID NOT NULL DEFAULT gen_random_uuid(),
+    "scheduledWorkoutId" UUID NOT NULL,
     "exerciseId" UUID NOT NULL,
-    "scheduledWorkoutUserId" UUID NOT NULL,
-    "scheduledWorkoutOrderNumber" INT4 NOT NULL,
     "orderNumber" INT4 NOT NULL,
 
-    CONSTRAINT "ScheduledWorkoutExercise_pkey" PRIMARY KEY ("scheduledWorkoutUserId","scheduledWorkoutOrderNumber","orderNumber")
+    CONSTRAINT "ScheduledWorkoutExercise_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
@@ -152,6 +152,9 @@ CREATE UNIQUE INDEX "Exercise_userId_name_key" ON "Exercise"("userId", "name" AS
 CREATE UNIQUE INDEX "ScheduledWorkout_userId_orderNumber_key" ON "ScheduledWorkout"("userId", "orderNumber");
 
 -- CreateIndex
+CREATE UNIQUE INDEX "ScheduledWorkoutExercise_scheduledWorkoutId_orderNumber_key" ON "ScheduledWorkoutExercise"("scheduledWorkoutId", "orderNumber");
+
+-- CreateIndex
 CREATE INDEX "ActiveWorkoutCheckin_at_idx" ON "ActiveWorkoutCheckin"("at" ASC);
 
 -- CreateIndex
@@ -176,7 +179,7 @@ ALTER TABLE "ScheduledWorkout" ADD CONSTRAINT "ScheduledWorkout_userId_fkey" FOR
 ALTER TABLE "ScheduledWorkoutExercise" ADD CONSTRAINT "ScheduledWorkoutExercise_exerciseId_fkey" FOREIGN KEY ("exerciseId") REFERENCES "Exercise"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "ScheduledWorkoutExercise" ADD CONSTRAINT "ScheduledWorkoutExercise_scheduledWorkoutUserId_scheduledW_fkey" FOREIGN KEY ("scheduledWorkoutUserId", "scheduledWorkoutOrderNumber") REFERENCES "ScheduledWorkout"("userId", "orderNumber") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "ScheduledWorkoutExercise" ADD CONSTRAINT "ScheduledWorkoutExercise_scheduledWorkoutId_fkey" FOREIGN KEY ("scheduledWorkoutId") REFERENCES "ScheduledWorkout"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "ActiveWorkout" ADD CONSTRAINT "ActiveWorkout_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("userId") ON DELETE CASCADE ON UPDATE CASCADE;

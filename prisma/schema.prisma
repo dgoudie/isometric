@@ -117,15 +117,15 @@ model ScheduledWorkout {
 
 /// represents an exercise that's a part of a scheduled workout in a user's plan.
 model ScheduledWorkoutExercise {
-  exerciseId                  String @db.Uuid
-  scheduledWorkoutUserId      String @db.Uuid
-  scheduledWorkoutOrderNumber Int
-  orderNumber                 Int
+  id                 String @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  scheduledWorkoutId String @db.Uuid
+  exerciseId         String @db.Uuid
+  orderNumber        Int
 
   exercise         Exercise         @relation(fields: [exerciseId], references: [id])
-  scheduledWorkout ScheduledWorkout @relation(fields: [scheduledWorkoutUserId, scheduledWorkoutOrderNumber], references: [userId, orderNumber], onDelete: Cascade)
+  scheduledWorkout ScheduledWorkout @relation(fields: [scheduledWorkoutId], references: [id], onDelete: Cascade)
 
-  @@id([scheduledWorkoutUserId, scheduledWorkoutOrderNumber, orderNumber])
+  @@unique([scheduledWorkoutId, orderNumber])
 }
 
 /// represents a user's single active workout.
