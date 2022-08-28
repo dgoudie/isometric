@@ -50,16 +50,6 @@ const sellingPoints: SellingPoint[] = [
 ];
 
 const Landing: NextPageWithLayout = () => {
-  const router = useRouter();
-  const { openSnackbar } = useContext(SnackbarContext);
-
-  useEffect(() => {
-    if (router.query.reason) {
-      if (router.query.reason === 'loggedoff')
-        openSnackbar('Please sign in to continue...');
-    }
-  }, [openSnackbar, router.query]);
-
   const head = useHeadWithTitle('Welcome');
   useOneTapSignin();
   const { status } = useSession();
