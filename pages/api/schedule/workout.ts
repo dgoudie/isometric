@@ -13,16 +13,52 @@ const handler: NextApiHandler = async (req, res) => {
       let dayCount = await prisma.scheduledWorkout.count({
         where: { userId },
       });
-      let day = await prisma.scheduledWorkout.create({
-        data: {
-          user: {
-            connect: { userId },
+      const id = req.query.copy;
+      if (typeof id === 'string') {
+        const dayToCopy = await prisma.scheduledWorkout.findFirst({
+          where: { userId, id },
+          include: {
+            exercises: {
+              include: {
+                exercise: true,
+              },
+            },
           },
-          orderNumber: dayCount,
-          nickname: '',
-        },
-      });
-      res.send(day.id);
+        });
+        if (!dayToCopy) {
+          res.status(404).end();
+          return;
+        }
+        let day = await prisma.scheduledWorkout.create({
+          data: {
+            user: {
+              connect: { userId },
+            },
+            orderNumber: dayCount,
+            nickname: dayToCopy.nickname,
+          },
+        });
+        await prisma.scheduledWorkoutExercise.createMany({
+          data: dayToCopy.exercises.map((scheduledWorkoutExercise) => ({
+            scheduledWorkoutUserId: userId,
+            scheduledWorkoutOrderNumber: dayCount,
+            orderNumber: scheduledWorkoutExercise.orderNumber,
+            exerciseId: scheduledWorkoutExercise.exerciseId,
+          })),
+        });
+        res.send(day.id);
+      } else {
+        let day = await prisma.scheduledWorkout.create({
+          data: {
+            user: {
+              connect: { userId },
+            },
+            orderNumber: dayCount,
+            nickname: '',
+          },
+        });
+        res.send(day.id);
+      }
       return;
     }
     default: {

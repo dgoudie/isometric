@@ -5,6 +5,7 @@ import {
   Droppable,
 } from 'react-beautiful-dnd';
 import { useCallback, useEffect, useMemo, useState } from 'react';
+import useSWR, { useSWRConfig } from 'swr';
 
 import AppBarWithAppHeaderLayout from '../layouts/AppBarWithAppHeaderLayout/AppBarWithAppHeaderLayout';
 import { ExerciseMuscleGroup } from '@prisma/client';
@@ -21,17 +22,20 @@ import styles from './Schedule.module.scss';
 import useFetchWith403Redirect from '../utils/fetch-with-403-redirect';
 import { useHeadWithTitle } from '../utils/use-head-with-title';
 import { useRouter } from 'next/router';
-import useSWR from 'swr';
+
+const url = `/api/schedule/workouts`;
 
 const WorkoutPlan: NextPageWithLayout = () => {
   const fetcher = useFetchWith403Redirect();
 
   const { data: scheduledWorkouts, error: fetchScheduleError } = useSWR<
     ScheduledWorkoutWithExerciseInSchedulesWithExercise[]
-  >('/api/schedule/workouts', fetcher, {
+  >(url, fetcher, {
     revalidateOnMount: true,
     dedupingInterval: 0,
   });
+
+  const { mutate } = useSWRConfig();
 
   const head = useHeadWithTitle(`Edit Schedule`);
 
@@ -75,6 +79,9 @@ const WorkoutPlan: NextPageWithLayout = () => {
         <ScheduledWorkouts
           scheduledWorkouts={scheduledWorkouts}
           addNewDay={addNewDay}
+          refreshScheduledWorkouts={() => {
+            mutate(url);
+          }}
         />
         <div className={classNames(styles.actions, 'fade-in')}>
           <div className={styles.autoSaveTip}>
@@ -106,11 +113,13 @@ export default WorkoutPlan;
 interface ScheduledWorkoutsProps {
   scheduledWorkouts: ScheduledWorkoutWithExerciseInSchedulesWithExercise[];
   addNewDay: () => void;
+  refreshScheduledWorkouts: () => void;
 }
 
 function ScheduledWorkouts({
   scheduledWorkouts: scheduledWorkoutsUnmemoized,
   addNewDay,
+  refreshScheduledWorkouts,
 }: ScheduledWorkoutsProps) {
   const [scheduledWorkouts, setScheduledWorkouts] = useState(
     scheduledWorkoutsUnmemoized
@@ -141,12 +150,42 @@ function ScheduledWorkouts({
       if (destination.index === source.index) {
         return;
       }
-      setScheduledWorkouts(
-        moveItemInArray(scheduledWorkouts, source.index, destination.index)
+      const reorderedArray = moveItemInArray(
+        scheduledWorkouts,
+        source.index,
+        destination.index
       );
-      // fetch(``)
+      setScheduledWorkouts(reorderedArray);
+      const scheduledWorkoutIds: string[] = reorderedArray.map(
+        (item) => item.id
+      );
+      fetch(`/api/schedule/workout/move`, {
+        method: 'PUT',
+        headers: {
+          'content-type': 'application/json',
+        },
+        body: JSON.stringify({
+          scheduledWorkoutIds,
+        }),
+      });
     },
     [scheduledWorkouts]
+  );
+
+  const copy = useCallback(
+    async (id: string) => {
+      await fetch(`/api/schedule/workout?copy=${id}`, { method: 'PUT' });
+      refreshScheduledWorkouts();
+    },
+    [refreshScheduledWorkouts]
+  );
+
+  const del = useCallback(
+    async (id: string) => {
+      await fetch(`/api/schedule/workout/${id}`, { method: 'DELETE' });
+      refreshScheduledWorkouts();
+    },
+    [refreshScheduledWorkouts]
   );
 
   const expand = useCallback(
@@ -192,7 +231,7 @@ function ScheduledWorkouts({
                     >
                       <i className='fa-solid fa-grip-lines'></i>
                     </div>
-                    <div className={styles.workoutBody}>
+                    <div className={classNames(styles.workoutBody, 'fade-in')}>
                       <div className={styles.workoutBodyUpper}>
                         <div className={styles.workoutBodyUpperLeft}>
                           <div className={styles.numberAndName}>
@@ -225,10 +264,22 @@ function ScheduledWorkouts({
                             <i className='fa-solid fa-edit'></i>Edit
                           </a>
                         </Link>
-                        <button className='standard-button slim'>
+                        <button
+                          className='standard-button slim'
+                          onClick={() => {
+                            copy(scheduledWorkout.id);
+                            expand(scheduledWorkout.id);
+                          }}
+                        >
                           <i className='fa-solid fa-copy'></i>Copy
                         </button>
-                        <button className='standard-button danger slim'>
+                        <button
+                          className='standard-button danger slim'
+                          onClick={() => {
+                            del(scheduledWorkout.id);
+                            expand(scheduledWorkout.id);
+                          }}
+                        >
                           <i className='fa-solid fa-trash'></i>
                         </button>
                       </div>
@@ -269,7 +320,7 @@ function ScheduledWorkoutMuscleGroups({
     scheduledWorkout.exercises.forEach(({ exercise }) => {
       muscleGroupToCountMap.set(
         exercise.primaryMuscleGroup,
-        muscleGroupToCountMap.get(exercise.primaryMuscleGroup)! + 1
+        muscleGroupToCountMap.get(exercise.primaryMuscleGroup)! + 2
       );
       exercise.secondaryMuscleGroups.forEach((group) => {
         muscleGroupToCountMap.set(group, muscleGroupToCountMap.get(group)! + 1);
@@ -279,7 +330,7 @@ function ScheduledWorkoutMuscleGroups({
       .filter(([_group, count]) => count > 0)
       .sort((a, b) => b[1] - a[1])
       .map(([group]) => group)
-      .slice(0, 2);
+      .slice(0, 3);
   }, [scheduledWorkout]);
   return (
     <div className={styles.muscleGroups}>
@@ -288,7 +339,7 @@ function ScheduledWorkoutMuscleGroups({
           <MuscleGroupTag key={group} muscleGroup={group} />
         ))
       ) : (
-        <MuscleGroupTag />
+        <i className={styles.none}>No exercises specified...</i>
       )}
     </div>
   );

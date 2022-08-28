@@ -48,23 +48,32 @@
     overflow-y: hidden;
     &Upper {
       display: flex;
-      padding: 1rem 1rem;
+      padding: 0.5rem 1rem;
       &Left {
         flex: 1;
         display: flex;
         flex-direction: column;
-        height: 2rem;
+        height: 3rem;
         justify-content: center;
         gap: 0.3rem;
+        min-width: 0;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        overflow-x: hidden;
 
         .muscleGroups {
           display: flex;
           gap: 0.5rem;
+          .none {
+            color: var(--color-secondary);
+            font-size: 0.9rem;
+          }
         }
       }
 
       &Button {
         border-radius: 1000px;
+        margin-top: 0.5rem;
         width: 2rem;
         height: 2rem;
         background-color: var(--background-alt-2);
@@ -93,7 +102,6 @@
 }
 
 .addActions {
-  padding: 0.75rem;
   display: flex;
   justify-content: flex-end;
 }

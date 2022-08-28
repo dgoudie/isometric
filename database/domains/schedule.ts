@@ -67,3 +67,29 @@ export async function getNextDaySchedule(
   });
   return { day, dayCount };
 }
+
+export async function cleanUpScheduledWorkoutOrderNumbers(
+  userId: string
+): Promise<void> {
+  await prisma.$transaction(async () => {
+    const orderedScheduledWorkouts = await prisma.scheduledWorkout.findMany({
+      where: { userId },
+      orderBy: {
+        orderNumber: 'asc',
+      },
+      select: {
+        id: true,
+      },
+    });
+    for (
+      let orderNumber = 0;
+      orderNumber < orderedScheduledWorkouts.length;
+      orderNumber++
+    ) {
+      await prisma.scheduledWorkout.update({
+        where: { id: orderedScheduledWorkouts[orderNumber].id },
+        data: { orderNumber },
+      });
+    }
+  });
+}

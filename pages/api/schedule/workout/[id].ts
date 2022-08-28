@@ -1,4 +1,5 @@
 import { NextApiHandler } from 'next';
+import { cleanUpScheduledWorkoutOrderNumbers } from '../../../../database/domains/schedule';
 import { getUserId } from '../../../../utils/get-user-id';
 import prisma from '../../../../database/prisma';
 
@@ -33,6 +34,22 @@ const handler: NextApiHandler = async (req, res) => {
         return;
       }
       res.send(day);
+      return;
+    }
+    case 'DELETE': {
+      const id = req.query.id;
+      if (typeof id !== 'string') {
+        res.status(400).end();
+        return;
+      }
+      await prisma.scheduledWorkout.deleteMany({
+        where: {
+          id,
+          userId,
+        },
+      });
+      await cleanUpScheduledWorkoutOrderNumbers(userId);
+      res.status(204).end();
       return;
     }
     default: {

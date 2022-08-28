@@ -20,7 +20,7 @@ const ScheduleWorkout: NextPageWithLayout = () => {
 
   const { data, error } =
     useSWR<ScheduledWorkoutWithExerciseInSchedulesWithExercise>(
-      router.isReady ? `/api/schedule/workouts/${scheduledWorkoutId}` : null,
+      router.isReady ? `/api/schedule/workout/${scheduledWorkoutId}` : null,
       fetcher
     );
 
