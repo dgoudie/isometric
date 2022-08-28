@@ -19,24 +19,24 @@
 }
 .workouts {
   flex: 1;
-  margin: 0 1rem;
-  position: relative;
   overflow-y: auto;
+  padding-right: 0.75rem;
 }
 .workout {
-  height: 3rem;
-  position: absolute;
-  left: 0;
-  right: 0;
+  height: 4rem;
   display: grid;
   grid-template-columns: 3rem auto;
-  gap: 0.75rem;
+  margin-bottom: 1rem;
+  will-change: height;
+  transition: height 200ms;
+
+  &.expanded {
+    height: 8rem;
+  }
 
   &Handle {
     touch-action: none;
-    background-color: var(--background-alt-2);
-    border-radius: 8px;
-    height: 3rem;
+    height: 4rem;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -45,7 +45,57 @@
   &Body {
     background-color: var(--background-alt);
     border-radius: 8px;
+    overflow-y: hidden;
+    &Upper {
+      display: flex;
+      padding: 1rem 1rem;
+      &Left {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        height: 2rem;
+        justify-content: center;
+        gap: 0.3rem;
+
+        .muscleGroups {
+          display: flex;
+          gap: 0.5rem;
+        }
+      }
+
+      &Button {
+        border-radius: 1000px;
+        width: 2rem;
+        height: 2rem;
+        background-color: var(--background-alt-2);
+
+        i {
+          transition: transform 200ms;
+        }
+
+        &.expanded i {
+          transform: rotate(-90deg);
+        }
+      }
+    }
+    &Lower {
+      margin: 0.75rem;
+      display: flex;
+      gap: 0.75rem;
+      > *:not(:global .danger) {
+        flex: 1;
+      }
+      :global .danger {
+        padding: 0 1rem;
+      }
+    }
   }
+}
+
+.addActions {
+  padding: 0.75rem;
+  display: flex;
+  justify-content: flex-end;
 }
 .actions {
   display: flex;

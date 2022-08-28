@@ -1,4 +1,5 @@
 import { NextApiHandler } from 'next';
+import { ScheduledWorkoutWithExerciseInSchedulesWithExercise } from '../../../types/ScheduledWorkout';
 import { getUserId } from '../../../utils/get-user-id';
 import prisma from '../../../database/prisma';
 
@@ -10,20 +11,21 @@ const handler: NextApiHandler = async (req, res) => {
   }
   switch (req.method) {
     case 'GET': {
-      const days = await prisma.scheduledWorkout.findMany({
-        where: { userId },
-        include: {
-          exercises: {
-            include: { exercise: true },
-            orderBy: {
-              orderNumber: 'asc',
+      const days: ScheduledWorkoutWithExerciseInSchedulesWithExercise[] =
+        await prisma.scheduledWorkout.findMany({
+          where: { userId },
+          include: {
+            exercises: {
+              include: { exercise: true },
+              orderBy: {
+                orderNumber: 'asc',
+              },
             },
           },
-        },
-        orderBy: {
-          orderNumber: 'asc',
-        },
-      });
+          orderBy: {
+            orderNumber: 'asc',
+          },
+        });
       res.send(days);
       return;
     }

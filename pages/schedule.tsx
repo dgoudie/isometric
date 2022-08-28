@@ -1,18 +1,23 @@
-import { animated, config, useSprings } from 'react-spring';
-import { useCallback, useRef, useState } from 'react';
+import {
+  DragDropContext,
+  Draggable,
+  DropResult,
+  Droppable,
+} from 'react-beautiful-dnd';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 
 import AppBarWithAppHeaderLayout from '../layouts/AppBarWithAppHeaderLayout/AppBarWithAppHeaderLayout';
+import { ExerciseMuscleGroup } from '@prisma/client';
 import Link from 'next/link';
+import MuscleGroupTag from '../components/MuscleGroupTag/MuscleGroupTag';
 import { NextPageWithLayout } from './_app';
 import PageWrapper from '../components/PageWrapper/PageWrapper';
 import RouteGuard from '../components/RouteGuard/RouteGuard';
 import RouteLoader from '../components/RouteLoader/RouteLoader';
-import { ScheduledWorkoutWithExerciseInSchedules } from '../types/ScheduledWorkout';
-import clamp from '../utils/clamp';
+import { ScheduledWorkoutWithExerciseInSchedulesWithExercise } from '../types/ScheduledWorkout';
 import classNames from 'classnames';
 import { moveItemInArray } from '../utils/array-helpers';
 import styles from './Schedule.module.scss';
-import { useDrag } from '@use-gesture/react';
 import useFetchWith403Redirect from '../utils/fetch-with-403-redirect';
 import { useHeadWithTitle } from '../utils/use-head-with-title';
 import { useRouter } from 'next/router';
@@ -22,14 +27,17 @@ const WorkoutPlan: NextPageWithLayout = () => {
   const fetcher = useFetchWith403Redirect();
 
   const { data: scheduledWorkouts, error: fetchScheduleError } = useSWR<
-    ScheduledWorkoutWithExerciseInSchedules[]
-  >('/api/schedule/workouts', fetcher);
+    ScheduledWorkoutWithExerciseInSchedulesWithExercise[]
+  >('/api/schedule/workouts', fetcher, {
+    revalidateOnMount: true,
+    dedupingInterval: 0,
+  });
 
   const head = useHeadWithTitle(`Edit Schedule`);
 
   const router = useRouter();
 
-  const createDay = useCallback(async () => {
+  const addNewDay = useCallback(async () => {
     const newScheduleWorkoutId = await fetch(`/api/schedule/workout`, {
       method: 'PUT',
     }).then((res) => res.text());
@@ -50,9 +58,9 @@ const WorkoutPlan: NextPageWithLayout = () => {
             Here, you can build a workout schedule. Start by adding a day, and
             adding some exercises.
           </span>
-          <button className={'standard-button primary'} onClick={createDay}>
+          <button className={'standard-button primary'} onClick={addNewDay}>
             <i className='fa-solid fa-plus'></i>
-            Add Day
+            Add New Day
           </button>
         </div>
       </>
@@ -64,7 +72,10 @@ const WorkoutPlan: NextPageWithLayout = () => {
       {head}
       <>
         <h1>Edit Schedule</h1>
-        <ScheduledWorkouts scheduledWorkouts={scheduledWorkouts} />
+        <ScheduledWorkouts
+          scheduledWorkouts={scheduledWorkouts}
+          addNewDay={addNewDay}
+        />
         <div className={classNames(styles.actions, 'fade-in')}>
           <div className={styles.autoSaveTip}>
             <i className='fa-solid fa-circle-info'></i>
@@ -92,100 +103,193 @@ WorkoutPlan.getLayout = (page) => (
 
 export default WorkoutPlan;
 
+interface ScheduledWorkoutsProps {
+  scheduledWorkouts: ScheduledWorkoutWithExerciseInSchedulesWithExercise[];
+  addNewDay: () => void;
+}
+
 function ScheduledWorkouts({
-  scheduledWorkouts,
-}: {
-  scheduledWorkouts: ScheduledWorkoutWithExerciseInSchedules[];
-}) {
+  scheduledWorkouts: scheduledWorkoutsUnmemoized,
+  addNewDay,
+}: ScheduledWorkoutsProps) {
+  const [scheduledWorkouts, setScheduledWorkouts] = useState(
+    scheduledWorkoutsUnmemoized
+  );
+
   const [expandedWorkoutIds, setExpandedWorkoutIds] = useState(
     new Set<string>()
   );
 
-  const order = useRef(scheduledWorkouts.map((_, index) => index)); // Store indicies as a local ref, this represents the item order
+  useEffect(() => {
+    setScheduledWorkouts(scheduledWorkoutsUnmemoized);
+    const idsAsSet = new Set(scheduledWorkoutsUnmemoized.map((sw) => sw.id));
+    setExpandedWorkoutIds(
+      new Set(
+        Array.from(expandedWorkoutIds).filter((expandedId) =>
+          idsAsSet.has(expandedId)
+        )
+      )
+    );
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [scheduledWorkoutsUnmemoized]);
 
-  const fn = useCallback(
-    (
-      order: number[],
-      active = false,
-      originalIndex = 0,
-      curIndex = 0,
-      y = 0
-    ) => {
-      return (index: number) => {
-        return active && index === originalIndex
-          ? {
-              y: curIndex * 64 + y,
-              zIndex: 1,
-              shadow: 5,
-              immediate: (key: string) => key === 'zIndex',
-              config: (key: string) =>
-                key === 'y' ? config.stiff : config.default,
-            }
-          : {
-              y: order.indexOf(index) * 64,
-              zIndex: 0,
-              shadow: 1,
-              immediate: false,
-            };
-      };
+  const onDragEnd = useCallback(
+    ({ source, destination }: DropResult) => {
+      if (!destination) {
+        return;
+      }
+      if (destination.index === source.index) {
+        return;
+      }
+      setScheduledWorkouts(
+        moveItemInArray(scheduledWorkouts, source.index, destination.index)
+      );
+      // fetch(``)
     },
-    []
+    [scheduledWorkouts]
   );
 
-  const [springs, api] = useSprings(
-    scheduledWorkouts.length,
-    fn(order.current)
-  ); // Create springs, each corresponds to an item, controlling its transform, scale, etc.
+  const expand = useCallback(
+    (id: string) => {
+      if (expandedWorkoutIds.has(id)) {
+        expandedWorkoutIds.delete(id);
+      } else {
+        expandedWorkoutIds.add(id);
+      }
+      setExpandedWorkoutIds(new Set(Array.from(expandedWorkoutIds)));
+    },
+    [expandedWorkoutIds]
+  );
 
-  const bind = useDrag(({ args: [originalIndex], active, movement: [, y] }) => {
-    const curIndex = order.current.indexOf(originalIndex);
-
-    const curRow = clamp(
-      Math.round((curIndex * 64 + y) / 64),
-      0,
-      scheduledWorkouts.length - 1
-    );
-
-    const newOrder = moveItemInArray(order.current, curIndex, curRow);
-
-    api.start(fn(newOrder, active, originalIndex, curIndex, y)); // Feed springs new style data, they'll animate the view without causing a single render
-
-    if (!active) order.current = newOrder;
-  });
   return (
-    <div className={classNames(styles.workouts, 'fade-in')}>
-      {springs.map(({ zIndex, shadow, y }, i) => (
-        <animated.div
-          className={styles.workout}
-          key={i}
-          style={{
-            zIndex,
-            y,
-          }}
-        >
-          <animated.div
-            {...bind(i)}
-            style={{
-              boxShadow: shadow.to(
-                (s) => `rgba(0, 0, 0, 0.15) 0px ${s}px ${2 * s}px 0px`
-              ),
-            }}
-            className={styles.workoutHandle}
+    <DragDropContext onDragEnd={onDragEnd}>
+      <Droppable droppableId='workout_plan_days'>
+        {(provided) => (
+          <div
+            ref={provided.innerRef}
+            className={classNames(styles.workouts, 'fade-in')}
+            {...provided.droppableProps}
           >
-            <i className='fa-solid fa-grip-lines'></i>
-          </animated.div>
-          <animated.div
-            style={{
-              boxShadow: shadow.to(
-                (s) => `rgba(0, 0, 0, 0.15) 0px ${s}px ${2 * s}px 0px`
-              ),
-            }}
-            className={styles.workoutBody}
-          >
-            {scheduledWorkouts[i].id}
-          </animated.div>
-        </animated.div>
-      ))}
+            {scheduledWorkouts.map((scheduledWorkout, index) => (
+              <Draggable
+                key={scheduledWorkout.id}
+                draggableId={scheduledWorkout.id}
+                index={index}
+              >
+                {(provided) => (
+                  <div
+                    className={classNames(
+                      styles.workout,
+                      expandedWorkoutIds.has(scheduledWorkout.id) &&
+                        styles.expanded
+                    )}
+                    ref={provided.innerRef}
+                    {...provided.draggableProps}
+                  >
+                    <div
+                      className={styles.workoutHandle}
+                      {...provided.dragHandleProps}
+                    >
+                      <i className='fa-solid fa-grip-lines'></i>
+                    </div>
+                    <div className={styles.workoutBody}>
+                      <div className={styles.workoutBodyUpper}>
+                        <div className={styles.workoutBodyUpperLeft}>
+                          <div className={styles.numberAndName}>
+                            Day {index + 1} -{' '}
+                            {scheduledWorkout.nickname ? (
+                              scheduledWorkout.nickname
+                            ) : (
+                              <i>No Name</i>
+                            )}
+                          </div>
+                          <ScheduledWorkoutMuscleGroups
+                            scheduledWorkout={scheduledWorkout}
+                          />
+                        </div>
+                        <button
+                          className={classNames(
+                            styles.workoutBodyUpperButton,
+                            expandedWorkoutIds.has(scheduledWorkout.id) &&
+                              styles.expanded
+                          )}
+                          onClick={() => expand(scheduledWorkout.id)}
+                        >
+                          <i className='fa-solid fa-chevron-left'></i>
+                        </button>
+                      </div>
+
+                      <div className={styles.workoutBodyLower}>
+                        <Link href={`/schedule/${scheduledWorkout.id}`}>
+                          <a className='standard-button slim primary'>
+                            <i className='fa-solid fa-edit'></i>Edit
+                          </a>
+                        </Link>
+                        <button className='standard-button slim'>
+                          <i className='fa-solid fa-copy'></i>Copy
+                        </button>
+                        <button className='standard-button danger slim'>
+                          <i className='fa-solid fa-trash'></i>
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </Draggable>
+            ))}
+            {provided.placeholder}
+            <div className={styles.addActions}>
+              <button
+                className='standard-button primary slim'
+                onClick={addNewDay}
+              >
+                <i className='fa-solid fa-plus'></i>
+                Add New Day
+              </button>
+            </div>
+          </div>
+        )}
+      </Droppable>
+    </DragDropContext>
+  );
+}
+
+function ScheduledWorkoutMuscleGroups({
+  scheduledWorkout,
+}: {
+  scheduledWorkout: ScheduledWorkoutWithExerciseInSchedulesWithExercise;
+}) {
+  const muscleGroups = useMemo(() => {
+    const muscleGroupToCountMap = new Map<ExerciseMuscleGroup, number>(
+      Object.keys(ExerciseMuscleGroup).map((group) => [
+        group as ExerciseMuscleGroup,
+        0,
+      ])
+    );
+    scheduledWorkout.exercises.forEach(({ exercise }) => {
+      muscleGroupToCountMap.set(
+        exercise.primaryMuscleGroup,
+        muscleGroupToCountMap.get(exercise.primaryMuscleGroup)! + 1
+      );
+      exercise.secondaryMuscleGroups.forEach((group) => {
+        muscleGroupToCountMap.set(group, muscleGroupToCountMap.get(group)! + 1);
+      });
+    });
+    return Array.from(muscleGroupToCountMap.entries())
+      .filter(([_group, count]) => count > 0)
+      .sort((a, b) => b[1] - a[1])
+      .map(([group]) => group)
+      .slice(0, 2);
+  }, [scheduledWorkout]);
+  return (
+    <div className={styles.muscleGroups}>
+      {!!muscleGroups.length ? (
+        muscleGroups.map((group) => (
+          <MuscleGroupTag key={group} muscleGroup={group} />
+        ))
+      ) : (
+        <MuscleGroupTag />
+      )}
     </div>
   );
 }
