@@ -22,7 +22,7 @@ const handler: NextApiHandler = async (req, res) => {
           nickname,
         },
       });
-      broadcastApiMutations(userId, [
+      await broadcastApiMutations(userId, [
         `/api/schedule/workouts`,
         `/api/schedule/workout/${id}`,
       ]);
