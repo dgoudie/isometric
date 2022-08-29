@@ -126,7 +126,7 @@
   .autoSaveTip {
     flex: 1;
     color: var(--color-secondary);
-    font-size: 0.8rem;
+    font-size: calc(0.6rem + 1vw);
     background: var(--background-alt);
     padding: 0.25rem;
     border-radius: 8px;

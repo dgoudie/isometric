@@ -5,7 +5,7 @@ import RouteGuard from '../../components/RouteGuard/RouteGuard';
 import RouteLoader from '../../components/RouteLoader/RouteLoader';
 import { ScheduledWorkoutWithExerciseInSchedulesWithExercise } from '../../types/ScheduledWorkout';
 import classNames from 'classnames';
-import styles from './SchedukeWorkout.module.scss';
+import styles from './ScheduleWorkout.module.scss';
 import useFetchWith403Redirect from '../../utils/fetch-with-403-redirect';
 import { useHeadWithTitle } from '../../utils/use-head-with-title';
 import { useRouter } from 'next/router';
