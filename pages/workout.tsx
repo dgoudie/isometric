@@ -191,10 +191,6 @@ const Workout: NextPageWithLayout = () => {
   );
 };
 
-Workout.getLayout = (page) => (
-  <RouteGuard>
-    <PageWrapper>{page}</PageWrapper>
-  </RouteGuard>
-);
+Workout.getLayout = (page) => <RouteGuard>{page}</RouteGuard>;
 
 export default Workout;

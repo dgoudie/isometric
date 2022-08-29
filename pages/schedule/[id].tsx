@@ -38,7 +38,6 @@ const ScheduleWorkout: NextPageWithLayout = () => {
 
   const persistNickname = useCallback(
     (value: string) => {
-      setNickname(value);
       fetch(`/api/schedule/workout/nickname`, {
         method: 'PUT',
         headers: {
@@ -46,11 +45,11 @@ const ScheduleWorkout: NextPageWithLayout = () => {
         },
         body: JSON.stringify({
           id: scheduledWorkoutId,
-          nickname: value,
+          nickname,
         }),
       });
     },
-    [scheduledWorkoutId]
+    [nickname, scheduledWorkoutId]
   );
 
   if (!data)
@@ -77,7 +76,11 @@ const ScheduleWorkout: NextPageWithLayout = () => {
           <input
             type='text'
             value={nickname}
-            onChange={(e) => persistNickname(e.target.value)}
+            onChange={(e) => setNickname(e.target.value)}
+            onBlur={(e) => persistNickname(e.target.value)}
+            placeholder='Enter a nickname...'
+            spellCheck='false'
+            autoCapitalize='words'
           />
         </div>
         <div className={styles.exercises}></div>

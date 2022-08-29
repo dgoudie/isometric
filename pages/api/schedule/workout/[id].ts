@@ -1,4 +1,5 @@
 import { NextApiHandler } from 'next';
+import broadcastApiMutations from '../../../../utils/broadcast-api-mutations';
 import { getUserId } from '../../../../utils/get-user-id';
 import prisma from '../../../../database/prisma';
 import { reindexScheduledWorkouts } from '../../../../database/domains/schedule';
@@ -49,6 +50,10 @@ const handler: NextApiHandler = async (req, res) => {
         },
       });
       await reindexScheduledWorkouts(userId);
+      broadcastApiMutations(userId, [
+        `/api/schedule/workouts`,
+        `/api/schedule/workout/${id}`,
+      ]);
       res.status(204).end();
       return;
     }

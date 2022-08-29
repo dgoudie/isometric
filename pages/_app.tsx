@@ -8,6 +8,7 @@ import AfterExerciseTimerProvider from '../providers/AfterExerciseTimer/AfterExe
 import type { AppProps } from 'next/app';
 import type { NextPage } from 'next';
 import PageWrapper from '../components/PageWrapper/PageWrapper';
+import PusherProviderWithConfig from '../providers/Pusher/Pusher';
 import { SessionProvider } from 'next-auth/react';
 import SnackbarProvider from '../providers/Snackbar/Snackbar';
 import WorkoutProvider from '../providers/Workout/Workout';
@@ -40,13 +41,15 @@ export default function MyApp({
   const pageWithLayout = getLayout(<Component {...pageProps} />);
   return (
     <SessionProvider session={session}>
-      <SnackbarProvider>
-        <WorkoutProvider>
-          <AfterExerciseTimerProvider>
-            <PageWrapper>{pageWithLayout}</PageWrapper>
-          </AfterExerciseTimerProvider>
-        </WorkoutProvider>
-      </SnackbarProvider>
+      <PusherProviderWithConfig>
+        <SnackbarProvider>
+          <WorkoutProvider>
+            <AfterExerciseTimerProvider>
+              <PageWrapper>{pageWithLayout}</PageWrapper>
+            </AfterExerciseTimerProvider>
+          </WorkoutProvider>
+        </SnackbarProvider>
+      </PusherProviderWithConfig>
     </SessionProvider>
   );
 }

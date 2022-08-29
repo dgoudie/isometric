@@ -5,14 +5,12 @@ import {
   Droppable,
 } from 'react-beautiful-dnd';
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import useSWR, { useSWRConfig } from 'swr';
 
 import AppBarWithAppHeaderLayout from '../layouts/AppBarWithAppHeaderLayout/AppBarWithAppHeaderLayout';
 import { ExerciseMuscleGroup } from '@prisma/client';
 import Link from 'next/link';
 import MuscleGroupTag from '../components/MuscleGroupTag/MuscleGroupTag';
 import { NextPageWithLayout } from './_app';
-import PageWrapper from '../components/PageWrapper/PageWrapper';
 import RouteGuard from '../components/RouteGuard/RouteGuard';
 import RouteLoader from '../components/RouteLoader/RouteLoader';
 import { ScheduledWorkoutWithExerciseInSchedulesWithExercise } from '../types/ScheduledWorkout';
@@ -22,6 +20,7 @@ import styles from './Schedule.module.scss';
 import useFetchWith403Redirect from '../utils/fetch-with-403-redirect';
 import { useHeadWithTitle } from '../utils/use-head-with-title';
 import { useRouter } from 'next/router';
+import useSWR from 'swr';
 
 const url = `/api/schedule/workouts`;
 
@@ -34,8 +33,6 @@ const WorkoutPlan: NextPageWithLayout = () => {
     revalidateOnMount: true,
     dedupingInterval: 0,
   });
-
-  const { mutate } = useSWRConfig();
 
   const head = useHeadWithTitle(`Edit Schedule`);
 
@@ -79,9 +76,6 @@ const WorkoutPlan: NextPageWithLayout = () => {
         <ScheduledWorkouts
           scheduledWorkouts={scheduledWorkouts}
           addNewDay={addNewDay}
-          refreshScheduledWorkouts={() => {
-            mutate(url);
-          }}
         />
         <div className={classNames(styles.actions, 'fade-in')}>
           <div className={styles.autoSaveTip}>
@@ -102,9 +96,7 @@ const WorkoutPlan: NextPageWithLayout = () => {
 
 WorkoutPlan.getLayout = (page) => (
   <AppBarWithAppHeaderLayout>
-    <RouteGuard>
-      <PageWrapper>{page}</PageWrapper>
-    </RouteGuard>
+    <RouteGuard>{page}</RouteGuard>
   </AppBarWithAppHeaderLayout>
 );
 
@@ -113,13 +105,11 @@ export default WorkoutPlan;
 interface ScheduledWorkoutsProps {
   scheduledWorkouts: ScheduledWorkoutWithExerciseInSchedulesWithExercise[];
   addNewDay: () => void;
-  refreshScheduledWorkouts: () => void;
 }
 
 function ScheduledWorkouts({
   scheduledWorkouts: scheduledWorkoutsUnmemoized,
   addNewDay,
-  refreshScheduledWorkouts,
 }: ScheduledWorkoutsProps) {
   const [scheduledWorkouts, setScheduledWorkouts] = useState(
     scheduledWorkoutsUnmemoized
@@ -172,21 +162,13 @@ function ScheduledWorkouts({
     [scheduledWorkouts]
   );
 
-  const copy = useCallback(
-    async (id: string) => {
-      await fetch(`/api/schedule/workout?copy=${id}`, { method: 'PUT' });
-      refreshScheduledWorkouts();
-    },
-    [refreshScheduledWorkouts]
-  );
+  const copy = useCallback(async (id: string) => {
+    await fetch(`/api/schedule/workout?copy=${id}`, { method: 'PUT' });
+  }, []);
 
-  const del = useCallback(
-    async (id: string) => {
-      await fetch(`/api/schedule/workout/${id}`, { method: 'DELETE' });
-      refreshScheduledWorkouts();
-    },
-    [refreshScheduledWorkouts]
-  );
+  const del = useCallback(async (id: string) => {
+    await fetch(`/api/schedule/workout/${id}`, { method: 'DELETE' });
+  }, []);
 
   const expand = useCallback(
     (id: string) => {
