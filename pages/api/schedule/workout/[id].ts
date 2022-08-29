@@ -1,7 +1,7 @@
 import { NextApiHandler } from 'next';
-import { cleanUpScheduledWorkoutOrderNumbers } from '../../../../database/domains/schedule';
 import { getUserId } from '../../../../utils/get-user-id';
 import prisma from '../../../../database/prisma';
+import { reindexScheduledWorkouts } from '../../../../database/domains/schedule';
 
 const handler: NextApiHandler = async (req, res) => {
   const userId = await getUserId(req, res);
@@ -48,7 +48,7 @@ const handler: NextApiHandler = async (req, res) => {
           userId,
         },
       });
-      await cleanUpScheduledWorkoutOrderNumbers(userId);
+      await reindexScheduledWorkouts(userId);
       res.status(204).end();
       return;
     }

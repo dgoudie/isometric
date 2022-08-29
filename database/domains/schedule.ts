@@ -68,28 +68,40 @@ export async function getNextDaySchedule(
   return { day, dayCount };
 }
 
-export async function cleanUpScheduledWorkoutOrderNumbers(
-  userId: string
-): Promise<void> {
-  // await prisma.$transaction(async () => {
-  const orderedScheduledWorkouts = await prisma.scheduledWorkout.findMany({
+export async function reindexScheduledWorkouts(userId: string): Promise<void> {
+  const maxOrderNumberRecord = await prisma.scheduledWorkout.findFirst({
     where: { userId },
     orderBy: {
-      orderNumber: 'asc',
-    },
-    select: {
-      id: true,
+      orderNumber: 'desc',
     },
   });
-  for (
-    let orderNumber = 0;
-    orderNumber < orderedScheduledWorkouts.length;
-    orderNumber++
-  ) {
-    await prisma.scheduledWorkout.update({
-      where: { id: orderedScheduledWorkouts[orderNumber].id },
-      data: { orderNumber },
-    });
+  if (!maxOrderNumberRecord) {
+    return;
   }
-  // });
+  const maxOrderNumber = maxOrderNumberRecord.orderNumber;
+  await reindex(userId, maxOrderNumber + 1);
+  await reindex(userId, 0);
+}
+
+async function reindex(userId: string, padding: number) {
+  await prisma.$executeRaw`
+    update
+      "ScheduledWorkout" sw
+    set
+      "orderNumber" = derivedOrder.order - 1 + cast(${padding} as int)
+    from
+      (
+      select
+        row_number() over (
+      order by
+        "orderNumber") as order,
+        id
+      from
+        "ScheduledWorkout" sw
+      where
+        "userId" = ${userId} ) derivedOrder
+    where
+      "userId" = ${userId}
+      and sw.id = derivedOrder.id
+  `;
 }

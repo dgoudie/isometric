@@ -150,22 +150,22 @@ function ScheduledWorkouts({
       if (destination.index === source.index) {
         return;
       }
+      const id = scheduledWorkouts[source.index].id;
       const reorderedArray = moveItemInArray(
         scheduledWorkouts,
         source.index,
         destination.index
       );
       setScheduledWorkouts(reorderedArray);
-      const scheduledWorkoutIds: string[] = reorderedArray.map(
-        (item) => item.id
-      );
       fetch(`/api/schedule/workout/move`, {
         method: 'PUT',
         headers: {
           'content-type': 'application/json',
         },
         body: JSON.stringify({
-          scheduledWorkoutIds,
+          from: source.index,
+          to: destination.index,
+          id,
         }),
       });
     },

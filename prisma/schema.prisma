@@ -146,6 +146,7 @@ model ActiveWorkout {
 
 /// represents an exercise that's a part of a user's active workout
 model ActiveWorkoutExercise {
+  id          String @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   userId      String @db.Uuid
   orderNumber Int
   exerciseId  String @db.Uuid
@@ -155,21 +156,21 @@ model ActiveWorkoutExercise {
 
   sets ActiveWorkoutExerciseSet[]
 
-  @@id([userId, orderNumber])
+  @@unique([userId, orderNumber])
 }
 
 model ActiveWorkoutExerciseSet {
-  workoutExerciseUserId      String  @db.Uuid
-  workoutExerciseOrderNumber Int
-  resistanceInPounds         Int?
-  repetitions                Int?
-  timeInSeconds              Int?
-  complete                   Boolean
-  orderNumber                Int
+  id                      String  @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  activeWorkoutExerciseId String  @db.Uuid
+  resistanceInPounds      Int?
+  repetitions             Int?
+  timeInSeconds           Int?
+  complete                Boolean
+  orderNumber             Int
 
-  activeWorkoutExercise ActiveWorkoutExercise @relation(fields: [workoutExerciseUserId, workoutExerciseOrderNumber], references: [userId, orderNumber], onDelete: Cascade)
+  activeWorkoutExercise ActiveWorkoutExercise @relation(fields: [activeWorkoutExerciseId], references: [id], onDelete: Cascade)
 
-  @@id([workoutExerciseUserId, workoutExerciseOrderNumber, orderNumber])
+  @@unique([activeWorkoutExerciseId, orderNumber])
 }
 
 model ActiveWorkoutCheckin {

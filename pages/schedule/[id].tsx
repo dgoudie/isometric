@@ -1,3 +1,5 @@
+import { useCallback, useEffect, useState } from 'react';
+
 import AppBarWithAppHeaderLayout from '../../layouts/AppBarWithAppHeaderLayout/AppBarWithAppHeaderLayout';
 import Link from 'next/link';
 import { NextPageWithLayout } from '../_app';
@@ -26,6 +28,31 @@ const ScheduleWorkout: NextPageWithLayout = () => {
 
   const head = useHeadWithTitle(`Edit Schedule`);
 
+  const [nickname, setNickname] = useState('');
+
+  useEffect(() => {
+    if (!!data) {
+      setNickname(data.nickname);
+    }
+  }, [data]);
+
+  const persistNickname = useCallback(
+    (value: string) => {
+      setNickname(value);
+      fetch(`/api/schedule/workout/nickname`, {
+        method: 'PUT',
+        headers: {
+          'content-type': 'application/json',
+        },
+        body: JSON.stringify({
+          id: scheduledWorkoutId,
+          nickname: value,
+        }),
+      });
+    },
+    [scheduledWorkoutId]
+  );
+
   if (!data)
     return (
       <>
@@ -42,6 +69,17 @@ const ScheduleWorkout: NextPageWithLayout = () => {
           Edit Schedule <i className='fa-solid fa-chevron-right'></i> Day{' '}
           {data.orderNumber + 1}
         </h1>
+        <div className={classNames(styles.nickname, 'fade-in')}>
+          <div>Workout Nickname</div>
+          <div className={styles.nicknameTip}>
+            Add a nickname to help distinguish this workout
+          </div>
+          <input
+            type='text'
+            value={nickname}
+            onChange={(e) => persistNickname(e.target.value)}
+          />
+        </div>
         <div className={styles.exercises}></div>
         <div className={classNames(styles.actions, 'fade-in')}>
           <div className={styles.autoSaveTip}>

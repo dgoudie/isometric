@@ -76,24 +76,25 @@ CREATE TABLE "ActiveWorkout" (
 
 -- CreateTable
 CREATE TABLE "ActiveWorkoutExercise" (
+    "id" UUID NOT NULL DEFAULT gen_random_uuid(),
     "userId" UUID NOT NULL,
     "orderNumber" INT4 NOT NULL,
     "exerciseId" UUID NOT NULL,
 
-    CONSTRAINT "ActiveWorkoutExercise_pkey" PRIMARY KEY ("userId","orderNumber")
+    CONSTRAINT "ActiveWorkoutExercise_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
 CREATE TABLE "ActiveWorkoutExerciseSet" (
-    "workoutExerciseUserId" UUID NOT NULL,
-    "workoutExerciseOrderNumber" INT4 NOT NULL,
+    "id" UUID NOT NULL DEFAULT gen_random_uuid(),
+    "activeWorkoutExerciseId" UUID NOT NULL,
     "resistanceInPounds" INT4,
     "repetitions" INT4,
     "timeInSeconds" INT4,
     "complete" BOOL NOT NULL,
     "orderNumber" INT4 NOT NULL,
 
-    CONSTRAINT "ActiveWorkoutExerciseSet_pkey" PRIMARY KEY ("workoutExerciseUserId","workoutExerciseOrderNumber","orderNumber")
+    CONSTRAINT "ActiveWorkoutExerciseSet_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
@@ -155,6 +156,12 @@ CREATE UNIQUE INDEX "ScheduledWorkout_userId_orderNumber_key" ON "ScheduledWorko
 CREATE UNIQUE INDEX "ScheduledWorkoutExercise_scheduledWorkoutId_orderNumber_key" ON "ScheduledWorkoutExercise"("scheduledWorkoutId", "orderNumber");
 
 -- CreateIndex
+CREATE UNIQUE INDEX "ActiveWorkoutExercise_userId_orderNumber_key" ON "ActiveWorkoutExercise"("userId", "orderNumber");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "ActiveWorkoutExerciseSet_activeWorkoutExerciseId_orderNumbe_key" ON "ActiveWorkoutExerciseSet"("activeWorkoutExerciseId", "orderNumber");
+
+-- CreateIndex
 CREATE INDEX "ActiveWorkoutCheckin_at_idx" ON "ActiveWorkoutCheckin"("at" ASC);
 
 -- CreateIndex
@@ -191,7 +198,7 @@ ALTER TABLE "ActiveWorkoutExercise" ADD CONSTRAINT "ActiveWorkoutExercise_userId
 ALTER TABLE "ActiveWorkoutExercise" ADD CONSTRAINT "ActiveWorkoutExercise_exerciseId_fkey" FOREIGN KEY ("exerciseId") REFERENCES "Exercise"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "ActiveWorkoutExerciseSet" ADD CONSTRAINT "ActiveWorkoutExerciseSet_workoutExerciseUserId_workoutExer_fkey" FOREIGN KEY ("workoutExerciseUserId", "workoutExerciseOrderNumber") REFERENCES "ActiveWorkoutExercise"("userId", "orderNumber") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "ActiveWorkoutExerciseSet" ADD CONSTRAINT "ActiveWorkoutExerciseSet_activeWorkoutExerciseId_fkey" FOREIGN KEY ("activeWorkoutExerciseId") REFERENCES "ActiveWorkoutExercise"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "ActiveWorkoutCheckin" ADD CONSTRAINT "ActiveWorkoutCheckin_workoutUserId_fkey" FOREIGN KEY ("workoutUserId") REFERENCES "ActiveWorkout"("userId") ON DELETE CASCADE ON UPDATE CASCADE;
