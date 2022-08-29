@@ -1,4 +1,5 @@
 import { NextApiHandler } from 'next';
+import broadcastApiMutations from '../../../utils/broadcast-api-mutations';
 import { getUserId } from '../../../utils/get-user-id';
 import prisma from '../../../database/prisma';
 
@@ -48,6 +49,7 @@ const handler: NextApiHandler = async (req, res) => {
             exerciseId: scheduledWorkoutExercise.exerciseId,
           })),
         });
+        await broadcastApiMutations(userId, [`/api/schedule/workouts`]);
         res.send(day.id);
       } else {
         let day = await prisma.scheduledWorkout.create({
@@ -59,6 +61,7 @@ const handler: NextApiHandler = async (req, res) => {
             nickname: '',
           },
         });
+        await broadcastApiMutations(userId, [`/api/schedule/workouts`]);
         res.send(day.id);
       }
       return;
