@@ -1,34 +1,31 @@
 import React, { createContext, useCallback, useEffect, useState } from 'react';
 
-import { IWorkout } from '@dgoudie/isometric-types';
-import { usePageVisibility } from 'react-page-visibility';
-import { useRouter } from 'next/router';
-
 export const WorkoutContext = createContext<{
-  workout: IWorkout | null | undefined;
   startWorkout: () => void;
   endWorkout: () => void;
   discardWorkout: () => void;
   persistSetComplete: (
-    exerciseIndex: number,
+    activeWorkoutExerciseId: string,
     setIndex: number,
     complete: boolean
   ) => void;
   persistSetRepetitions: (
-    exerciseIndex: number,
+    activeWorkoutExerciseId: string,
     setIndex: number,
-    repetitions: number | undefined
+    repetitions: number | null
   ) => void;
   persistSetResistance: (
-    exerciseIndex: number,
+    activeWorkoutExerciseId: string,
     setIndex: number,
-    resistanceInPounds: number | undefined
+    resistanceInPounds: number | null
   ) => void;
-  replaceExercise: (exerciseIndex: number, newExerciseId: string) => void;
+  replaceExercise: (
+    activeWorkoutExerciseId: string,
+    newExerciseId: string
+  ) => void;
   addExercise: (exerciseId: string, index: number) => void;
-  deleteExercise: (index: number) => void;
+  deleteExercise: (activeWorkoutExerciseId: string) => void;
 }>({
-  workout: undefined,
   startWorkout: () => undefined,
   endWorkout: () => undefined,
   discardWorkout: () => undefined,
@@ -43,10 +40,6 @@ export const WorkoutContext = createContext<{
 export default function WorkoutProvider({
   children,
 }: React.PropsWithChildren<{}>) {
-  const [workout, setWorkout] = useState<IWorkout | null | undefined>(
-    undefined
-  );
-
   const startWorkout = useCallback(() => {
     fetch(`/api/workout/start`);
   }, []);
@@ -57,9 +50,9 @@ export default function WorkoutProvider({
     fetch(`/api/workout/discard`);
   }, []);
   const persistSetComplete = useCallback(
-    (exerciseIndex: number, setIndex: number, complete: boolean) => {
+    (activeWorkoutExerciseId: string, setIndex: number, complete: boolean) => {
       const query = new URLSearchParams({
-        exercise_index: exerciseIndex.toString(),
+        active_workout_exercise_id: activeWorkoutExerciseId,
         set_index: setIndex.toString(),
         complete: complete.toString(),
       });
@@ -68,7 +61,7 @@ export default function WorkoutProvider({
     []
   );
   const replaceExercise = useCallback(
-    (exerciseIndex: number, newExerciseId: string) => {
+    (activeWorkoutExerciseId: string, newExerciseId: string) => {
       // sendJsonMessage(
       //   verifyType<WSWorkoutUpdate>({
       //     type: 'REPLACE_EXERCISE',
@@ -88,7 +81,7 @@ export default function WorkoutProvider({
     //   })
     // );
   }, []);
-  const deleteExercise = useCallback((index: number) => {
+  const deleteExercise = useCallback((activeWorkoutExerciseId: string) => {
     // sendJsonMessage(
     //   verifyType<WSWorkoutUpdate>({
     //     type: 'DELETE_EXERCISE',
@@ -98,9 +91,9 @@ export default function WorkoutProvider({
   }, []);
   const persistSetRepetitions = useCallback(
     (
-      exerciseIndex: number,
+      activeWorkoutExerciseId: string,
       setIndex: number,
-      repetitions: number | undefined
+      repetitions: number | null
     ) => {
       // sendJsonMessage(
       //   verifyType<WSWorkoutUpdate>({
@@ -115,9 +108,9 @@ export default function WorkoutProvider({
   );
   const persistSetResistance = useCallback(
     (
-      exerciseIndex: number,
+      activeWorkoutExerciseId: string,
       setIndex: number,
-      resistanceInPounds: number | undefined
+      resistanceInPounds: number | null
     ) => {
       // sendJsonMessage(
       //   verifyType<WSWorkoutUpdate>({
@@ -130,22 +123,9 @@ export default function WorkoutProvider({
     },
     []
   );
-  const router = useRouter();
-
-  useEffect(() => {
-    if (typeof workout != 'undefined') {
-      if (workout === null && router.pathname === '/workout') {
-        router.replace('/dashboard');
-      } else if (workout !== null && router.pathname !== '/workout') {
-        router.replace('/workout');
-      }
-    }
-  }, [router, workout]);
-
   return (
     <WorkoutContext.Provider
       value={{
-        workout,
         startWorkout,
         endWorkout,
         discardWorkout,

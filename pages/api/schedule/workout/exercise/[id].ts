@@ -39,6 +39,7 @@ const handler: NextApiHandler = async (req, res) => {
       });
       await reindexScheduledWorkoutExercises(scheduledWorkoutForProvidedId.id);
       await broadcastApiMutations(userId, [
+        `/api/schedule/upcoming`,
         `/api/schedule/workouts`,
         `/api/schedule/workout/${scheduledWorkoutForProvidedId.id}`,
       ]);

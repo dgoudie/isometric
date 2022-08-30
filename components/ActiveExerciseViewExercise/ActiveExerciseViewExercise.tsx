@@ -1,9 +1,16 @@
-import { useCallback, useContext, useEffect, useRef, useState } from 'react';
+import {
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
 
 import ActiveExerciseViewExerciseInstances from '../ActiveExerciseViewExerciseInstances/ActiveExerciseViewExerciseInstances';
 import ActiveExerciseViewExerciseSet from '../ActiveExerciseViewExerciseSet/ActiveExerciseViewExerciseSet';
+import { ActiveWorkoutExerciseSet } from '@prisma/client';
 import { ActiveWorkoutExerciseWithSetsAndDetails } from '../../types/ActiveWorkoutExercise';
-import { AfterExerciseTimerContext } from '../../providers/AfterExerciseTimer/AfterExerciseTimer';
 import ConfirmationBottomSheet from '../BottomSheet/components/ConfirmationBottomSheet/ConfirmationBottomSheet';
 import ExercisePickerBottomSheet from '../BottomSheet/components/ExercisePickerBottomSheet/ExercisePickerBottomSheet';
 import MuscleGroupTag from '../MuscleGroupTag/MuscleGroupTag';
@@ -16,25 +23,59 @@ import { useInView } from 'react-intersection-observer';
 
 interface Props {
   activeWorkoutExercise: ActiveWorkoutExerciseWithSetsAndDetails;
-  nextActiveWorkoutExercise:
-    | ActiveWorkoutExerciseWithSetsAndDetails
-    | undefined;
-  exerciseIndex: number;
+  activeWorkoutExerciseChanged: (
+    activeWorkoutExercise: ActiveWorkoutExerciseWithSetsAndDetails
+  ) => void;
+  onCompleted: (
+    activeWorkoutExercise: ActiveWorkoutExerciseWithSetsAndDetails
+  ) => void;
   exerciseCount: number;
-  onSelected: (i: number) => void;
-  onCompleted: () => void;
+  scrolledIntoView: (i: number) => void;
 }
 
 export default function ActiveExerciseViewExercise({
   activeWorkoutExercise: activeWorkoutExerciseUnmemoized,
-  exerciseIndex,
-  nextActiveWorkoutExercise,
-  exerciseCount,
-  onSelected,
+  activeWorkoutExerciseChanged,
   onCompleted,
+  exerciseCount,
+  scrolledIntoView,
 }: Props) {
   const [activeWorkoutExercise, setActiveWorkoutExercise] = useState(
     activeWorkoutExerciseUnmemoized
+  );
+
+  const onSetCompleted = useCallback(
+    (setOrderNumber: number, complete: boolean) => {
+      const sets = activeWorkoutExercise.sets.map((set, index) => {
+        let derivedComplete: boolean = false;
+        if (setOrderNumber === index) {
+          derivedComplete = complete;
+        } else if (index > setOrderNumber) {
+          derivedComplete = false;
+        } else {
+          derivedComplete = true;
+        }
+        return { ...set, complete: derivedComplete };
+      });
+      if (sets.every((set) => set.complete)) {
+        onCompleted({ ...activeWorkoutExercise, sets });
+      } else {
+        activeWorkoutExerciseChanged({ ...activeWorkoutExercise, sets });
+      }
+    },
+    [activeWorkoutExercise, activeWorkoutExerciseChanged, onCompleted]
+  );
+
+  const onSetChangedExceptCompleted = useCallback(
+    (set: ActiveWorkoutExerciseSet) => {
+      activeWorkoutExerciseChanged({
+        ...activeWorkoutExercise,
+        sets: activeWorkoutExercise.sets.map((currentSet, index) =>
+          set.orderNumber === index ? set : currentSet
+        ),
+      });
+    },
+    [activeWorkoutExercise, activeWorkoutExerciseChanged]
   );
 
   useEffect(() => {
@@ -43,41 +84,6 @@ export default function ActiveExerciseViewExercise({
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [activeWorkoutExerciseUnmemoized]);
-
-  const { show, showAfterLastExercise, showAfterLastSet, cancel } = useContext(
-    AfterExerciseTimerContext
-  );
-
-  const getNumberOfCompletedSets = useCallback(
-    () => activeWorkoutExercise.sets.filter((set) => set.complete).length,
-    [activeWorkoutExercise]
-  );
-
-  const previousNumberOfCompletedSets = useRef(getNumberOfCompletedSets());
-
-  const numberOfCompletedSets = getNumberOfCompletedSets();
-
-  useEffect(() => {
-    if (numberOfCompletedSets > previousNumberOfCompletedSets.current) {
-      let allSetsCompleted =
-        numberOfCompletedSets === activeWorkoutExercise.sets.length;
-      if (allSetsCompleted) {
-        if (!!nextActiveWorkoutExercise) {
-          showAfterLastSet(
-            nextActiveWorkoutExercise.exercise.name,
-            nextActiveWorkoutExercise.exercise.primaryMuscleGroup,
-            onCompleted
-          );
-        } else {
-          showAfterLastExercise();
-        }
-      } else {
-        show();
-      }
-    }
-    previousNumberOfCompletedSets.current = numberOfCompletedSets;
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [activeWorkoutExercise, nextActiveWorkoutExercise]);
 
   const { ref, inView } = useInView({
     threshold: 0.55,
@@ -95,7 +101,7 @@ export default function ActiveExerciseViewExercise({
 
   useEffect(() => {
     if (inView) {
-      onSelected(exerciseIndex);
+      scrolledIntoView(activeWorkoutExercise.orderNumber);
     } else if (!inView && wasInViewPreviously.current) {
       clearTimeout(timeoutId.current);
       timeoutId.current = setTimeout(
@@ -107,7 +113,12 @@ export default function ActiveExerciseViewExercise({
     return () => {
       clearTimeout(timeoutId.current);
     };
-  }, [inView, onSelected, exerciseIndex, scrollToTop]);
+  }, [
+    inView,
+    scrolledIntoView,
+    scrollToTop,
+    activeWorkoutExercise.orderNumber,
+  ]);
 
   const { replaceExercise, deleteExercise } = useContext(WorkoutContext);
 
@@ -123,25 +134,30 @@ export default function ActiveExerciseViewExercise({
   const newExerciseSelected = useCallback(
     (exerciseId: string | undefined) => {
       if (!!exerciseId) {
-        replaceExercise(exerciseIndex, exerciseId);
+        replaceExercise(activeWorkoutExercise.id, exerciseId);
         openSnackbar(`Exercise replaced.`, 2000);
         scrollToTop();
       }
       setShowExercisePicker(false);
     },
-    [exerciseIndex, openSnackbar, replaceExercise, scrollToTop]
+    [activeWorkoutExercise.id, openSnackbar, replaceExercise, scrollToTop]
   );
 
   const removeExercise = useCallback(
     (removalConfirmed: boolean) => {
       if (!!removalConfirmed) {
-        deleteExercise(exerciseIndex);
+        deleteExercise(activeWorkoutExercise.id);
         openSnackbar(`Exercise removed.`, 2000);
         scrollToTop();
       }
       setShowDeleteExeciseConfirmationBottomSheet(false);
     },
-    [deleteExercise, exerciseIndex, openSnackbar, scrollToTop]
+    [activeWorkoutExercise.id, deleteExercise, openSnackbar, scrollToTop]
+  );
+
+  const activeSetOrderNumber = useMemo(
+    () => activeWorkoutExercise.sets.findIndex((set) => !set.complete),
+    [activeWorkoutExercise.sets]
   );
 
   return (
@@ -164,15 +180,17 @@ export default function ActiveExerciseViewExercise({
               <ExerciseMetadata className={styles.metadata} exercise={data} />
             )} */}
             <div className={styles.sets}>
-              {activeWorkoutExercise.sets.map((set, index) => (
+              {activeWorkoutExercise.sets.map((set) => (
                 <ActiveExerciseViewExerciseSet
-                  key={index}
-                  exercise={activeWorkoutExercise.exercise}
+                  key={set.orderNumber}
+                  activeWorkoutExercise={activeWorkoutExercise}
                   set={set}
-                  exerciseSelected={inView}
-                  setSelected={numberOfCompletedSets === index}
-                  exerciseIndex={exerciseIndex}
-                  setIndex={index}
+                  exerciseIsActive={inView}
+                  isActive={set.orderNumber === activeSetOrderNumber}
+                  onChangedExceptCompleted={onSetChangedExceptCompleted}
+                  onCompleted={(complete) => {
+                    onSetCompleted(set.orderNumber, complete);
+                  }}
                 />
               ))}
             </div>

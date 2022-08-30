@@ -1,13 +1,15 @@
 import {
-  FinishedWorkoutExerciseWithSets,
-  FullWorkout,
-} from '../../example_type';
+  ActiveWorkoutExerciseSet,
+  FinishedWorkoutExerciseSet,
+} from '@prisma/client';
 import {
   differenceInMilliseconds,
   millisecondsToSeconds,
   minutesToMilliseconds,
 } from 'date-fns';
 
+import { ActiveWorkoutWithExercisesWithExerciseWithSetsAndDetails } from '../../types/ActiveWorkout';
+import { FinishedWorkoutExerciseWithSets } from '../../example_type';
 import { FinishedWorkoutWithExerciseWithSets } from '../../types/FinishedWorkout';
 import { getExerciseById } from './exercise';
 import { getNextDaySchedule } from './scheduled_workout';
@@ -38,7 +40,7 @@ export async function getFinishedWorkouts(
   });
 }
 
-export async function getActiveWorkoutId(userId: string): Promise<boolean> {
+export async function hasActiveWorkout(userId: string): Promise<boolean> {
   const activeWorkout = await prisma.activeWorkout.findUnique({
     where: {
       userId,
@@ -50,7 +52,7 @@ export async function getActiveWorkoutId(userId: string): Promise<boolean> {
   return !!activeWorkout;
 }
 
-export async function getMinifiedActiveWorkout(userId: string) {
+export async function getActiveWorkout(userId: string) {
   return prisma.activeWorkout.findUnique({
     where: {
       userId,
@@ -60,7 +62,7 @@ export async function getMinifiedActiveWorkout(userId: string) {
 
 export async function getFullActiveWorkout(
   userId: string
-): Promise<FullWorkout | null> {
+): Promise<ActiveWorkoutWithExercisesWithExerciseWithSetsAndDetails | null> {
   return prisma.activeWorkout.findUnique({
     where: {
       userId,
@@ -69,7 +71,14 @@ export async function getFullActiveWorkout(
       exercises: {
         include: {
           exercise: true,
-          sets: true,
+          sets: {
+            orderBy: {
+              orderNumber: 'asc',
+            },
+          },
+        },
+        orderBy: {
+          orderNumber: 'asc',
         },
       },
       checkins: true,
@@ -78,7 +87,7 @@ export async function getFullActiveWorkout(
 }
 
 export async function addCheckInToActiveWorkout(userId: string) {
-  const activeWorkoutId = await getActiveWorkoutId(userId);
+  const activeWorkoutId = await hasActiveWorkout(userId);
   if (activeWorkoutId === null) {
     return;
   }
@@ -94,21 +103,20 @@ export async function addCheckInToActiveWorkout(userId: string) {
   });
 }
 
-export async function startWorkout(userId: string) {
-  const alreadyInProgressWorkout = await getActiveWorkoutId(userId);
-
-  if (alreadyInProgressWorkout !== null) {
-    return getFullActiveWorkout(userId);
+export async function startWorkout(userId: string): Promise<void> {
+  const _hasActiveWorkout = await hasActiveWorkout(userId);
+  if (_hasActiveWorkout) {
+    return;
   }
 
   const nextDaySchedule = await getNextDaySchedule(userId);
   if (!nextDaySchedule.day) {
-    return null;
+    return;
   }
 
   const { nickname, orderNumber, exercises } = nextDaySchedule.day;
 
-  const workout = await prisma.activeWorkout.create({
+  await prisma.activeWorkout.create({
     data: {
       userId,
       orderNumber,
@@ -126,7 +134,9 @@ export async function startWorkout(userId: string) {
         data: {
           orderNumber: exerciseInSchedule.orderNumber,
           activeWorkout: {
-            connect: workout,
+            connect: {
+              userId,
+            },
           },
           exercise: {
             connect: {
@@ -135,26 +145,28 @@ export async function startWorkout(userId: string) {
           },
           sets: {
             createMany: {
-              data: new Array(exerciseInSchedule.exercise.setCount).fill({
-                complete: false,
-                timeInSeconds:
-                  exerciseInSchedule.exercise.exerciseType === 'timed'
-                    ? exerciseInSchedule.exercise.timePerSetInSeconds
-                    : undefined,
-              }),
+              data: new Array(exerciseInSchedule.exercise.setCount)
+                .fill(null)
+                .map((_, orderNumber) => ({
+                  orderNumber,
+                  complete: false,
+                  timeInSeconds:
+                    exerciseInSchedule.exercise.exerciseType === 'timed'
+                      ? exerciseInSchedule.exercise.timePerSetInSeconds
+                      : undefined,
+                })),
             },
           },
         },
       });
     })
   );
-  return getFullActiveWorkout(userId);
 }
 
 export async function persistSetComplete(
   userId: string,
-  exerciseIndex: number,
-  setIndex: number,
+  activeWorkoutExerciseId: string,
+  orderNumber: number,
   complete: boolean
 ) {
   await prisma.activeWorkoutExerciseSet.updateMany({
@@ -163,11 +175,11 @@ export async function persistSetComplete(
     },
     where: {
       orderNumber: {
-        lt: complete ? setIndex : setIndex - 1,
+        lte: complete ? orderNumber : orderNumber - 1,
       },
+      activeWorkoutExerciseId,
       activeWorkoutExercise: {
         userId,
-        orderNumber: exerciseIndex,
       },
     },
   });
@@ -177,11 +189,11 @@ export async function persistSetComplete(
     },
     where: {
       orderNumber: {
-        lt: complete ? setIndex + 1 : setIndex,
+        gte: complete ? orderNumber + 1 : orderNumber,
       },
       activeWorkoutExercise: {
         userId,
-        orderNumber: exerciseIndex,
+        id: activeWorkoutExerciseId,
       },
     },
   });
@@ -247,7 +259,7 @@ export async function replaceExercise(
   exerciseIndex: number,
   newExerciseId: string
 ) {
-  const activeWorkout = await getMinifiedActiveWorkout(userId);
+  const activeWorkout = await getActiveWorkout(userId);
   if (activeWorkout === null) {
     return;
   }
@@ -289,7 +301,7 @@ export async function replaceExercise(
       },
     },
   });
-  return getMinifiedActiveWorkout(userId);
+  return getActiveWorkout(userId);
 }
 
 export async function addExercise(
@@ -297,7 +309,7 @@ export async function addExercise(
   exerciseId: string,
   index: number
 ) {
-  const activeWorkoutId = await getActiveWorkoutId(userId);
+  const activeWorkoutId = await hasActiveWorkout(userId);
   if (activeWorkoutId === null) {
     return;
   }
@@ -397,42 +409,41 @@ export async function endWorkout(userId: string) {
     );
   }
   const durationInSeconds = millisecondsToSeconds(durationInMilliseconds);
-  await prisma.$transaction(async (prisma) => {
-    const finishedWorkout = await prisma.finishedWorkout.create({
-      data: {
-        orderNumber: activeWorkout.orderNumber,
-        endedAt: new Date(),
-        nickname: activeWorkout.nickname,
-        durationInSeconds,
-        startedAt: activeWorkout.createdAt,
-        user: {
-          connect: {
-            userId,
-          },
-        },
-      },
-    });
-    await Promise.all(
-      activeWorkout.exercises.map((workoutExercise) =>
+  const finishedWorkout = await prisma.finishedWorkout.create({
+    data: {
+      orderNumber: activeWorkout.orderNumber,
+      endedAt: new Date(),
+      nickname: activeWorkout.nickname,
+      durationInSeconds,
+      startedAt: activeWorkout.createdAt,
+      userId,
+    },
+  });
+  await Promise.all(
+    activeWorkout.exercises
+      .filter(
+        (activeWorkoutExercise) =>
+          !!activeWorkoutExercise.sets.find((set) => set.complete)
+      )
+      .map((workoutExercise) =>
         prisma.finishedWorkoutExercise.create({
           data: {
             name: workoutExercise.exercise.name,
             exerciseType: workoutExercise.exercise.exerciseType,
             primaryMuscleGroup: workoutExercise.exercise.primaryMuscleGroup,
             orderNumber: workoutExercise.orderNumber,
-            finishedWorkout: {
-              connect: finishedWorkout,
-            },
+            finishedWorkoutId: finishedWorkout.id,
             sets: {
               createMany: {
-                data: workoutExercise.sets.filter((set) => set.complete),
+                data: workoutExercise.sets
+                  .filter((set) => set.complete)
+                  .map(({ complete, activeWorkoutExerciseId, ...set }) => set),
               },
             },
           },
         })
       )
-    );
-  });
+  );
   await discardWorkout(userId);
 }
 

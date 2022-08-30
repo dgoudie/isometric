@@ -14,7 +14,7 @@ import { fetchFromApi } from '../utils/fetch-from-api';
 import { getFinishedWorkouts } from '../database/domains/active_workout';
 import { secondsToMilliseconds } from 'date-fns';
 import styles from './History.module.scss';
-import useFetchWith403Redirect from '../utils/fetch-with-403-redirect';
+import { useFetchJSONWith403Redirect } from '../utils/fetch-with-403-redirect';
 import { useHeadWithTitle } from '../utils/use-head-with-title';
 import useSWR from 'swr';
 
@@ -30,7 +30,7 @@ const History: NextPageWithLayout = ({}) => {
   const [moreWorkouts, setMoreWorkouts] = useState(false);
   const [page, setPage] = useState(2);
 
-  const fetcher = useFetchWith403Redirect();
+  const fetcher = useFetchJSONWith403Redirect();
 
   const { data, error } = useSWR<FinishedWorkoutWithExerciseWithSets[]>(
     '/api/workouts?page=1',

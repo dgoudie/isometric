@@ -5,6 +5,7 @@ import ActiveExerciseViewExercise from '../ActiveExerciseViewExercise/ActiveExer
 import { ActiveWorkoutExerciseWithSetsAndDetails } from '../../types/ActiveWorkoutExercise';
 import { AfterExerciseTimerContext } from '../../providers/AfterExerciseTimer/AfterExerciseTimer';
 import classNames from 'classnames';
+import equal from 'deep-equal';
 import styles from './ActiveExerciseView.module.scss';
 import { usePageVisibility } from 'react-page-visibility';
 
@@ -14,10 +15,21 @@ interface Props {
   focusedExerciseChanged: (exercise: ActiveExercise) => void;
 }
 export default function ActiveExerciseView({
-  activeWorkoutExercises,
+  activeWorkoutExercises: activeWorkoutExercisesUnmemoized,
   focusedExercise,
   focusedExerciseChanged,
 }: Props) {
+  const [activeWorkoutExercises, setActiveWorkoutExercises] = useState(
+    activeWorkoutExercisesUnmemoized
+  );
+
+  useEffect(() => {
+    if (!equal(activeWorkoutExercises, activeWorkoutExercisesUnmemoized)) {
+      setActiveWorkoutExercises(activeWorkoutExercisesUnmemoized);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [activeWorkoutExercisesUnmemoized]);
+
   const rootRef = useRef<HTMLDivElement>(null);
   const scrollExerciseIntoViewByIndex = useCallback(
     (index: number) => {
@@ -56,42 +68,47 @@ export default function ActiveExerciseView({
     queuedExerciseIndexToScrollIntoView,
   ]);
 
-  const [nextNoncompleteExercise, setNextNoncompleteExercise] = useState<{
-    index: number;
-    activeWorkoutExercise: ActiveWorkoutExerciseWithSetsAndDetails;
-  }>();
-
-  useEffect(() => {
-    let indexOfNextNonCompleteExercise = activeWorkoutExercises.findIndex(
-      (exercise, i) =>
-        focusedExercise.index !== i &&
-        !exercise.sets.every((set) => set.complete)
-    );
-    if (indexOfNextNonCompleteExercise >= 0) {
-      setNextNoncompleteExercise({
-        index: indexOfNextNonCompleteExercise,
-        activeWorkoutExercise:
-          activeWorkoutExercises[indexOfNextNonCompleteExercise],
-      });
-    } else {
-      setNextNoncompleteExercise(undefined);
-    }
-  }, [activeWorkoutExercises, focusedExercise]);
-
-  const onSelected = useCallback(
+  const scrolledIntoView = useCallback(
     (index: number) => {
       focusedExerciseChanged({ index, scrollIntoView: false });
     },
     [focusedExerciseChanged]
   );
-  const onCompleted = useCallback(() => {
-    if (typeof nextNoncompleteExercise !== 'undefined') {
-      focusedExerciseChanged({
-        index: nextNoncompleteExercise.index,
-        scrollIntoView: true,
-      });
-    }
-  }, [nextNoncompleteExercise, focusedExerciseChanged]);
+
+  const activeWorkoutExerciseChanged = useCallback(
+    (activeWorkoutExercise: ActiveWorkoutExerciseWithSetsAndDetails) => {
+      setActiveWorkoutExercises(
+        activeWorkoutExercises.map((previous, i) =>
+          i === activeWorkoutExercise.orderNumber
+            ? activeWorkoutExercise
+            : previous
+        )
+      );
+    },
+    [activeWorkoutExercises]
+  );
+
+  const onCompleted = useCallback(
+    (activeWorkoutExercise: ActiveWorkoutExerciseWithSetsAndDetails) => {
+      let nextNonCompleteExercise = activeWorkoutExercises.find(
+        (exercise) =>
+          exercise.id !== activeWorkoutExercise.id &&
+          !exercise.sets.every((set) => set.complete)
+      );
+      if (!!nextNonCompleteExercise) {
+        focusedExerciseChanged({
+          index: nextNonCompleteExercise.orderNumber,
+          scrollIntoView: true,
+        });
+      }
+      activeWorkoutExerciseChanged(activeWorkoutExercise);
+    },
+    [
+      activeWorkoutExerciseChanged,
+      activeWorkoutExercises,
+      focusedExerciseChanged,
+    ]
+  );
 
   const { isOpenAndMinimized: timerIsOpenAndMinimized, cancel } =
     React.useContext(AfterExerciseTimerContext);
@@ -112,17 +129,14 @@ export default function ActiveExerciseView({
       )}
       ref={rootRef}
     >
-      {activeWorkoutExercises.map((exercise, index) => (
+      {activeWorkoutExercises.map((activeWorkoutExercise) => (
         <ActiveExerciseViewExercise
-          key={index}
-          activeWorkoutExercise={exercise}
-          nextActiveWorkoutExercise={
-            nextNoncompleteExercise?.activeWorkoutExercise
-          }
-          exerciseIndex={index}
-          exerciseCount={activeWorkoutExercises.length}
-          onSelected={onSelected}
+          key={activeWorkoutExercise.id}
+          activeWorkoutExercise={activeWorkoutExercise}
+          activeWorkoutExerciseChanged={activeWorkoutExerciseChanged}
           onCompleted={onCompleted}
+          exerciseCount={activeWorkoutExercises.length}
+          scrolledIntoView={scrolledIntoView}
         />
       ))}
     </div>

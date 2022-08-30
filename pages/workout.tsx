@@ -11,10 +11,8 @@ import ActiveExerciseView from '../components/ActiveExerciseView/ActiveExerciseV
 import { ActiveWorkoutWithExercisesWithExerciseWithSetsAndDetails } from '../types/ActiveWorkout';
 import EndWorkoutBottomSheet from '../components/BottomSheet/components/EndWorkoutBottomSheet/EndWorkoutBottomSheet';
 import ExercisePickerBottomSheet from '../components/BottomSheet/components/ExercisePickerBottomSheet/ExercisePickerBottomSheet';
-import { FullWorkout } from '../example_type';
 import { GetServerSideProps } from 'next';
 import { NextPageWithLayout } from './_app';
-import PageWrapper from '../components/PageWrapper/PageWrapper';
 import RouteGuard from '../components/RouteGuard/RouteGuard';
 import RouteLoader from '../components/RouteLoader/RouteLoader';
 import { SnackbarContext } from '../providers/Snackbar/Snackbar';
@@ -22,11 +20,11 @@ import SwipeDeadZone from '../components/SwipeDeadZone/SwipeDeadZone';
 import { WorkoutContext } from '../providers/Workout/Workout';
 import WorkoutExercisesBottomSheet from '../components/BottomSheet/components/WorkoutExercisesBottomSheet/WorkoutExercisesBottomSheet';
 import classNames from 'classnames';
-import { getActiveWorkoutId } from '../database/domains/active_workout';
 import { getUserId } from '../utils/get-user-id';
+import { hasActiveWorkout } from '../database/domains/active_workout';
 import { requestNotificationPermission } from '../utils/notification';
 import styles from './Workout.module.scss';
-import useFetchWith403Redirect from '../utils/fetch-with-403-redirect';
+import { useFetchJSONWith403Redirect } from '../utils/fetch-with-403-redirect';
 import { useHeadWithTitle } from '../utils/use-head-with-title';
 import useSWR from 'swr';
 
@@ -40,7 +38,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
   if (!userId) {
     return { redirect: { destination: '/', permanent: false } };
   }
-  const activeWorkoutId = getActiveWorkoutId(userId);
+  const activeWorkoutId = hasActiveWorkout(userId);
   if (!activeWorkoutId) {
     return { redirect: { destination: '/dashboard', permanent: false } };
   }
@@ -55,7 +53,7 @@ const Workout: NextPageWithLayout = () => {
   const { endWorkout, discardWorkout, addExercise } =
     useContext(WorkoutContext);
 
-  const fetcher = useFetchWith403Redirect();
+  const fetcher = useFetchJSONWith403Redirect();
 
   const { openSnackbar } = useContext(SnackbarContext);
 

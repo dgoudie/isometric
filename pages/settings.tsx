@@ -5,7 +5,7 @@ import useSWR from 'swr';
 import RouteGuard from '../components/RouteGuard/RouteGuard';
 import RouteLoader from '../components/RouteLoader/RouteLoader';
 import AppBarWithAppHeaderLayout from '../layouts/AppBarWithAppHeaderLayout/AppBarWithAppHeaderLayout';
-import useFetchWith403Redirect from '../utils/fetch-with-403-redirect';
+import { useFetchJSONWith403Redirect } from '../utils/fetch-with-403-redirect';
 import themes from '../utils/themes';
 import { useHeadWithTitle } from '../utils/use-head-with-title';
 import styles from './Settings.module.scss';
@@ -15,7 +15,7 @@ import classNames from 'classnames';
 const themeLocalStorageKey = `isometric.theme_name`;
 
 const Settings: NextPageWithLayout = ({}) => {
-  const fetcher = useFetchWith403Redirect();
+  const fetcher = useFetchJSONWith403Redirect();
 
   const { data, error } = useSWR<Setting[]>('/api/settings', fetcher);
 

@@ -23,6 +23,7 @@ const handler: NextApiHandler = async (req, res) => {
         },
       });
       await broadcastApiMutations(userId, [
+        `/api/schedule/upcoming`,
         `/api/schedule/workouts`,
         `/api/schedule/workout/${id}`,
       ]);

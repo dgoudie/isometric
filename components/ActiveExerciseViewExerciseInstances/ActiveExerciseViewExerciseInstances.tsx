@@ -2,8 +2,8 @@ import { FinishedWorkoutExerciseWithSets } from '../../example_type';
 import RouteLoader from '../RouteLoader/RouteLoader';
 import SetView from '../SetView/SetView';
 import styles from './ActiveExerciseViewExerciseInstances.module.scss';
-import useFetchWith403Redirect from '../../utils/fetch-with-403-redirect';
-import useSWR from 'swr';
+import { useFetchJSONWith403Redirect } from '../../utils/fetch-with-403-redirect';
+import useSWR from 'swr/immutable';
 
 const format = new Intl.DateTimeFormat('en-US');
 
@@ -14,7 +14,7 @@ interface Props {
 export default function ActiveExerciseViewExerciseInstances({
   exerciseName,
 }: Props) {
-  const fetcher = useFetchWith403Redirect();
+  const fetcher = useFetchJSONWith403Redirect();
   const { data: instances, error } = useSWR<FinishedWorkoutExerciseWithSets[]>(
     `/api/exercise/instances/${exerciseName}`,
     fetcher

@@ -4,6 +4,8 @@
   height: 4rem;
   border-radius: 8px;
 
+  border: 2px solid var(--background-alt-2);
+
   pre {
     margin: 0;
   }
@@ -86,6 +88,7 @@
   }
 
   &.highlighted {
+    border: 2px solid var(--pop-color);
     background-color: var(--pop-color);
     color: black;
     .set {

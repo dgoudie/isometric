@@ -4,7 +4,7 @@ import {
   DropResult,
   Droppable,
 } from 'react-beautiful-dnd';
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useContext, useEffect, useState } from 'react';
 
 import AppBarWithAppHeaderLayout from '../../layouts/AppBarWithAppHeaderLayout/AppBarWithAppHeaderLayout';
 import ExercisePickerBottomSheet from '../../components/BottomSheet/components/ExercisePickerBottomSheet/ExercisePickerBottomSheet';
@@ -16,10 +16,11 @@ import RouteLoader from '../../components/RouteLoader/RouteLoader';
 import { ScheduledWorkoutExercise } from '@prisma/client';
 import { ScheduledWorkoutExerciseWithExercise } from '../../types/ScheduledWorkoutExercise';
 import { ScheduledWorkoutWithExerciseInSchedulesWithExercise } from '../../types/ScheduledWorkout';
+import { SnackbarContext } from '../../providers/Snackbar/Snackbar';
 import classNames from 'classnames';
 import { moveItemInArray } from '../../utils/array-helpers';
 import styles from './ScheduleWorkout.module.scss';
-import useFetchWith403Redirect from '../../utils/fetch-with-403-redirect';
+import { useFetchJSONWith403Redirect } from '../../utils/fetch-with-403-redirect';
 import { useHeadWithTitle } from '../../utils/use-head-with-title';
 import { useRouter } from 'next/router';
 import useSWR from 'swr';
@@ -29,13 +30,23 @@ const ScheduleWorkout: NextPageWithLayout = () => {
 
   const scheduledWorkoutId = router.query.id as string;
 
-  const fetcher = useFetchWith403Redirect();
+  const fetcher = useFetchJSONWith403Redirect();
+
+  const { openSnackbar } = useContext(SnackbarContext);
 
   const { data, error } =
     useSWR<ScheduledWorkoutWithExerciseInSchedulesWithExercise>(
       router.isReady ? `/api/schedule/workout/${scheduledWorkoutId}` : null,
       fetcher
     );
+
+  useEffect(() => {
+    if (error?.status === 404) {
+      openSnackbar(`This scheduled workout no longer exists.`);
+      router.replace('/schedule');
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [error]);
 
   const head = useHeadWithTitle(`Edit Schedule`);
 

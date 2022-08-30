@@ -1,10 +1,4 @@
 import {
-  ActiveWorkoutExercise,
-  ActiveWorkoutExerciseSet,
-  Exercise,
-} from '@prisma/client';
-import { IExercise, IWorkoutExerciseSet } from '@dgoudie/isometric-types';
-import {
   addMilliseconds,
   differenceInMilliseconds,
   intervalToDuration,
@@ -13,6 +7,8 @@ import {
 } from 'date-fns';
 import { useContext, useEffect, useMemo, useRef, useState } from 'react';
 
+import { ActiveWorkoutExerciseSet } from '@prisma/client';
+import { ActiveWorkoutExerciseWithSetsAndDetails } from '../../types/ActiveWorkoutExercise';
 import { WorkoutContext } from '../../providers/Workout/Workout';
 import classNames from 'classnames';
 import { inputForceInteger } from '../../utils/input-force-integer';
@@ -21,25 +17,27 @@ import { showNotification } from '../../utils/notification';
 import styles from './ActiveExerciseViewExerciseSet.module.scss';
 
 interface Props {
-  exercise: Exercise;
+  activeWorkoutExercise: ActiveWorkoutExerciseWithSetsAndDetails;
   set: ActiveWorkoutExerciseSet;
-  exerciseSelected: boolean;
-  setSelected: boolean;
-  exerciseIndex: number;
-  setIndex: number;
+  exerciseIsActive: boolean;
+  isActive: boolean;
+  onChangedExceptCompleted: (set: ActiveWorkoutExerciseSet) => void;
+  onCompleted: (complete: boolean) => void;
 }
 export default function ActiveExerciseViewExerciseSet(props: Props) {
   let children = <WeightedSet {...props} />;
-  if (props.exercise.exerciseType === 'timed') {
+  if (props.activeWorkoutExercise.exercise.exerciseType === 'timed') {
     children = <TimedSet {...props} />;
-  } else if (props.exercise.exerciseType === 'rep_based') {
+  } else if (
+    props.activeWorkoutExercise.exercise.exerciseType === 'rep_based'
+  ) {
     children = <RepBasedSet {...props} />;
   }
   return (
     <div
       className={classNames(
         styles.root,
-        props.setSelected && styles.highlighted,
+        props.isActive && styles.highlighted,
         props.set.complete && styles.completed
       )}
     >
@@ -48,14 +46,7 @@ export default function ActiveExerciseViewExerciseSet(props: Props) {
   );
 }
 
-function WeightedSet({
-  exercise,
-  set,
-  setSelected,
-  exerciseSelected,
-  exerciseIndex,
-  setIndex,
-}: Props) {
+function WeightedSet(props: Props) {
   const { persistSetComplete, persistSetRepetitions, persistSetResistance } =
     useContext(WorkoutContext);
 
@@ -63,22 +54,22 @@ function WeightedSet({
   const repCountInput = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
-    if (!exerciseSelected) {
+    if (!props.exerciseIsActive) {
       resistanceInput.current?.blur();
       repCountInput.current?.blur();
     }
-  }, [resistanceInput, repCountInput, exerciseSelected]);
+  }, [resistanceInput, repCountInput, props.exerciseIsActive]);
 
   useEffect(() => {
     resistanceInput.current &&
       (resistanceInput.current.value =
-        set.resistanceInPounds?.toString() ?? '');
-  }, [resistanceInput, set]);
+        props.set.resistanceInPounds?.toString() ?? '');
+  }, [props.set.resistanceInPounds, resistanceInput]);
 
   useEffect(() => {
     repCountInput.current &&
-      (repCountInput.current.value = set.repetitions?.toString() ?? '');
-  }, [repCountInput, set]);
+      (repCountInput.current.value = props.set.repetitions?.toString() ?? '');
+  }, [props.set.repetitions, repCountInput]);
 
   return (
     <div className={classNames(styles.set, styles.setTypeWeighted)}>
@@ -91,13 +82,20 @@ function WeightedSet({
             inputMode='numeric'
             onFocus={inputSelectAllOnFocus}
             onInput={inputForceInteger}
-            onBlur={(e) =>
+            onBlur={(e) => {
+              const resistanceInPounds = e.target.value
+                ? parseInt(e.target.value)
+                : null;
               persistSetResistance(
-                exerciseIndex,
-                setIndex,
-                e.target.value ? parseInt(e.target.value) : undefined
-              )
-            }
+                props.activeWorkoutExercise.id,
+                props.set.orderNumber,
+                resistanceInPounds
+              );
+              props.onChangedExceptCompleted({
+                ...props.set,
+                resistanceInPounds,
+              });
+            }}
           />
         </div>
 
@@ -109,26 +107,35 @@ function WeightedSet({
             ref={repCountInput}
             type='number'
             inputMode='numeric'
-            placeholder={`${exercise.maximumRecommendedRepetitions}-${exercise.maximumRecommendedRepetitions}`}
+            placeholder={`${props.activeWorkoutExercise.exercise.maximumRecommendedRepetitions}-${props.activeWorkoutExercise.exercise.maximumRecommendedRepetitions}`}
             onFocus={inputSelectAllOnFocus}
             onInput={inputForceInteger}
-            onBlur={(e) =>
+            onBlur={(e) => {
+              const repetitions = e.target.value
+                ? parseInt(e.target.value)
+                : null;
               persistSetRepetitions(
-                exerciseIndex,
-                setIndex,
-                e.target.value ? parseInt(e.target.value) : undefined
-              )
-            }
+                props.activeWorkoutExercise.id,
+                props.set.orderNumber,
+                repetitions
+              );
+              props.onChangedExceptCompleted({ ...props.set, repetitions });
+            }}
           />
         </div>
         <span className={styles.setInputSuffix}>reps</span>
       </div>
       <button
-        disabled={!setSelected && !set.complete}
+        disabled={!props.isActive && !props.set.complete}
         type='button'
-        onClick={() =>
-          persistSetComplete(exerciseIndex, setIndex, !set.complete)
-        }
+        onClick={() => {
+          props.onCompleted(!props.set.complete);
+          persistSetComplete(
+            props.activeWorkoutExercise.id,
+            props.set.orderNumber,
+            !props.set.complete
+          );
+        }}
         className={classNames(styles.setButton, styles.setButtonCompleted)}
       >
         <i className='fa-solid fa-check'></i>
@@ -138,17 +145,19 @@ function WeightedSet({
 }
 
 function TimedSet({
-  exercise,
+  activeWorkoutExercise,
   set,
-  exerciseIndex,
-  setIndex,
-  setSelected,
+  isActive,
+  onCompleted,
 }: Props) {
   const { persistSetComplete } = useContext(WorkoutContext);
 
   const millisecondsPerSet = useMemo(
-    () => secondsToMilliseconds(exercise.timePerSetInSeconds!),
-    [exercise.timePerSetInSeconds]
+    () =>
+      secondsToMilliseconds(
+        activeWorkoutExercise.exercise.timePerSetInSeconds!
+      ),
+    [activeWorkoutExercise]
   );
 
   const [millisecondsRemaining, setMillisecondsRemaining] =
@@ -229,9 +238,14 @@ function TimedSet({
         type='button'
         onClick={() => {
           setPaused(true);
-          persistSetComplete(exerciseIndex, setIndex, !set.complete);
+          onCompleted(!set.complete);
+          persistSetComplete(
+            activeWorkoutExercise.id,
+            set.orderNumber,
+            !set.complete
+          );
         }}
-        disabled={!setSelected && !set.complete}
+        disabled={!isActive && !set.complete}
         className={classNames(styles.setButton, styles.setButtonCompleted)}
       >
         <i className='fa-solid fa-check'></i>
@@ -240,27 +254,21 @@ function TimedSet({
   );
 }
 
-function RepBasedSet({
-  set,
-  setSelected,
-  exerciseSelected,
-  exerciseIndex,
-  setIndex,
-}: Props) {
+function RepBasedSet(props: Props) {
   const { persistSetComplete, persistSetRepetitions } =
     useContext(WorkoutContext);
   const repCountInput = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
-    if (!exerciseSelected) {
+    if (!props.exerciseIsActive) {
       repCountInput.current?.blur();
     }
-  }, [repCountInput, exerciseSelected]);
+  }, [repCountInput, props.exerciseIsActive]);
 
   useEffect(() => {
     repCountInput.current &&
-      (repCountInput.current.value = set.repetitions?.toString() ?? '');
-  }, [repCountInput, set]);
+      (repCountInput.current.value = props.set.repetitions?.toString() ?? '');
+  }, [props.set.repetitions, repCountInput]);
 
   return (
     <div className={classNames(styles.set, styles.setTypeRepBased)}>
@@ -273,23 +281,32 @@ function RepBasedSet({
             placeholder='--'
             onFocus={inputSelectAllOnFocus}
             onInput={inputForceInteger}
-            onBlur={(e) =>
+            onBlur={(e) => {
+              const repetitions = e.target.value
+                ? parseInt(e.target.value)
+                : null;
               persistSetRepetitions(
-                exerciseIndex,
-                setIndex,
-                e.target.value ? parseInt(e.target.value) : undefined
-              )
-            }
+                props.activeWorkoutExercise.id,
+                props.set.orderNumber,
+                repetitions
+              );
+              props.onChangedExceptCompleted({ ...props.set, repetitions });
+            }}
           />
         </div>
         <span className={styles.setInputSuffix}>reps</span>
       </div>
       <button
         type='button'
-        onClick={() =>
-          persistSetComplete(exerciseIndex, setIndex, !set.complete)
-        }
-        disabled={!setSelected && !set.complete}
+        onClick={() => {
+          persistSetComplete(
+            props.activeWorkoutExercise.id,
+            props.set.orderNumber,
+            !props.set.complete
+          );
+          props.onCompleted(!props.set.complete);
+        }}
+        disabled={!props.isActive && !props.set.complete}
         className={classNames(styles.setButton, styles.setButtonCompleted)}
       >
         <i className='fa-solid fa-check'></i>

@@ -49,7 +49,10 @@ const handler: NextApiHandler = async (req, res) => {
             exerciseId: scheduledWorkoutExercise.exerciseId,
           })),
         });
-        await broadcastApiMutations(userId, [`/api/schedule/workouts`]);
+        await broadcastApiMutations(userId, [
+          `/api/schedule/upcoming`,
+          `/api/schedule/workouts`,
+        ]);
         res.send(day.id);
       } else {
         let day = await prisma.scheduledWorkout.create({
@@ -61,7 +64,10 @@ const handler: NextApiHandler = async (req, res) => {
             nickname: '',
           },
         });
-        await broadcastApiMutations(userId, [`/api/schedule/workouts`]);
+        await broadcastApiMutations(userId, [
+          `/api/schedule/upcoming`,
+          `/api/schedule/workouts`,
+        ]);
         res.send(day.id);
       }
       return;

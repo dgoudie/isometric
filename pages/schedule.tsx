@@ -9,6 +9,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import AppBarWithAppHeaderLayout from '../layouts/AppBarWithAppHeaderLayout/AppBarWithAppHeaderLayout';
 import { ExerciseMuscleGroup } from '@prisma/client';
 import Link from 'next/link';
+import LoadingButton from '../components/LoadingButton/LoadingButton';
 import MuscleGroupTag from '../components/MuscleGroupTag/MuscleGroupTag';
 import { NextPageWithLayout } from './_app';
 import RouteGuard from '../components/RouteGuard/RouteGuard';
@@ -17,7 +18,7 @@ import { ScheduledWorkoutWithExerciseInSchedulesWithExercise } from '../types/Sc
 import classNames from 'classnames';
 import { moveItemInArray } from '../utils/array-helpers';
 import styles from './Schedule.module.scss';
-import useFetchWith403Redirect from '../utils/fetch-with-403-redirect';
+import { useFetchJSONWith403Redirect } from '../utils/fetch-with-403-redirect';
 import { useHeadWithTitle } from '../utils/use-head-with-title';
 import { useRouter } from 'next/router';
 import useSWR from 'swr';
@@ -25,7 +26,7 @@ import useSWR from 'swr';
 const url = `/api/schedule/workouts`;
 
 const WorkoutPlan: NextPageWithLayout = () => {
-  const fetcher = useFetchWith403Redirect();
+  const fetcher = useFetchJSONWith403Redirect();
 
   const { data: scheduledWorkouts, error: fetchScheduleError } = useSWR<
     ScheduledWorkoutWithExerciseInSchedulesWithExercise[]
@@ -59,10 +60,13 @@ const WorkoutPlan: NextPageWithLayout = () => {
             Here, you can build a workout schedule. Start by adding a day, and
             adding some exercises.
           </span>
-          <button className={'standard-button primary'} onClick={addNewDay}>
+          <LoadingButton
+            className={'standard-button primary'}
+            onClick={addNewDay}
+          >
             <i className='fa-solid fa-plus'></i>
             Add New Day
-          </button>
+          </LoadingButton>
         </div>
       </>
     );
@@ -273,13 +277,13 @@ function ScheduledWorkouts({
             ))}
             {provided.placeholder}
             <div className={styles.addActions}>
-              <button
+              <LoadingButton
                 className='standard-button highlighted outlined slim'
                 onClick={addNewDay}
               >
                 <i className='fa-solid fa-plus'></i>
                 Add New Day
-              </button>
+              </LoadingButton>
             </div>
           </div>
         )}

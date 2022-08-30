@@ -2,6 +2,7 @@ import { useContext, useEffect, useMemo, useState } from 'react';
 
 import AppBarWithAppHeaderLayout from '../layouts/AppBarWithAppHeaderLayout/AppBarWithAppHeaderLayout';
 import Link from 'next/link';
+import LoadingButton from '../components/LoadingButton/LoadingButton';
 import MuscleGroupTag from '../components/MuscleGroupTag/MuscleGroupTag';
 import { NextDaySchedule } from '../database/domains/scheduled_workout';
 import { NextPageWithLayout } from './_app';
@@ -12,7 +13,7 @@ import classNames from 'classnames';
 import { getGreeting } from '../utils/get-greeting';
 import { secondsToMinutes } from 'date-fns';
 import styles from './Dashboard.module.scss';
-import useFetchWith403Redirect from '../utils/fetch-with-403-redirect';
+import { useFetchJSONWith403Redirect } from '../utils/fetch-with-403-redirect';
 import { useHeadWithTitle } from '../utils/use-head-with-title';
 import useSWR from 'swr';
 
@@ -26,7 +27,7 @@ const Dashboard: NextPageWithLayout = () => {
     setGreeting(getGreeting());
   }, []);
 
-  const fetcher = useFetchWith403Redirect();
+  const fetcher = useFetchJSONWith403Redirect();
 
   const { data: schedule, error } = useSWR<NextDaySchedule>(
     `/api/schedule/upcoming`,
@@ -144,14 +145,14 @@ const Dashboard: NextPageWithLayout = () => {
               Edit Plan
             </a>
           </Link>
-          <button
+          <LoadingButton
             type='button'
             onClick={() => startWorkout()}
             className={classNames('standard-button primary')}
           >
             <i className='fa-solid fa-person-walking'></i>
             Start Day {schedule.day.orderNumber + 1}
-          </button>
+          </LoadingButton>
         </div>
       </div>
     </div>
