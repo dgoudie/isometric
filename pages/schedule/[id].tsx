@@ -270,7 +270,7 @@ function ScheduledWorkoutExercises({
                           </div>
                           <button
                             className={classNames(
-                              styles.exerciseBodyDelete,
+                              styles.exerciseBodyLeftDelete,
                               'standard-button danger slim'
                             )}
                             onClick={() => {
