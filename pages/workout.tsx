@@ -22,7 +22,7 @@ import SwipeDeadZone from '../components/SwipeDeadZone/SwipeDeadZone';
 import { WorkoutContext } from '../providers/Workout/Workout';
 import WorkoutExercisesBottomSheet from '../components/BottomSheet/components/WorkoutExercisesBottomSheet/WorkoutExercisesBottomSheet';
 import classNames from 'classnames';
-import { getActiveWorkoutId } from '../database/domains/workout';
+import { getActiveWorkoutId } from '../database/domains/active_workout';
 import { getUserId } from '../utils/get-user-id';
 import { requestNotificationPermission } from '../utils/notification';
 import styles from './Workout.module.scss';

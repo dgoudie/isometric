@@ -10,7 +10,7 @@ import {
 
 import { FinishedWorkoutWithExerciseWithSets } from '../../types/FinishedWorkout';
 import { getExerciseById } from './exercise';
-import { getNextDaySchedule } from './schedule';
+import { getNextDaySchedule } from './scheduled_workout';
 import prisma from '../prisma';
 
 export async function getFinishedWorkouts(

@@ -2,7 +2,7 @@ import { NextApiHandler } from 'next';
 import broadcastApiMutations from '../../../../utils/broadcast-api-mutations';
 import { getUserId } from '../../../../utils/get-user-id';
 import prisma from '../../../../database/prisma';
-import { reindexScheduledWorkouts } from '../../../../database/domains/schedule';
+import { reindexScheduledWorkouts } from '../../../../database/domains/scheduled_workout';
 
 const handler: NextApiHandler = async (req, res) => {
   const userId = await getUserId(req, res);
@@ -26,6 +26,9 @@ const handler: NextApiHandler = async (req, res) => {
           exercises: {
             include: {
               exercise: true,
+            },
+            orderBy: {
+              orderNumber: 'asc',
             },
           },
         },

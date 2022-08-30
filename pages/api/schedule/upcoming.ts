@@ -1,5 +1,5 @@
 import { NextApiHandler } from 'next';
-import { getNextDaySchedule } from '../../../database/domains/schedule';
+import { getNextDaySchedule } from '../../../database/domains/scheduled_workout';
 import { getUserId } from '../../../utils/get-user-id';
 
 const handler: NextApiHandler = async (req, res) => {

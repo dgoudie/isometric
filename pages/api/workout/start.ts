@@ -1,6 +1,6 @@
 import { NextApiHandler } from 'next';
 import { getUserId } from '../../../utils/get-user-id';
-import { startWorkout } from '../../../database/domains/workout';
+import { startWorkout } from '../../../database/domains/active_workout';
 
 const handler: NextApiHandler = async (req, res) => {
   const userId = await getUserId(req, res);

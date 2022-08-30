@@ -3,7 +3,7 @@ import { useContext, useEffect, useMemo, useState } from 'react';
 import AppBarWithAppHeaderLayout from '../layouts/AppBarWithAppHeaderLayout/AppBarWithAppHeaderLayout';
 import Link from 'next/link';
 import MuscleGroupTag from '../components/MuscleGroupTag/MuscleGroupTag';
-import { NextDaySchedule } from '../database/domains/schedule';
+import { NextDaySchedule } from '../database/domains/scheduled_workout';
 import { NextPageWithLayout } from './_app';
 import { Prisma } from '@prisma/client';
 import RouteLoader from '../components/RouteLoader/RouteLoader';
@@ -128,7 +128,7 @@ const Dashboard: NextPageWithLayout = () => {
           <div className={styles.exercises}>
             {schedule.day.exercises.map((exerciseInSchedule) => (
               <ExerciseItem
-                key={exerciseInSchedule.exerciseId}
+                key={exerciseInSchedule.id}
                 scheduledWorkoutWithExercise={exerciseInSchedule}
               />
             ))}

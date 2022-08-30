@@ -2,7 +2,7 @@ import { isNaB, parseBoolean } from '../../../utils/boolean';
 
 import { NextApiHandler } from 'next';
 import { getUserId } from '../../../utils/get-user-id';
-import { persistSetComplete } from '../../../database/domains/workout';
+import { persistSetComplete } from '../../../database/domains/active_workout';
 
 const handler: NextApiHandler = async (req, res) => {
   const userId = await getUserId(req, res);

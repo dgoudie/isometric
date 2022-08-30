@@ -35,7 +35,7 @@ export default function MuscleGroupTag({ muscleGroup, className }: Props) {
       className={classNames(className, styles.item)}
       style={muscleGroupStyles}
     >
-      {muscleGroup ? muscleGroup.toUpperCase() : 'N/A'}
+      {muscleGroup ? muscleGroup.toUpperCase().replace(/_/, ' ') : 'N/A'}
     </div>
   );
 }

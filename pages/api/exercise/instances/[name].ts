@@ -1,6 +1,6 @@
 import { NextApiHandler } from 'next';
 import { getUserId } from '../../../../utils/get-user-id';
-import { getWorkoutInstancesByExerciseName } from '../../../../database/domains/workout';
+import { getWorkoutInstancesByExerciseName } from '../../../../database/domains/active_workout';
 
 const handler: NextApiHandler = async (req, res) => {
   switch (req.method) {

@@ -11,7 +11,7 @@ import RouteLoader from '../components/RouteLoader/RouteLoader';
 import SetView from '../components/SetView/SetView';
 import classNames from 'classnames';
 import { fetchFromApi } from '../utils/fetch-from-api';
-import { getFinishedWorkouts } from '../database/domains/workout';
+import { getFinishedWorkouts } from '../database/domains/active_workout';
 import { secondsToMilliseconds } from 'date-fns';
 import styles from './History.module.scss';
 import useFetchWith403Redirect from '../utils/fetch-with-403-redirect';

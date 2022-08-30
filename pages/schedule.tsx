@@ -42,7 +42,7 @@ const WorkoutPlan: NextPageWithLayout = () => {
     const newScheduleWorkoutId = await fetch(`/api/schedule/workout`, {
       method: 'PUT',
     }).then((res) => res.text());
-    router.replace(`/schedule/${newScheduleWorkoutId}`);
+    router.push(`/schedule/${newScheduleWorkoutId}`);
   }, [router]);
 
   if (!scheduledWorkouts) {
@@ -53,7 +53,7 @@ const WorkoutPlan: NextPageWithLayout = () => {
     return (
       <>
         <h1>Schedule Builder</h1>
-        <div className={styles.noDays}>
+        <div className={classNames(styles.noDays, 'fade-in')}>
           {head}
           <span>
             Here, you can build a workout schedule. Start by adding a day, and
@@ -72,7 +72,7 @@ const WorkoutPlan: NextPageWithLayout = () => {
     <div className={styles.root}>
       {head}
       <>
-        <h1>Edit Schedule</h1>
+        <h1>Schedule Builder</h1>
         <ScheduledWorkouts
           scheduledWorkouts={scheduledWorkouts}
           addNewDay={addNewDay}
@@ -213,7 +213,7 @@ function ScheduledWorkouts({
                     >
                       <i className='fa-solid fa-grip-lines'></i>
                     </div>
-                    <div className={classNames(styles.workoutBody, 'fade-in')}>
+                    <div className={classNames(styles.workoutBody)}>
                       <button onClick={() => expand(scheduledWorkout.id)}>
                         <div className={styles.workoutBodyUpper}>
                           <div className={styles.workoutBodyUpperLeft}>
@@ -274,7 +274,7 @@ function ScheduledWorkouts({
             {provided.placeholder}
             <div className={styles.addActions}>
               <button
-                className='standard-button primary slim'
+                className='standard-button highlighted outlined slim'
                 onClick={addNewDay}
               >
                 <i className='fa-solid fa-plus'></i>
