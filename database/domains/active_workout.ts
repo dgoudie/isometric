@@ -201,7 +201,7 @@ export async function persistSetComplete(
 
 export async function persistSetRepetitions(
   userId: string,
-  exerciseIndex: number,
+  activeWorkoutExerciseId: string,
   setIndex: number,
   repetitions: number | undefined
 ) {
@@ -212,10 +212,8 @@ export async function persistSetRepetitions(
     where: {
       orderNumber: setIndex,
       activeWorkoutExercise: {
-        orderNumber: exerciseIndex,
-        activeWorkout: {
-          userId,
-        },
+        id: activeWorkoutExerciseId,
+        userId,
       },
     },
   });
@@ -223,7 +221,7 @@ export async function persistSetRepetitions(
 
 export async function persistSetResistance(
   userId: string,
-  exerciseIndex: number,
+  activeWorkoutExerciseId: string,
   setIndex: number,
   resistanceInPounds: number | undefined
 ) {
@@ -235,20 +233,16 @@ export async function persistSetResistance(
       OR: [
         { orderNumber: setIndex },
         {
-          AND: [
-            {
-              orderNumber: {
-                gt: setIndex,
-              },
-              resistanceInPounds: null,
-              repetitions: null,
-            },
-          ],
+          orderNumber: {
+            gt: setIndex,
+          },
+          resistanceInPounds: null,
+          repetitions: null,
         },
       ],
       activeWorkoutExercise: {
         userId,
-        orderNumber: exerciseIndex,
+        id: activeWorkoutExerciseId,
       },
     },
   });

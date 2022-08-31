@@ -1,9 +1,12 @@
 import { isNaB, parseBoolean } from '../../../utils/boolean';
+import {
+  persistSetComplete,
+  persistSetRepetitions,
+} from '../../../database/domains/active_workout';
 
 import { NextApiHandler } from 'next';
 import broadcastApiMutations from '../../../utils/broadcast-api-mutations';
 import { getUserId } from '../../../utils/get-user-id';
-import { persistSetComplete } from '../../../database/domains/active_workout';
 
 const handler: NextApiHandler = async (req, res) => {
   const userId = await getUserId(req, res);
@@ -11,20 +14,27 @@ const handler: NextApiHandler = async (req, res) => {
     res.status(403).end();
     return;
   }
-  const { activeWorkoutExerciseId, setIndex, complete } = req.body;
+  const { activeWorkoutExerciseId, setIndex, repetitions } = req.body;
   if (typeof activeWorkoutExerciseId !== 'string') {
     res.status(400).send(`Parameter activeWorkoutExerciseId is invalid.`);
     return;
   }
   if (typeof setIndex !== 'number') {
-    res.status(400).send(`Parameter set_setIndexindex is invalid.`);
+    res.status(400).send(`Parameter setIndex is invalid.`);
     return;
   }
-  if (typeof complete !== 'boolean') {
-    res.status(400).send(`Parameter complete is invalid.`);
-    return;
+  if (repetitions !== null) {
+    if (typeof repetitions !== 'number' || repetitions < 0) {
+      res.status(400).send(`Parameter repetitions is invalid.`);
+      return;
+    }
   }
-  await persistSetComplete(userId, activeWorkoutExerciseId, setIndex, complete);
+  await persistSetRepetitions(
+    userId,
+    activeWorkoutExerciseId,
+    setIndex,
+    repetitions
+  );
   broadcastApiMutations(userId, [`/api/workout`]);
   res.end();
 };

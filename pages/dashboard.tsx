@@ -235,12 +235,13 @@ function ExerciseItem({ scheduledWorkoutWithExercise }: ExerciseItemProps) {
             {
               scheduledWorkoutWithExercise.exercise
                 .minimumRecommendedRepetitions
-            }{' '}
-            -{' '}
+            }
+            -
             {
               scheduledWorkoutWithExercise.exercise
                 .maximumRecommendedRepetitions
-            }
+            }{' '}
+            reps
           </>
         );
       }

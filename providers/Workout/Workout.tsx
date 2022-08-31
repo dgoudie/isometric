@@ -51,12 +51,17 @@ export default function WorkoutProvider({
   }, []);
   const persistSetComplete = useCallback(
     (activeWorkoutExerciseId: string, setIndex: number, complete: boolean) => {
-      const query = new URLSearchParams({
-        active_workout_exercise_id: activeWorkoutExerciseId,
-        set_index: setIndex.toString(),
-        complete: complete.toString(),
+      fetch(`/api/workout/persist_set_complete`, {
+        method: 'PUT',
+        headers: {
+          'content-type': 'application/json',
+        },
+        body: JSON.stringify({
+          activeWorkoutExerciseId,
+          setIndex,
+          complete,
+        }),
       });
-      fetch(`/api/workout/persist_set_complete?${query}`);
     },
     []
   );
@@ -95,14 +100,17 @@ export default function WorkoutProvider({
       setIndex: number,
       repetitions: number | null
     ) => {
-      // sendJsonMessage(
-      //   verifyType<WSWorkoutUpdate>({
-      //     type: 'PERSIST_SET_REPETITIONS',
-      //     exerciseIndex,
-      //     setIndex,
-      //     repetitions,
-      //   })
-      // );
+      fetch(`/api/workout/persist_set_repetitions`, {
+        method: 'PUT',
+        headers: {
+          'content-type': 'application/json',
+        },
+        body: JSON.stringify({
+          activeWorkoutExerciseId,
+          setIndex,
+          repetitions,
+        }),
+      });
     },
     []
   );
@@ -112,14 +120,17 @@ export default function WorkoutProvider({
       setIndex: number,
       resistanceInPounds: number | null
     ) => {
-      // sendJsonMessage(
-      //   verifyType<WSWorkoutUpdate>({
-      //     type: 'PERSIST_SET_RESISTANCE',
-      //     exerciseIndex,
-      //     setIndex,
-      //     resistanceInPounds,
-      //   })
-      // );
+      fetch(`/api/workout/persist_set_resistance`, {
+        method: 'PUT',
+        headers: {
+          'content-type': 'application/json',
+        },
+        body: JSON.stringify({
+          activeWorkoutExerciseId,
+          setIndex,
+          resistanceInPounds,
+        }),
+      });
     },
     []
   );

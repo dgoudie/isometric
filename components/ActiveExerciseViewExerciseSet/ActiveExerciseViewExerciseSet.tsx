@@ -107,7 +107,7 @@ function WeightedSet(props: Props) {
             ref={repCountInput}
             type='number'
             inputMode='numeric'
-            placeholder={`${props.activeWorkoutExercise.exercise.maximumRecommendedRepetitions}-${props.activeWorkoutExercise.exercise.maximumRecommendedRepetitions}`}
+            placeholder={`${props.activeWorkoutExercise.exercise.minimumRecommendedRepetitions}-${props.activeWorkoutExercise.exercise.maximumRecommendedRepetitions}`}
             onFocus={inputSelectAllOnFocus}
             onInput={inputForceInteger}
             onBlur={(e) => {
