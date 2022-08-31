@@ -25,7 +25,7 @@ const handler: NextApiHandler = async (req, res) => {
     return;
   }
   await persistSetComplete(userId, activeWorkoutExerciseId, setIndex, complete);
-  broadcastApiMutations(userId, [`/api/workout`]);
+  // await broadcastApiMutations(userId, [`/api/workout`]);
   res.end();
 };
 

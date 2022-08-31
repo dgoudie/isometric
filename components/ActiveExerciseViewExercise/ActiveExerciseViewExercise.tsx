@@ -11,6 +11,7 @@ import ActiveExerciseViewExerciseInstances from '../ActiveExerciseViewExerciseIn
 import ActiveExerciseViewExerciseSet from '../ActiveExerciseViewExerciseSet/ActiveExerciseViewExerciseSet';
 import { ActiveWorkoutExerciseSet } from '@prisma/client';
 import { ActiveWorkoutExerciseWithSetsAndDetails } from '../../types/ActiveWorkoutExercise';
+import { AfterExerciseTimerContext } from '../../providers/AfterExerciseTimer/AfterExerciseTimer';
 import ConfirmationBottomSheet from '../BottomSheet/components/ConfirmationBottomSheet/ConfirmationBottomSheet';
 import ExercisePickerBottomSheet from '../BottomSheet/components/ExercisePickerBottomSheet/ExercisePickerBottomSheet';
 import MuscleGroupTag from '../MuscleGroupTag/MuscleGroupTag';
@@ -44,6 +45,8 @@ export default function ActiveExerciseViewExercise({
     activeWorkoutExerciseUnmemoized
   );
 
+  const { show } = useContext(AfterExerciseTimerContext);
+
   const onSetCompleted = useCallback(
     (setOrderNumber: number, complete: boolean) => {
       const sets = activeWorkoutExercise.sets.map((set, index) => {
@@ -60,19 +63,37 @@ export default function ActiveExerciseViewExercise({
       if (sets.every((set) => set.complete)) {
         onCompleted({ ...activeWorkoutExercise, sets });
       } else {
+        if (complete) {
+          show();
+        }
         activeWorkoutExerciseChanged({ ...activeWorkoutExercise, sets });
       }
     },
-    [activeWorkoutExercise, activeWorkoutExerciseChanged, onCompleted]
+    [activeWorkoutExercise, activeWorkoutExerciseChanged, onCompleted, show]
   );
 
   const onSetChangedExceptCompleted = useCallback(
-    (set: ActiveWorkoutExerciseSet) => {
+    (
+      updatedSet: ActiveWorkoutExerciseSet,
+      isResistanceChange: boolean = false
+    ) => {
+      let sets = activeWorkoutExercise.sets.map((currentSet, index) =>
+        updatedSet.orderNumber === index ? updatedSet : currentSet
+      );
+      if (isResistanceChange) {
+        sets = sets.map((set) => {
+          if (
+            set.orderNumber > updatedSet.orderNumber &&
+            set.resistanceInPounds === null
+          ) {
+            set.resistanceInPounds = updatedSet.resistanceInPounds;
+          }
+          return set;
+        });
+      }
       activeWorkoutExerciseChanged({
         ...activeWorkoutExercise,
-        sets: activeWorkoutExercise.sets.map((currentSet, index) =>
-          set.orderNumber === index ? set : currentSet
-        ),
+        sets,
       });
     },
     [activeWorkoutExercise, activeWorkoutExerciseChanged]
@@ -188,7 +209,7 @@ export default function ActiveExerciseViewExercise({
                   exerciseIsActive={inView}
                   isActive={set.orderNumber === activeSetOrderNumber}
                   onChangedExceptCompleted={onSetChangedExceptCompleted}
-                  onCompleted={(complete) => {
+                  onCompleteToggled={(complete) => {
                     onSetCompleted(set.orderNumber, complete);
                   }}
                 />

@@ -29,7 +29,14 @@ export async function getFinishedWorkouts(
     include: {
       exercises: {
         include: {
-          sets: true,
+          sets: {
+            orderBy: {
+              orderNumber: 'asc',
+            },
+          },
+        },
+        orderBy: {
+          orderNumber: 'asc',
         },
       },
     },

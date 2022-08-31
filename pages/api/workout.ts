@@ -9,7 +9,7 @@ const handler: NextApiHandler = async (req, res) => {
     return;
   }
   const workout = await getFullActiveWorkout(userId);
-  res.send(workout);
+  res.send({ workout });
 };
 
 export default handler;

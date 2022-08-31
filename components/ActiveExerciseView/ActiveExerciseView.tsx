@@ -1,4 +1,10 @@
-import React, { useCallback, useEffect, useRef, useState } from 'react';
+import React, {
+  useCallback,
+  useContext,
+  useEffect,
+  useRef,
+  useState,
+} from 'react';
 
 import { ActiveExercise } from '../../pages/workout';
 import ActiveExerciseViewExercise from '../ActiveExerciseViewExercise/ActiveExerciseViewExercise';
@@ -88,6 +94,36 @@ export default function ActiveExerciseView({
     [activeWorkoutExercises]
   );
 
+  const {
+    isOpenAndMinimized: timerIsOpenAndMinimized,
+    cancel,
+    showAfterLastSet,
+    showAfterLastExercise,
+  } = useContext(AfterExerciseTimerContext);
+
+  const getNextNonCompleteExercise = useCallback(
+    (idToIgnore: string) => {
+      return activeWorkoutExercises.find(
+        (exercise) =>
+          exercise.id !== idToIgnore &&
+          !exercise.sets.every((set) => set.complete)
+      );
+    },
+    [activeWorkoutExercises]
+  );
+
+  const focusNextExercise = useCallback(
+    (idToIgnore: string) => {
+      const nextNonCompleteExercise = getNextNonCompleteExercise(idToIgnore);
+      !!nextNonCompleteExercise &&
+        focusedExerciseChanged({
+          index: nextNonCompleteExercise.orderNumber,
+          scrollIntoView: true,
+        });
+    },
+    [focusedExerciseChanged, getNextNonCompleteExercise]
+  );
+
   const onCompleted = useCallback(
     (activeWorkoutExercise: ActiveWorkoutExerciseWithSetsAndDetails) => {
       let nextNonCompleteExercise = activeWorkoutExercises.find(
@@ -96,22 +132,24 @@ export default function ActiveExerciseView({
           !exercise.sets.every((set) => set.complete)
       );
       if (!!nextNonCompleteExercise) {
-        focusedExerciseChanged({
-          index: nextNonCompleteExercise.orderNumber,
-          scrollIntoView: true,
-        });
+        showAfterLastSet(
+          nextNonCompleteExercise.exercise.name,
+          nextNonCompleteExercise.exercise.primaryMuscleGroup,
+          () => focusNextExercise(activeWorkoutExercise.id)
+        );
+      } else {
+        showAfterLastExercise();
       }
       activeWorkoutExerciseChanged(activeWorkoutExercise);
     },
     [
       activeWorkoutExerciseChanged,
       activeWorkoutExercises,
-      focusedExerciseChanged,
+      focusNextExercise,
+      showAfterLastExercise,
+      showAfterLastSet,
     ]
   );
-
-  const { isOpenAndMinimized: timerIsOpenAndMinimized, cancel } =
-    React.useContext(AfterExerciseTimerContext);
 
   useEffect(() => {
     return () => {

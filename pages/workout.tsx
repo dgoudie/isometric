@@ -118,14 +118,16 @@ const Workout: NextPageWithLayout = () => {
 
   const head = useHeadWithTitle('Workout');
 
-  const { data, error } =
-    useSWR<ActiveWorkoutWithExercisesWithExerciseWithSetsAndDetails>(
-      '/api/workout',
-      fetcher
-    );
+  const { data, error } = useSWR<{
+    workout: ActiveWorkoutWithExercisesWithExerciseWithSetsAndDetails;
+  }>('/api/workout', fetcher);
 
   if (error) throw error;
   if (!data) return <RouteLoader />;
+
+  if (!data.workout) {
+    return null;
+  }
 
   return (
     <div className={styles.root}>
@@ -140,7 +142,7 @@ const Workout: NextPageWithLayout = () => {
         </button>
 
         <div className={styles.headerExerciseNumber}>
-          {exerciseIndexInView + 1} / {data.exercises.length}
+          {exerciseIndexInView + 1} / {data.workout.exercises.length}
         </div>
         <button
           type='button'
@@ -152,13 +154,13 @@ const Workout: NextPageWithLayout = () => {
       </header>
       <Suspense fallback={<RouteLoader className={styles.loader} />}>
         <ActiveExerciseView
-          activeWorkoutExercises={data.exercises}
+          activeWorkoutExercises={data.workout.exercises}
           focusedExercise={activeExercise}
           focusedExerciseChanged={focusedExerciseChanged}
         />
       </Suspense>
       <div className={styles.paginator}>
-        {data.exercises.map((exercise, index) => (
+        {data.workout.exercises.map((exercise, index) => (
           <div
             key={index}
             className={classNames(
@@ -178,7 +180,7 @@ const Workout: NextPageWithLayout = () => {
       )}
       {showWorkoutExercisesBottomSheet && (
         <WorkoutExercisesBottomSheet
-          activeWorkoutExercises={data.exercises}
+          activeWorkoutExercises={data.workout.exercises}
           onResult={onExeciseSelected}
         />
       )}

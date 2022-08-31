@@ -8,6 +8,9 @@ const prisma = new PrismaClient();
 
 const DATA = [
   {
+    _id: {
+      $oid: '62477466d89882611045ba7e',
+    },
     userId: 'emdgoudie@gmail.com',
     dayNumber: 1,
     nickname: 'Push',
@@ -216,6 +219,7 @@ const DATA = [
         $numberLong: '1648855669793',
       },
     },
+    __v: 0,
     endedAt: {
       $date: {
         $numberLong: '1648855669793',
@@ -224,6 +228,9 @@ const DATA = [
     durationInSeconds: 5640,
   },
   {
+    _id: {
+      $oid: '624e0bc5b6045e14e73d01fa',
+    },
     userId: 'emdgoudie@gmail.com',
     dayNumber: 1,
     nickname: 'Push',
@@ -375,6 +382,7 @@ const DATA = [
         $numberLong: '1649288551612',
       },
     },
+    __v: 0,
     endedAt: {
       $date: {
         $numberLong: '1649288551612',
@@ -383,6 +391,9 @@ const DATA = [
     durationInSeconds: 6562,
   },
   {
+    _id: {
+      $oid: '624cb9b9b7dd295d67a21f59',
+    },
     userId: 'emdgoudie@gmail.com',
     dayNumber: 0,
     nickname: 'Pull',
@@ -624,6 +635,7 @@ const DATA = [
         $numberLong: '1649202234925',
       },
     },
+    __v: 0,
     endedAt: {
       $date: {
         $numberLong: '1649202234925',
@@ -632,6 +644,9 @@ const DATA = [
     durationInSeconds: 6785,
   },
   {
+    _id: {
+      $oid: '62462a78d89882611045b8f7',
+    },
     userId: 'emdgoudie@gmail.com',
     dayNumber: 0,
     nickname: 'Pull',
@@ -843,6 +858,7 @@ const DATA = [
         $numberLong: '1648772526408',
       },
     },
+    __v: 0,
     endedAt: {
       $date: {
         $numberLong: '1648772526408',
@@ -851,6 +867,9 @@ const DATA = [
     durationInSeconds: 6960,
   },
   {
+    _id: {
+      $oid: '6255fc1e91d4701ce5a4e92b',
+    },
     userId: 'emdgoudie@gmail.com',
     dayNumber: 0,
     nickname: 'Push',
@@ -1032,6 +1051,7 @@ const DATA = [
         $numberLong: '1649807826927',
       },
     },
+    __v: 0,
     endedAt: {
       $date: {
         $numberLong: '1649807826927',
@@ -1040,6 +1060,9 @@ const DATA = [
     durationInSeconds: 5556,
   },
   {
+    _id: {
+      $oid: '624b63cec2e95a1473b25a6f',
+    },
     userId: 'emdgoudie@gmail.com',
     dayNumber: 2,
     nickname: 'Legs',
@@ -1224,6 +1247,7 @@ const DATA = [
         $numberLong: '1649114070971',
       },
     },
+    __v: 0,
     endedAt: {
       $date: {
         $numberLong: '1649114070971',
@@ -1232,6 +1256,9 @@ const DATA = [
     durationInSeconds: 6152,
   },
   {
+    _id: {
+      $oid: '62589c513ffdb6e050766bbf',
+    },
     userId: 'emdgoudie@gmail.com',
     dayNumber: 2,
     nickname: 'Legs',
@@ -1416,6 +1443,7 @@ const DATA = [
         $numberLong: '1649979783784',
       },
     },
+    __v: 0,
     endedAt: {
       $date: {
         $numberLong: '1649979783784',
@@ -1424,6 +1452,9 @@ const DATA = [
     durationInSeconds: 5429,
   },
   {
+    _id: {
+      $oid: '6254ab5191d4701ce5a4e619',
+    },
     userId: 'emdgoudie@gmail.com',
     dayNumber: 2,
     nickname: 'Pull',
@@ -1634,6 +1665,7 @@ const DATA = [
         $numberLong: '1649721118061',
       },
     },
+    __v: 0,
     endedAt: {
       $date: {
         $numberLong: '1649721118061',
@@ -1642,6 +1674,9 @@ const DATA = [
     durationInSeconds: 5068,
   },
   {
+    _id: {
+      $oid: '62574e353ffdb6e050766919',
+    },
     userId: 'emdgoudie@gmail.com',
     dayNumber: 1,
     nickname: 'Pull',
@@ -1884,6 +1919,7 @@ const DATA = [
         $numberLong: '1649894529480',
       },
     },
+    __v: 0,
     endedAt: {
       $date: {
         $numberLong: '1649894529480',
@@ -1892,6 +1928,9 @@ const DATA = [
     durationInSeconds: 5707,
   },
   {
+    _id: {
+      $oid: '625dd89e67f67b3dbbe5dca4',
+    },
     userId: 'emdgoudie@gmail.com',
     dayNumber: 0,
     nickname: 'Push',
@@ -2110,6 +2149,7 @@ const DATA = [
         $numberLong: '1650324288112',
       },
     },
+    __v: 0,
     endedAt: {
       $date: {
         $numberLong: '1650324288112',
@@ -2118,6 +2158,9 @@ const DATA = [
     durationInSeconds: 6817,
   },
   {
+    _id: {
+      $oid: '625f51180a0f7161a8587aec',
+    },
     userId: 'emdgoudie@gmail.com',
     dayNumber: 1,
     nickname: 'Pull',
@@ -2211,6 +2254,7 @@ const DATA = [
         $numberLong: '1650413874380',
       },
     },
+    __v: 0,
     endedAt: {
       $date: {
         $numberLong: '1650413874380',
@@ -2219,6 +2263,9 @@ const DATA = [
     durationInSeconds: 25,
   },
   {
+    _id: {
+      $oid: '626098c7779f92d9642c7c18',
+    },
     userId: 'emdgoudie@gmail.com',
     dayNumber: 2,
     nickname: 'Pull',
@@ -2434,6 +2481,7 @@ const DATA = [
         $numberLong: '1650504361924',
       },
     },
+    __v: 0,
     endedAt: {
       $date: {
         $numberLong: '1650504361924',
@@ -2442,6 +2490,9 @@ const DATA = [
     durationInSeconds: 6626,
   },
   {
+    _id: {
+      $oid: '6261d1fd779f92d9642c7e8e',
+    },
     userId: 'emdgoudie@gmail.com',
     dayNumber: 0,
     nickname: 'Legs',
@@ -2625,6 +2676,7 @@ const DATA = [
         $numberLong: '1650582650315',
       },
     },
+    __v: 0,
     endedAt: {
       $date: {
         $numberLong: '1650582650315',
@@ -2633,6 +2685,9 @@ const DATA = [
     durationInSeconds: 4732,
   },
   {
+    _id: {
+      $oid: '62632e260c30ca3ae22fb2b1',
+    },
     userId: 'emdgoudie@gmail.com',
     dayNumber: 1,
     nickname: 'Push',
@@ -2832,6 +2887,7 @@ const DATA = [
         $numberLong: '1650671911381',
       },
     },
+    __v: 0,
     endedAt: {
       $date: {
         $numberLong: '1650671911381',
@@ -2840,6 +2896,9 @@ const DATA = [
     durationInSeconds: 4864,
   },
   {
+    _id: {
+      $oid: '62671946afaddbe8f840c725',
+    },
     userId: 'emdgoudie@gmail.com',
     dayNumber: 2,
     nickname: 'Pull',
@@ -3025,6 +3084,7 @@ const DATA = [
         $numberLong: '1650929528239',
       },
     },
+    __v: 0,
     endedAt: {
       $date: {
         $numberLong: '1650929528239',
@@ -3033,6 +3093,9 @@ const DATA = [
     durationInSeconds: 5681,
   },
   {
+    _id: {
+      $oid: '626868dfafaddbe8f840ca8c',
+    },
     userId: 'emdgoudie@gmail.com',
     dayNumber: 3,
     nickname: 'Legs',
@@ -3244,6 +3307,7 @@ const DATA = [
         $numberLong: '1651017086241',
       },
     },
+    __v: 0,
     endedAt: {
       $date: {
         $numberLong: '1651017086241',
@@ -3252,6 +3316,9 @@ const DATA = [
     durationInSeconds: 7326,
   },
   {
+    _id: {
+      $oid: '6269d032afaddbe8f840ce67',
+    },
     userId: 'emdgoudie@gmail.com',
     dayNumber: 4,
     nickname: 'Push',
@@ -3383,6 +3450,7 @@ const DATA = [
         $numberLong: '1651106622440',
       },
     },
+    __v: 0,
     endedAt: {
       $date: {
         $numberLong: '1651106622440',
@@ -3391,6 +3459,9 @@ const DATA = [
     durationInSeconds: 4876,
   },
   {
+    _id: {
+      $oid: '626b0bafafaddbe8f840d175',
+    },
     userId: 'emdgoudie@gmail.com',
     dayNumber: 5,
     nickname: 'Pull',
@@ -3614,6 +3685,7 @@ const DATA = [
         $numberLong: '1651188035776',
       },
     },
+    __v: 0,
     endedAt: {
       $date: {
         $numberLong: '1651188035776',
@@ -3622,6 +3694,9 @@ const DATA = [
     durationInSeconds: 5524,
   },
   {
+    _id: {
+      $oid: '6270533913694d51f7aab6b1',
+    },
     userId: 'emdgoudie@gmail.com',
     dayNumber: 0,
     nickname: 'Push',
@@ -3783,6 +3858,7 @@ const DATA = [
         $numberLong: '1651538028058',
       },
     },
+    __v: 0,
     endedAt: {
       $date: {
         $numberLong: '1651538028058',
@@ -3791,6 +3867,9 @@ const DATA = [
     durationInSeconds: 8045,
   },
   {
+    _id: {
+      $oid: '62719f4313694d51f7aab8ac',
+    },
     userId: 'emdgoudie@gmail.com',
     dayNumber: 1,
     nickname: 'Pull',
@@ -4017,6 +4096,7 @@ const DATA = [
         $numberLong: '1651618863690',
       },
     },
+    __v: 0,
     endedAt: {
       $date: {
         $numberLong: '1651618863689',
@@ -4025,6 +4105,9 @@ const DATA = [
     durationInSeconds: 5356,
   },
   {
+    _id: {
+      $oid: '6272fc5213694d51f7aabaaf',
+    },
     userId: 'emdgoudie@gmail.com',
     dayNumber: 2,
     nickname: 'Legs',
@@ -4239,6 +4322,7 @@ const DATA = [
         $numberLong: '1651709446734',
       },
     },
+    __v: 0,
     endedAt: {
       $date: {
         $numberLong: '1651709446733',
@@ -4247,6 +4331,9 @@ const DATA = [
     durationInSeconds: 6580,
   },
   {
+    _id: {
+      $oid: '6275b15613694d51f7aabee4',
+    },
     userId: 'emdgoudie@gmail.com',
     dayNumber: 3,
     nickname: 'Push',
@@ -4388,6 +4475,7 @@ const DATA = [
         $numberLong: '1651929559458',
       },
     },
+    __v: 0,
     endedAt: {
       $date: {
         $numberLong: '1651929559458',
@@ -4396,6 +4484,9 @@ const DATA = [
     durationInSeconds: 2639,
   },
   {
+    _id: {
+      $oid: '62798df513694d51f7aac1dd',
+    },
     userId: 'emdgoudie@gmail.com',
     dayNumber: 4,
     nickname: 'Pull',
@@ -4611,6 +4702,7 @@ const DATA = [
         $numberLong: '1652142726816',
       },
     },
+    __v: 0,
     endedAt: {
       $date: {
         $numberLong: '1652142726815',
@@ -4619,6 +4711,9 @@ const DATA = [
     durationInSeconds: 9361,
   },
   {
+    _id: {
+      $oid: '627af1a613694d51f7aac4d7',
+    },
     userId: 'emdgoudie@gmail.com',
     dayNumber: 5,
     nickname: 'Legs',
@@ -4814,6 +4909,7 @@ const DATA = [
         $numberLong: '1652229263589',
       },
     },
+    __v: 0,
     endedAt: {
       $date: {
         $numberLong: '1652229263589',
@@ -4822,6 +4918,9 @@ const DATA = [
     durationInSeconds: 4841,
   },
   {
+    _id: {
+      $oid: '627d7d1413694d51f7aac77e',
+    },
     userId: 'emdgoudie@gmail.com',
     dayNumber: 0,
     nickname: 'Push',
@@ -4953,6 +5052,7 @@ const DATA = [
         $numberLong: '1652395081772',
       },
     },
+    __v: 0,
     endedAt: {
       $date: {
         $numberLong: '1652395081772',
@@ -4961,6 +5061,9 @@ const DATA = [
     durationInSeconds: 3892,
   },
   {
+    _id: {
+      $oid: '6287c1bc13694d51f7aaca35',
+    },
     userId: 'emdgoudie@gmail.com',
     dayNumber: 1,
     nickname: 'Push',
@@ -5151,6 +5254,7 @@ const DATA = [
         $numberLong: '1653093149043',
       },
     },
+    __v: 0,
     endedAt: {
       $date: {
         $numberLong: '1653093149043',
@@ -5159,6 +5263,9 @@ const DATA = [
     durationInSeconds: 4444,
   },
   {
+    _id: {
+      $oid: '628c0fa513694d51f7aacc3f',
+    },
     userId: 'emdgoudie@gmail.com',
     dayNumber: 2,
     nickname: 'Push',
@@ -5289,6 +5396,7 @@ const DATA = [
         $numberLong: '1653350848672',
       },
     },
+    __v: 0,
     endedAt: {
       $date: {
         $numberLong: '1653350848672',
@@ -5297,6 +5405,9 @@ const DATA = [
     durationInSeconds: 4634,
   },
   {
+    _id: {
+      $oid: '628d66ea13694d51f7aacdb9',
+    },
     userId: 'emdgoudie@gmail.com',
     dayNumber: 3,
     nickname: 'Legs',
@@ -5481,6 +5592,7 @@ const DATA = [
         $numberLong: '1653437602615',
       },
     },
+    __v: 0,
     endedAt: {
       $date: {
         $numberLong: '1653437602615',
@@ -5489,6 +5601,9 @@ const DATA = [
     durationInSeconds: 3512,
   },
   {
+    _id: {
+      $oid: '628ffeb913694d51f7aacf66',
+    },
     userId: 'emdgoudie@gmail.com',
     dayNumber: 4,
     nickname: 'Push',
@@ -5627,6 +5742,7 @@ const DATA = [
         $numberLong: '1653608516253',
       },
     },
+    __v: 0,
     endedAt: {
       $date: {
         $numberLong: '1653608516253',
@@ -5635,6 +5751,9 @@ const DATA = [
     durationInSeconds: 4452,
   },
   {
+    _id: {
+      $oid: '62915b4f13694d51f7aad0a5',
+    },
     userId: 'emdgoudie@gmail.com',
     dayNumber: 5,
     nickname: 'Pull',
@@ -5819,6 +5938,7 @@ const DATA = [
         $numberLong: '1653702106102',
       },
     },
+    __v: 0,
     endedAt: {
       $date: {
         $numberLong: '1653702106102',
@@ -5827,6 +5947,9 @@ const DATA = [
     durationInSeconds: 6074,
   },
   {
+    _id: {
+      $oid: '62968a7813694d51f7aad312',
+    },
     userId: 'emdgoudie@gmail.com',
     dayNumber: 0,
     nickname: 'Push',
@@ -5926,6 +6049,7 @@ const DATA = [
         $numberLong: '1654119613435',
       },
     },
+    __v: 0,
     endedAt: {
       $date: {
         $numberLong: '1654119613435',
@@ -5934,6 +6058,9 @@ const DATA = [
     durationInSeconds: 3069,
   },
   {
+    _id: {
+      $oid: '6299405013694d51f7aad4d2',
+    },
     userId: 'emdgoudie@gmail.com',
     dayNumber: 1,
     nickname: 'Legs',
@@ -6069,6 +6196,7 @@ const DATA = [
         $numberLong: '1654213654611',
       },
     },
+    __v: 0,
     endedAt: {
       $date: {
         $numberLong: '1654213654611',
@@ -6077,6 +6205,9 @@ const DATA = [
     durationInSeconds: 3014,
   },
   {
+    _id: {
+      $oid: '629e774b13694d51f7aad670',
+    },
     userId: 'emdgoudie@gmail.com',
     dayNumber: 2,
     nickname: 'Push',
@@ -6237,6 +6368,7 @@ const DATA = [
         $numberLong: '1654559308031',
       },
     },
+    __v: 0,
     endedAt: {
       $date: {
         $numberLong: '1654559308031',
@@ -6245,6 +6377,9 @@ const DATA = [
     durationInSeconds: 6912,
   },
   {
+    _id: {
+      $oid: '629fc7b813694d51f7aad86e',
+    },
     userId: 'emdgoudie@gmail.com',
     dayNumber: 3,
     nickname: 'Pull',
@@ -6400,6 +6535,7 @@ const DATA = [
         $numberLong: '1654643949743',
       },
     },
+    __v: 0,
     endedAt: {
       $date: {
         $numberLong: '1654643949743',
@@ -6408,6 +6544,9 @@ const DATA = [
     durationInSeconds: 5429,
   },
   {
+    _id: {
+      $oid: '62b0e6b1d6064cd2cc2de826',
+    },
     userId: 'emdgoudie@gmail.com',
     dayNumber: 4,
     nickname: 'Push',
@@ -6506,6 +6645,7 @@ const DATA = [
         $numberLong: '1655765265770',
       },
     },
+    __v: 0,
     endedAt: {
       $date: {
         $numberLong: '1655765265769',
@@ -6514,6 +6654,9 @@ const DATA = [
     durationInSeconds: 4704,
   },
   {
+    _id: {
+      $oid: '62b4dd93d6064cd2cc2de8e6',
+    },
     userId: 'emdgoudie@gmail.com',
     dayNumber: 5,
     nickname: 'Push',
@@ -6705,6 +6848,7 @@ const DATA = [
         $numberLong: '1656026657357',
       },
     },
+    __v: 0,
     endedAt: {
       $date: {
         $numberLong: '1656026657357',
@@ -6713,6 +6857,9 @@ const DATA = [
     durationInSeconds: 6142,
   },
   {
+    _id: {
+      $oid: '62ba2788d6064cd2cc2dead9',
+    },
     userId: 'emdgoudie@gmail.com',
     dayNumber: 0,
     nickname: 'Pull',
@@ -6805,6 +6952,7 @@ const DATA = [
         $numberLong: '1656371768280',
       },
     },
+    __v: 0,
     endedAt: {
       $date: {
         $numberLong: '1656371768280',
@@ -6813,6 +6961,9 @@ const DATA = [
     durationInSeconds: 4784,
   },
   {
+    _id: {
+      $oid: '62bccb43d6064cd2cc2deb83',
+    },
     userId: 'emdgoudie@gmail.com',
     dayNumber: 1,
     nickname: 'Legs',
@@ -6966,6 +7117,7 @@ const DATA = [
         $numberLong: '1656627924915',
       },
     },
+    __v: 0,
     endedAt: {
       $date: {
         $numberLong: '1656627924915',
@@ -6974,6 +7126,9 @@ const DATA = [
     durationInSeconds: 6431,
   },
   {
+    _id: {
+      $oid: '62c89c12d6064cd2cc2dedc7',
+    },
     userId: 'emdgoudie@gmail.com',
     dayNumber: 2,
     nickname: 'Push',
@@ -7085,6 +7240,7 @@ const DATA = [
         $numberLong: '1657318337013',
       },
     },
+    __v: 0,
     endedAt: {
       $date: {
         $numberLong: '1657318337013',
@@ -7093,6 +7249,9 @@ const DATA = [
     durationInSeconds: 3522,
   },
   {
+    _id: {
+      $oid: '62d5d6d7d6064cd2cc2df2c8',
+    },
     userId: 'emdgoudie@gmail.com',
     dayNumber: 3,
     nickname: 'Push',
@@ -7194,6 +7353,7 @@ const DATA = [
         $numberLong: '1658268445771',
       },
     },
+    __v: 0,
     endedAt: {
       $date: {
         $numberLong: '1658268445771',
@@ -7202,6 +7362,9 @@ const DATA = [
     durationInSeconds: 6724,
   },
   {
+    _id: {
+      $oid: '62d72b21d6064cd2cc2df3dd',
+    },
     userId: 'emdgoudie@gmail.com',
     dayNumber: 4,
     nickname: 'Pull',
@@ -7357,6 +7520,7 @@ const DATA = [
         $numberLong: '1658274740763',
       },
     },
+    __v: 0,
     endedAt: {
       $date: {
         $numberLong: '1658274740763',
@@ -7365,6 +7529,9 @@ const DATA = [
     durationInSeconds: 6291,
   },
   {
+    _id: {
+      $oid: '62d87d3fd6064cd2cc2df50d',
+    },
     userId: 'emdgoudie@gmail.com',
     dayNumber: 5,
     nickname: 'Legs',
@@ -7498,6 +7665,7 @@ const DATA = [
         $numberLong: '1658442233410',
       },
     },
+    __v: 0,
     endedAt: {
       $date: {
         $numberLong: '1658442233410',
@@ -7506,6 +7674,9 @@ const DATA = [
     durationInSeconds: 5783,
   },
   {
+    _id: {
+      $oid: '62d9d210d6064cd2cc2df616',
+    },
     userId: 'emdgoudie@gmail.com',
     dayNumber: 0,
     nickname: 'Push',
@@ -7607,6 +7778,7 @@ const DATA = [
         $numberLong: '1658445804457',
       },
     },
+    __v: 0,
     endedAt: {
       $date: {
         $numberLong: '1658445804457',
@@ -7615,6 +7787,9 @@ const DATA = [
     durationInSeconds: 3547,
   },
   {
+    _id: {
+      $oid: '62e0727807f8af9eadf908af',
+    },
     userId: 'emdgoudie@gmail.com',
     dayNumber: 1,
     nickname: 'Pull',
@@ -7710,6 +7885,7 @@ const DATA = [
         $numberLong: '1658928123191',
       },
     },
+    __v: 0,
     endedAt: {
       $date: {
         $numberLong: '1658928123191',
@@ -7718,6 +7894,9 @@ const DATA = [
     durationInSeconds: 4657,
   },
   {
+    _id: {
+      $oid: '62e84ee7ccd3ae1889308da8',
+    },
     userId: 'emdgoudie@gmail.com',
     dayNumber: 2,
     nickname: 'Push',
@@ -7906,6 +8085,7 @@ const DATA = [
         $numberLong: '1659396713065',
       },
     },
+    __v: 0,
     endedAt: {
       $date: {
         $numberLong: '1659396713065',
@@ -7914,6 +8094,9 @@ const DATA = [
     durationInSeconds: 4993,
   },
   {
+    _id: {
+      $oid: '62e99df3ccd3ae1889309127',
+    },
     userId: 'emdgoudie@gmail.com',
     dayNumber: 3,
     nickname: 'Pull',
@@ -8039,6 +8222,7 @@ const DATA = [
         $numberLong: '1659482634664',
       },
     },
+    __v: 0,
     endedAt: {
       $date: {
         $numberLong: '1659482634664',
@@ -8047,6 +8231,9 @@ const DATA = [
     durationInSeconds: 5143,
   },
   {
+    _id: {
+      $oid: '62eaf4b3ccd3ae1889309269',
+    },
     userId: 'emdgoudie@gmail.com',
     dayNumber: 4,
     nickname: 'Legs',
@@ -8261,6 +8448,7 @@ const DATA = [
         $numberLong: '1659571741925',
       },
     },
+    __v: 0,
     endedAt: {
       $date: {
         $numberLong: '1659571741925',
@@ -8269,6 +8457,9 @@ const DATA = [
     durationInSeconds: 6506,
   },
   {
+    _id: {
+      $oid: '62ed8632ccd3ae188930954d',
+    },
     userId: 'emdgoudie@gmail.com',
     dayNumber: 5,
     nickname: 'Push',
@@ -8460,6 +8651,7 @@ const DATA = [
         $numberLong: '1659740179817',
       },
     },
+    __v: 0,
     endedAt: {
       $date: {
         $numberLong: '1659740179816',
@@ -8468,6 +8660,9 @@ const DATA = [
     durationInSeconds: 6625,
   },
   {
+    _id: {
+      $oid: '62f18663ccd3ae1889309931',
+    },
     userId: 'emdgoudie@gmail.com',
     dayNumber: 0,
     nickname: 'Pull',
@@ -8653,6 +8848,7 @@ const DATA = [
         $numberLong: '1660001289973',
       },
     },
+    __v: 0,
     endedAt: {
       $date: {
         $numberLong: '1660001289973',
@@ -8661,6 +8857,9 @@ const DATA = [
     durationInSeconds: 5542,
   },
   {
+    _id: {
+      $oid: '62f2dd00ccd3ae1889309be1',
+    },
     userId: 'emdgoudie@gmail.com',
     dayNumber: 1,
     nickname: 'Legs',
@@ -8755,6 +8954,7 @@ const DATA = [
         $numberLong: '1660087116924',
       },
     },
+    __v: 0,
     endedAt: {
       $date: {
         $numberLong: '1660087116924',
@@ -8763,6 +8963,9 @@ const DATA = [
     durationInSeconds: 3660,
   },
   {
+    _id: {
+      $oid: '62f4268cccd3ae1889309ca5',
+    },
     userId: 'emdgoudie@gmail.com',
     dayNumber: 2,
     nickname: 'Push',
@@ -8984,6 +9187,7 @@ const DATA = [
         $numberLong: '1660174747006',
       },
     },
+    __v: 0,
     endedAt: {
       $date: {
         $numberLong: '1660174747005',
@@ -8992,6 +9196,9 @@ const DATA = [
     durationInSeconds: 6840,
   },
   {
+    _id: {
+      $oid: '62f6cf8788b9133dee0f6b85',
+    },
     userId: 'emdgoudie@gmail.com',
     dayNumber: 3,
     nickname: 'Pull',
@@ -9233,6 +9440,7 @@ const DATA = [
         $numberLong: '1660349172372',
       },
     },
+    __v: 0,
     endedAt: {
       $date: {
         $numberLong: '1660349172372',
@@ -9241,6 +9449,9 @@ const DATA = [
     durationInSeconds: 7020,
   },
   {
+    _id: {
+      $oid: '62fabe8688b9133dee0f708f',
+    },
     userId: 'emdgoudie@gmail.com',
     dayNumber: 4,
     nickname: 'Legs',
@@ -9455,6 +9666,7 @@ const DATA = [
         $numberLong: '1660606394663',
       },
     },
+    __v: 0,
     endedAt: {
       $date: {
         $numberLong: '1660606394662',
@@ -9463,6 +9675,9 @@ const DATA = [
     durationInSeconds: 6451,
   },
   {
+    _id: {
+      $oid: '62fc0dfa88b9133dee0f73ce',
+    },
     userId: 'emdgoudie@gmail.com',
     dayNumber: 5,
     nickname: 'Push',
@@ -9651,6 +9866,7 @@ const DATA = [
         $numberLong: '1660692311907',
       },
     },
+    __v: 0,
     endedAt: {
       $date: {
         $numberLong: '1660692311907',
@@ -9659,6 +9875,9 @@ const DATA = [
     durationInSeconds: 6493,
   },
   {
+    _id: {
+      $oid: '62fd6c8388b9133dee0f7635',
+    },
     userId: 'emdgoudie@gmail.com',
     dayNumber: 0,
     nickname: 'Pull',
@@ -9843,6 +10062,7 @@ const DATA = [
         $numberLong: '1660782720694',
       },
     },
+    __v: 0,
     endedAt: {
       $date: {
         $numberLong: '1660782720694',
@@ -9851,6 +10071,9 @@ const DATA = [
     durationInSeconds: 6647,
   },
   {
+    _id: {
+      $oid: '62feb3fadd23293383d4d9aa',
+    },
     userId: 'emdgoudie@gmail.com',
     dayNumber: 1,
     nickname: 'Legs',
@@ -9975,6 +10198,7 @@ const DATA = [
         $numberLong: '1660864318501',
       },
     },
+    __v: 0,
     endedAt: {
       $date: {
         $numberLong: '1660864318501',
@@ -9983,6 +10207,9 @@ const DATA = [
     durationInSeconds: 4931,
   },
   {
+    _id: {
+      $oid: '63000ad6dd23293383d4dcd4',
+    },
     userId: 'emdgoudie@gmail.com',
     dayNumber: 2,
     nickname: 'Push',
@@ -10085,6 +10312,7 @@ const DATA = [
         $numberLong: '1660950245991',
       },
     },
+    __v: 0,
     endedAt: {
       $date: {
         $numberLong: '1660950245991',
@@ -10093,6 +10321,9 @@ const DATA = [
     durationInSeconds: 3087,
   },
   {
+    _id: {
+      $oid: '6303fa88dd23293383d4df24',
+    },
     userId: 'emdgoudie@gmail.com',
     dayNumber: 3,
     nickname: 'Pull',
@@ -10248,12 +10479,179 @@ const DATA = [
         $numberLong: '1661212717240',
       },
     },
+    __v: 0,
     endedAt: {
       $date: {
         $numberLong: '1661212717240',
       },
     },
     durationInSeconds: 6542,
+  },
+  {
+    _id: {
+      $oid: '630d3ebedd23293383d4e956',
+    },
+    userId: 'emdgoudie@gmail.com',
+    dayNumber: 4,
+    nickname: 'Legs',
+    exercises: [
+      {
+        _id: {
+          $oid: '622cf5ac671ab3d12676b76f',
+        },
+        name: 'Running',
+        exerciseType: 'timed',
+        primaryMuscleGroup: 'cardio',
+        performedAt: {
+          $date: {
+            $numberLong: '1661812414894',
+          },
+        },
+        sets: [
+          {
+            timeInSeconds: 900,
+            complete: true,
+          },
+        ],
+      },
+      {
+        _id: {
+          $oid: '622cf5ac671ab3d12676b74c',
+        },
+        name: 'Barbell Back Squat',
+        exerciseType: 'weighted',
+        primaryMuscleGroup: 'quads',
+        performedAt: {
+          $date: {
+            $numberLong: '1661812414894',
+          },
+        },
+        sets: [
+          {
+            resistanceInPounds: 135,
+            repetitions: 10,
+            complete: true,
+          },
+          {
+            resistanceInPounds: 135,
+            repetitions: 10,
+            complete: true,
+          },
+          {
+            resistanceInPounds: 135,
+            repetitions: 10,
+            complete: true,
+          },
+        ],
+      },
+      {
+        _id: {
+          $oid: '622cf5ac671ab3d12676b760',
+        },
+        name: 'Lying Single Leg Curl Machine',
+        exerciseType: 'weighted',
+        primaryMuscleGroup: 'hamstrings',
+        performedAt: {
+          $date: {
+            $numberLong: '1661812414894',
+          },
+        },
+        sets: [
+          {
+            resistanceInPounds: 65,
+            repetitions: 15,
+            complete: true,
+          },
+          {
+            resistanceInPounds: 65,
+            repetitions: 15,
+            complete: true,
+          },
+          {
+            resistanceInPounds: 65,
+            repetitions: 15,
+            complete: true,
+          },
+        ],
+      },
+      {
+        _id: {
+          $oid: '622cf5ac671ab3d12676b76c',
+        },
+        name: 'Seated Calf Raise Machine',
+        exerciseType: 'weighted',
+        primaryMuscleGroup: 'calves',
+        performedAt: {
+          $date: {
+            $numberLong: '1661812414894',
+          },
+        },
+        sets: [
+          {
+            complete: true,
+            resistanceInPounds: 220,
+            repetitions: 15,
+          },
+          {
+            complete: true,
+            resistanceInPounds: 220,
+            repetitions: 15,
+          },
+          {
+            complete: true,
+            resistanceInPounds: 220,
+            repetitions: 15,
+          },
+        ],
+      },
+      {
+        _id: {
+          $oid: '622cf5ac671ab3d12676b749',
+        },
+        name: 'Standing Dumbbell Side Bend',
+        exerciseType: 'weighted',
+        primaryMuscleGroup: 'obliques',
+        performedAt: {
+          $date: {
+            $numberLong: '1661812414894',
+          },
+        },
+        sets: [
+          {
+            complete: true,
+            resistanceInPounds: 65,
+            repetitions: 15,
+          },
+          {
+            complete: true,
+            resistanceInPounds: 65,
+            repetitions: 15,
+          },
+          {
+            complete: true,
+            resistanceInPounds: 65,
+            repetitions: 15,
+          },
+        ],
+      },
+    ],
+    createdAt: {
+      $date: {
+        $numberLong: '1661812414898',
+      },
+    },
+    updatedAt: {
+      $date: {
+        $numberLong: '1661835016278',
+      },
+    },
+    __v: 0,
+    endedAt: {
+      $date: {
+        $numberLong: '1661835016277',
+      },
+    },
+    durationInSeconds: 6622,
   },
 ];
 

@@ -35,7 +35,7 @@ const handler: NextApiHandler = async (req, res) => {
     setIndex,
     repetitions
   );
-  broadcastApiMutations(userId, [`/api/workout`]);
+  // await broadcastApiMutations(userId, [`/api/workout`]);
   res.end();
 };
 

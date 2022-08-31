@@ -14,7 +14,7 @@ export default function ThreeDotLoader({ className }: Props) {
   useEffect(() => {
     const interval = setTimeout(
       () => setCounter(counter === 3 ? 1 : counter + 1),
-      secondsToMilliseconds(0.5)
+      secondsToMilliseconds(0.25)
     );
     return () => {
       clearTimeout(interval);

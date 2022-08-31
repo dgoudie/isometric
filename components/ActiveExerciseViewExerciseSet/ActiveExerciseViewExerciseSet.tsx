@@ -21,8 +21,11 @@ interface Props {
   set: ActiveWorkoutExerciseSet;
   exerciseIsActive: boolean;
   isActive: boolean;
-  onChangedExceptCompleted: (set: ActiveWorkoutExerciseSet) => void;
-  onCompleted: (complete: boolean) => void;
+  onChangedExceptCompleted: (
+    set: ActiveWorkoutExerciseSet,
+    isResistanceChange?: boolean
+  ) => void;
+  onCompleteToggled: (complete: boolean) => void;
 }
 export default function ActiveExerciseViewExerciseSet(props: Props) {
   let children = <WeightedSet {...props} />;
@@ -91,10 +94,13 @@ function WeightedSet(props: Props) {
                 props.set.orderNumber,
                 resistanceInPounds
               );
-              props.onChangedExceptCompleted({
-                ...props.set,
-                resistanceInPounds,
-              });
+              props.onChangedExceptCompleted(
+                {
+                  ...props.set,
+                  resistanceInPounds,
+                },
+                true
+              );
             }}
           />
         </div>
@@ -129,7 +135,7 @@ function WeightedSet(props: Props) {
         disabled={!props.isActive && !props.set.complete}
         type='button'
         onClick={() => {
-          props.onCompleted(!props.set.complete);
+          props.onCompleteToggled(!props.set.complete);
           persistSetComplete(
             props.activeWorkoutExercise.id,
             props.set.orderNumber,
@@ -148,7 +154,7 @@ function TimedSet({
   activeWorkoutExercise,
   set,
   isActive,
-  onCompleted,
+  onCompleteToggled: onCompleted,
 }: Props) {
   const { persistSetComplete } = useContext(WorkoutContext);
 
@@ -304,7 +310,7 @@ function RepBasedSet(props: Props) {
             props.set.orderNumber,
             !props.set.complete
           );
-          props.onCompleted(!props.set.complete);
+          props.onCompleteToggled(!props.set.complete);
         }}
         disabled={!props.isActive && !props.set.complete}
         className={classNames(styles.setButton, styles.setButtonCompleted)}
