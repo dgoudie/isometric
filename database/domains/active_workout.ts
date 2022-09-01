@@ -475,8 +475,17 @@ export async function getWorkoutInstancesByExerciseName(
       },
     },
     include: {
-      sets: true,
+      sets: {
+        orderBy: {
+          orderNumber: 'asc',
+        },
+      },
       finishedWorkout: true,
+    },
+    orderBy: {
+      finishedWorkout: {
+        startedAt: 'desc',
+      },
     },
     take,
     skip,
