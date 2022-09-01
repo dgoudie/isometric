@@ -18,6 +18,7 @@ import styles from './Landing.module.scss';
 import { useHeadWithTitle } from '../utils/use-head-with-title';
 import useOneTapSignin from '../utils/use-google-one-tap-signin';
 import { useRouter } from 'next/router';
+import { useSWRConfig } from 'swr';
 
 interface SellingPoint {
   iconClass: string;

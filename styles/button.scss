@@ -37,9 +37,8 @@
   }
 
   &.danger {
-    background-color: var(--error);
-    color: white;
-    border-color: var(--error);
+    border: 2px solid var(--error);
+    color: var(--error);
   }
 
   &:disabled {

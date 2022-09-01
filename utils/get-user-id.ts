@@ -8,9 +8,6 @@ export const getUserId = async (
   res: GetServerSidePropsContext['res']
 ) => {
   let userId: string | null = null;
-  // if (process.env.NODE_ENV === 'development') {
-  //   userId = process.env.USER_ID ?? null;
-  // }
   const session = await unstable_getServerSession(req, res, nextAuthOptions);
   if (!!session) {
     const user = await prisma.user.findUnique({

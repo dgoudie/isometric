@@ -30,6 +30,11 @@ const nextAuthOptions: NextAuthOptions = {
       return verified;
     },
   },
+  events: {
+    signOut() {
+      setTimeout(() => location.reload());
+    },
+  },
   pages: {
     signIn: '/auth/signin',
   },

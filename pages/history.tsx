@@ -2,6 +2,7 @@ import { formatDistance, formatDuration, intervalToDuration } from 'date-fns';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 
 import AppBarWithAppHeaderLayout from '../layouts/AppBarWithAppHeaderLayout/AppBarWithAppHeaderLayout';
+import ConfirmationBottomSheet from '../components/BottomSheet/components/ConfirmationBottomSheet/ConfirmationBottomSheet';
 import { FinishedWorkoutWithExerciseWithSets } from '../types/FinishedWorkout';
 import InfiniteScroll from '../components/InfiniteScroll/InfiniteScroll';
 import MuscleGroupTag from '../components/MuscleGroupTag/MuscleGroupTag';
@@ -32,7 +33,7 @@ const History: NextPageWithLayout = ({}) => {
 
   const fetcher = useFetchJSONWith403Redirect();
 
-  const { data, error } = useSWR<FinishedWorkoutWithExerciseWithSets[]>(
+  const { data, error, mutate } = useSWR<FinishedWorkoutWithExerciseWithSets[]>(
     '/api/workouts?page=1',
     fetcher
   );
@@ -47,9 +48,9 @@ const History: NextPageWithLayout = ({}) => {
 
   const items = useMemo(() => {
     return workouts?.map((workout) => (
-      <Workout workout={workout} key={workout.id} />
+      <Workout workout={workout} key={workout.id} reload={mutate} />
     ));
-  }, [workouts]);
+  }, [mutate, workouts]);
 
   const loadMore = useCallback(async () => {
     const params = new URLSearchParams();
@@ -97,9 +98,10 @@ const History: NextPageWithLayout = ({}) => {
 
 interface WorkoutProps {
   workout: FinishedWorkoutWithExerciseWithSets;
+  reload: () => void;
 }
 
-function Workout({ workout }: WorkoutProps) {
+function Workout({ workout, reload }: WorkoutProps) {
   const howLongAgo = useMemo(
     () =>
       formatDistance(new Date(workout.startedAt), new Date(), {
@@ -142,35 +144,67 @@ function Workout({ workout }: WorkoutProps) {
 
   const [open, setOpen] = useState(false);
 
+  const [confirmDeleteBottomSheetOpen, setConfirmDeleteBottomSheetOpen] =
+    useState(false);
+
+  const deleteFinishedWorkout = useCallback(
+    async (result: boolean) => {
+      if (result) {
+        await fetch(`/api/workout/finished/${workout.id}`, {
+          method: 'DELETE',
+        });
+        reload();
+      }
+      setConfirmDeleteBottomSheetOpen(false);
+    },
+    [reload, workout.id]
+  );
+
   return (
-    <div className={classNames(styles.workout, 'fade-in')}>
-      <div className={styles.item}>
-        <div className={styles.header}>{workout.nickname}</div>
+    <>
+      <div className={classNames(styles.workout, 'fade-in')}>
+        <div className={styles.item}>
+          <div className={styles.header}>{workout.nickname}</div>
+        </div>
+        <div className={styles.item}>
+          <label>Date</label>
+          <div>{format.format(new Date(workout.startedAt))}</div>
+          <div className={styles.suffix}>{howLongAgo}</div>
+        </div>
+        <div className={styles.item}>
+          <label>Duration</label>
+          <div>{duration}</div>
+        </div>
+        <div className={styles.workoutActions}>
+          <button
+            type='button'
+            onClick={() => setOpen(!open)}
+            className={classNames(
+              styles.workoutActionsViewExercises,
+              'standard-button outlined',
+              open && 'highlighted'
+            )}
+          >
+            <i className='fa-solid fa-person-walking'></i>
+            <span>{open ? 'Hide' : 'Show'} Exercises</span>
+          </button>
+          <button
+            type='button'
+            onClick={() => setConfirmDeleteBottomSheetOpen(true)}
+            className={classNames('standard-button danger')}
+          >
+            <i className='fa-solid fa-trash'></i>
+          </button>
+        </div>
+        {open && <div className={styles.exercises}>{exercises}</div>}
       </div>
-      <div className={styles.item}>
-        <label>Date</label>
-        <div>{format.format(new Date(workout.startedAt))}</div>
-        <div className={styles.suffix}>{howLongAgo}</div>
-      </div>
-      <div className={styles.item}>
-        <label>Duration</label>
-        <div>{duration}</div>
-      </div>
-      <details
-        onToggle={(event) => setOpen((event.target as HTMLDetailsElement).open)}
-      >
-        <summary
-          className={classNames(
-            'standard-button outlined',
-            open && 'highlighted'
-          )}
-        >
-          <i className='fa-solid fa-person-walking'></i>
-          <span>{open ? 'Hide' : 'Show'} Exercises</span>
-        </summary>
-        <div className={styles.exercises}>{exercises}</div>
-      </details>
-    </div>
+      {confirmDeleteBottomSheetOpen && (
+        <ConfirmationBottomSheet
+          prompt="Are you sure you'd like to delete this workout?"
+          onResult={deleteFinishedWorkout}
+        />
+      )}
+    </>
   );
 }
 

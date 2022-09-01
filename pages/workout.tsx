@@ -121,7 +121,7 @@ const Workout: NextPageWithLayout = () => {
 
   const { data: dataUnmemoized, error } = useSWR<{
     workout: ActiveWorkoutWithExercisesWithExerciseWithSetsAndDetails;
-  }>('/api/workout', fetcher);
+  }>('/api/workout/active', fetcher);
 
   const [data, setData] = useState(dataUnmemoized);
 
