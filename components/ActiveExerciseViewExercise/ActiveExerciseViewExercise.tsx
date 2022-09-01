@@ -156,15 +156,24 @@ export default function ActiveExerciseViewExercise({
   const { openSnackbar } = useContext(SnackbarContext);
 
   const newExerciseSelected = useCallback(
-    (exerciseId: string | undefined) => {
+    async (exerciseId: string | undefined) => {
       if (!!exerciseId) {
-        replaceExercise(activeWorkoutExercise.id, exerciseId);
+        const newExercise = await replaceExercise(
+          activeWorkoutExercise.orderNumber,
+          exerciseId
+        );
+        activeWorkoutExerciseChanged(newExercise);
         openSnackbar(`Exercise replaced.`, 2000);
         scrollToTop();
       }
       setShowExercisePicker(false);
     },
-    [activeWorkoutExercise.id, openSnackbar, replaceExercise, scrollToTop]
+    [
+      activeWorkoutExercise.orderNumber,
+      openSnackbar,
+      replaceExercise,
+      scrollToTop,
+    ]
   );
 
   const removeExercise = useCallback(

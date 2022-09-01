@@ -5,6 +5,7 @@ import {
   minutesToMilliseconds,
 } from 'date-fns';
 
+import { ActiveWorkoutExerciseWithSetsAndDetails } from '../../types/ActiveWorkoutExercise';
 import { ActiveWorkoutWithExercisesWithExerciseWithSetsAndDetails } from '../../types/ActiveWorkout';
 import { FinishedWorkoutExerciseWithSets } from '../../example_type';
 import { FinishedWorkoutWithExerciseWithSets } from '../../types/FinishedWorkout';
@@ -260,21 +261,19 @@ export async function persistSetResistance(
   });
 }
 
+export class ReplaceExerciseError extends Error {}
+
 export async function replaceExercise(
   userId: string,
   exerciseIndex: number,
   newExerciseId: string
-) {
-  const activeWorkout = await getActiveWorkout(userId);
-  if (activeWorkout === null) {
-    return;
-  }
+): Promise<ActiveWorkoutExerciseWithSetsAndDetails> {
   const newExercise = await getExerciseById(userId, newExerciseId);
   if (!newExercise) {
-    return;
+    throw new ReplaceExerciseError('no active workout');
   }
-  await prisma.$transaction(async (prisma) => {
-    await prisma.activeWorkoutExercise.deleteMany({
+  return prisma.$transaction(async (prisma) => {
+    const result = await prisma.activeWorkoutExercise.deleteMany({
       where: {
         activeWorkout: {
           userId,
@@ -282,7 +281,10 @@ export async function replaceExercise(
         orderNumber: exerciseIndex,
       },
     });
-    await prisma.activeWorkoutExercise.create({
+    if (result.count === 0) {
+      throw new ReplaceExerciseError('No record could be deleted.');
+    }
+    const newRecord = await prisma.activeWorkoutExercise.create({
       data: {
         orderNumber: exerciseIndex,
         activeWorkout: {
@@ -297,17 +299,35 @@ export async function replaceExercise(
         },
         sets: {
           createMany: {
-            data: new Array(newExercise.setCount).fill({
-              complete: false,
-              timeInSeconds:
-                newExercise.exerciseType === 'timed'
-                  ? newExercise.timePerSetInSeconds
-                  : undefined,
-            }),
+            data: new Array(newExercise.setCount)
+              .fill(null)
+              .map((_, orderNumber) => ({
+                orderNumber,
+                complete: false,
+                timeInSeconds:
+                  newExercise.exerciseType === 'timed'
+                    ? newExercise.timePerSetInSeconds
+                    : undefined,
+              })),
           },
         },
       },
     });
+    const newRecordFound: ActiveWorkoutExerciseWithSetsAndDetails =
+      (await prisma.activeWorkoutExercise.findUnique({
+        where: {
+          id: newRecord.id,
+        },
+        include: {
+          exercise: true,
+          sets: {
+            orderBy: {
+              orderNumber: 'asc',
+            },
+          },
+        },
+      }))!;
+    return newRecordFound;
   });
 }
 

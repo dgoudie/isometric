@@ -1,5 +1,8 @@
 import React, { createContext, useCallback, useEffect, useState } from 'react';
 
+import { ActiveWorkoutExerciseWithSetsAndDetails } from '../../types/ActiveWorkoutExercise';
+import { useFetchJSONWith403Redirect } from '../../utils/fetch-with-403-redirect';
+
 export const WorkoutContext = createContext<{
   startWorkout: () => void;
   endWorkout: () => void;
@@ -20,9 +23,9 @@ export const WorkoutContext = createContext<{
     resistanceInPounds: number | null
   ) => void;
   replaceExercise: (
-    activeWorkoutExerciseId: string,
+    index: number,
     newExerciseId: string
-  ) => void;
+  ) => Promise<ActiveWorkoutExerciseWithSetsAndDetails>;
   addExercise: (exerciseId: string, index: number) => void;
   deleteExercise: (index: number) => void;
 }>({
@@ -32,7 +35,7 @@ export const WorkoutContext = createContext<{
   persistSetComplete: () => undefined,
   persistSetRepetitions: () => undefined,
   persistSetResistance: () => undefined,
-  replaceExercise: () => undefined,
+  replaceExercise: () => Promise.reject(),
   addExercise: () => undefined,
   deleteExercise: () => undefined,
 });
@@ -40,6 +43,7 @@ export const WorkoutContext = createContext<{
 export default function WorkoutProvider({
   children,
 }: React.PropsWithChildren<{}>) {
+  const fetcher = useFetchJSONWith403Redirect();
   const startWorkout = useCallback(() => {
     navigator.sendBeacon(`/api/workout/start`);
   }, []);
@@ -68,16 +72,18 @@ export default function WorkoutProvider({
     []
   );
   const replaceExercise = useCallback(
-    (activeWorkoutExerciseId: string, newExerciseId: string) => {
-      // sendJsonMessage(
-      //   verifyType<WSWorkoutUpdate>({
-      //     type: 'REPLACE_EXERCISE',
-      //     exerciseIndex,
-      //     newExerciseId,
-      //   })
-      // );
-    },
-    []
+    (index: number, newExerciseId: string) =>
+      fetcher(`/api/workout/replace_exercise`, {
+        method: 'PUT',
+        headers: {
+          'content-type': 'application/json',
+        },
+        body: JSON.stringify({
+          index,
+          newExerciseId,
+        }),
+      }),
+    [fetcher]
   );
   const addExercise = useCallback((exerciseId: string, index: number) => {
     // sendJsonMessage(
