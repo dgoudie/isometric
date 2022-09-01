@@ -1,9 +1,11 @@
 import {
   ReplaceExerciseError,
+  addCheckInToActiveWorkout,
   replaceExercise,
 } from '../../../database/domains/active_workout';
 
 import { NextApiHandler } from 'next';
+import broadcastApiMutations from '../../../utils/broadcast-api-mutations';
 import { getUserId } from '../../../utils/get-user-id';
 
 const handler: NextApiHandler = async (req, res) => {
@@ -22,12 +24,10 @@ const handler: NextApiHandler = async (req, res) => {
     return;
   }
   try {
-    const newActiveWorkoutExercise = await replaceExercise(
-      userId,
-      index,
-      newExerciseId
-    );
-    res.send(newActiveWorkoutExercise);
+    await replaceExercise(userId, index, newExerciseId);
+    await addCheckInToActiveWorkout(userId);
+    await broadcastApiMutations(userId, ['/api/workout/active']);
+    res.end();
   } catch (e) {
     if (e instanceof ReplaceExerciseError) {
       res.status(400).end(e);

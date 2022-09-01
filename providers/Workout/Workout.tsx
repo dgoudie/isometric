@@ -1,6 +1,5 @@
-import React, { createContext, useCallback, useEffect, useState } from 'react';
+import React, { createContext, useCallback } from 'react';
 
-import { ActiveWorkoutExerciseWithSetsAndDetails } from '../../types/ActiveWorkoutExercise';
 import { useFetchJSONWith403Redirect } from '../../utils/fetch-with-403-redirect';
 
 export const WorkoutContext = createContext<{
@@ -22,11 +21,8 @@ export const WorkoutContext = createContext<{
     setIndex: number,
     resistanceInPounds: number | null
   ) => void;
-  replaceExercise: (
-    index: number,
-    newExerciseId: string
-  ) => Promise<ActiveWorkoutExerciseWithSetsAndDetails>;
-  addExercise: (exerciseId: string, index: number) => void;
+  replaceExercise: (index: number, newExerciseId: string) => Promise<void>;
+  addExercise: (exerciseId: string, index: number) => Promise<void>;
   deleteExercise: (index: number) => void;
 }>({
   startWorkout: () => undefined,
@@ -36,7 +32,7 @@ export const WorkoutContext = createContext<{
   persistSetRepetitions: () => undefined,
   persistSetResistance: () => undefined,
   replaceExercise: () => Promise.reject(),
-  addExercise: () => undefined,
+  addExercise: () => Promise.reject(),
   deleteExercise: () => undefined,
 });
 
@@ -72,8 +68,8 @@ export default function WorkoutProvider({
     []
   );
   const replaceExercise = useCallback(
-    (index: number, newExerciseId: string) =>
-      fetcher(`/api/workout/replace_exercise`, {
+    async (index: number, newExerciseId: string) => {
+      await fetch(`/api/workout/replace_exercise`, {
         method: 'PUT',
         headers: {
           'content-type': 'application/json',
@@ -82,17 +78,21 @@ export default function WorkoutProvider({
           index,
           newExerciseId,
         }),
-      }),
-    [fetcher]
+      });
+    },
+    []
   );
-  const addExercise = useCallback((exerciseId: string, index: number) => {
-    // sendJsonMessage(
-    //   verifyType<WSWorkoutUpdate>({
-    //     type: 'ADD_EXERCISE',
-    //     exerciseId,
-    //     index,
-    //   })
-    // );
+  const addExercise = useCallback(async (exerciseId: string, index: number) => {
+    await fetch(`/api/workout/add_exercise`, {
+      method: 'PUT',
+      headers: {
+        'content-type': 'application/json',
+      },
+      body: JSON.stringify({
+        index,
+        exerciseId,
+      }),
+    });
   }, []);
   const deleteExercise = useCallback((index: number) => {
     navigator.sendBeacon(

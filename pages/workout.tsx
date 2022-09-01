@@ -8,6 +8,7 @@ import {
 } from 'react';
 
 import ActiveExerciseView from '../components/ActiveExerciseView/ActiveExerciseView';
+import { ActiveWorkoutExerciseWithSetsAndDetails } from '../types/ActiveWorkoutExercise';
 import { ActiveWorkoutWithExercisesWithExerciseWithSetsAndDetails } from '../types/ActiveWorkout';
 import EndWorkoutBottomSheet from '../components/BottomSheet/components/EndWorkoutBottomSheet/EndWorkoutBottomSheet';
 import ExercisePickerBottomSheet from '../components/BottomSheet/components/ExercisePickerBottomSheet/ExercisePickerBottomSheet';
@@ -106,17 +107,6 @@ const Workout: NextPageWithLayout = () => {
     setShowWorkoutExercisesBottomSheet(false);
   }, []);
 
-  const onExeciseAdded = useCallback(
-    (exerciseId: string | undefined) => {
-      if (typeof exerciseId !== 'undefined') {
-        addExercise(exerciseId, activeExercise.index + 1);
-        openSnackbar('Exercise Added.');
-      }
-      setShowAddExerciseBottomSheet(false);
-    },
-    [activeExercise.index, addExercise, openSnackbar]
-  );
-
   const head = useHeadWithTitle('Workout');
 
   const { data: dataUnmemoized, error } = useSWR<{
@@ -131,6 +121,30 @@ const Workout: NextPageWithLayout = () => {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [dataUnmemoized]);
+
+  const activeWorkoutExercisesChanged = useCallback(
+    (newActiveWorkoutExercises: ActiveWorkoutExerciseWithSetsAndDetails[]) => {
+      setData({
+        ...data,
+        workout: {
+          ...data!.workout,
+          exercises: newActiveWorkoutExercises,
+        },
+      });
+    },
+    [data]
+  );
+
+  const onExeciseAdded = useCallback(
+    async (exerciseId: string | undefined) => {
+      if (typeof exerciseId !== 'undefined') {
+        await addExercise(exerciseId, activeExercise.index + 1);
+        openSnackbar('Exercise Added.');
+      }
+      setShowAddExerciseBottomSheet(false);
+    },
+    [activeExercise.index, addExercise, openSnackbar]
+  );
 
   if (error) throw error;
   if (!data) return <RouteLoader />;
@@ -165,15 +179,7 @@ const Workout: NextPageWithLayout = () => {
       <Suspense fallback={<RouteLoader className={styles.loader} />}>
         <ActiveExerciseView
           activeWorkoutExercises={data.workout.exercises}
-          activeWorkoutExercisesChanged={(newActiveWorkoutExercises) => {
-            setData({
-              ...data,
-              workout: {
-                ...data.workout,
-                exercises: newActiveWorkoutExercises,
-              },
-            });
-          }}
+          activeWorkoutExercisesChanged={activeWorkoutExercisesChanged}
           focusedExercise={activeExercise}
           focusedExerciseChanged={focusedExerciseChanged}
         />

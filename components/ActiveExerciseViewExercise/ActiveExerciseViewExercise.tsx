@@ -158,11 +158,7 @@ export default function ActiveExerciseViewExercise({
   const newExerciseSelected = useCallback(
     async (exerciseId: string | undefined) => {
       if (!!exerciseId) {
-        const newExercise = await replaceExercise(
-          activeWorkoutExercise.orderNumber,
-          exerciseId
-        );
-        activeWorkoutExerciseChanged(newExercise);
+        await replaceExercise(activeWorkoutExercise.orderNumber, exerciseId);
         openSnackbar(`Exercise replaced.`, 2000);
         scrollToTop();
       }

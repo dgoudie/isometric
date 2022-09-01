@@ -1,9 +1,12 @@
+import {
+  addCheckInToActiveWorkout,
+  persistSetComplete,
+} from '../../../database/domains/active_workout';
 import { isNaB, parseBoolean } from '../../../utils/boolean';
 
 import { NextApiHandler } from 'next';
 import broadcastApiMutations from '../../../utils/broadcast-api-mutations';
 import { getUserId } from '../../../utils/get-user-id';
-import { persistSetComplete } from '../../../database/domains/active_workout';
 
 const handler: NextApiHandler = async (req, res) => {
   const userId = await getUserId(req, res);
@@ -25,6 +28,7 @@ const handler: NextApiHandler = async (req, res) => {
     return;
   }
   await persistSetComplete(userId, activeWorkoutExerciseId, setIndex, complete);
+  await addCheckInToActiveWorkout(userId);
   // await broadcastApiMutations(userId, [`/api/workout`]);
   res.end();
 };

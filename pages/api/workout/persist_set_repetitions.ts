@@ -1,8 +1,9 @@
-import { isNaB, parseBoolean } from '../../../utils/boolean';
 import {
+  addCheckInToActiveWorkout,
   persistSetComplete,
   persistSetRepetitions,
 } from '../../../database/domains/active_workout';
+import { isNaB, parseBoolean } from '../../../utils/boolean';
 
 import { NextApiHandler } from 'next';
 import broadcastApiMutations from '../../../utils/broadcast-api-mutations';
@@ -35,6 +36,7 @@ const handler: NextApiHandler = async (req, res) => {
     setIndex,
     repetitions
   );
+  await addCheckInToActiveWorkout(userId);
   // await broadcastApiMutations(userId, [`/api/workout`]);
   res.end();
 };

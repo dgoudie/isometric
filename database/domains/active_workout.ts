@@ -5,7 +5,6 @@ import {
   minutesToMilliseconds,
 } from 'date-fns';
 
-import { ActiveWorkoutExerciseWithSetsAndDetails } from '../../types/ActiveWorkoutExercise';
 import { ActiveWorkoutWithExercisesWithExerciseWithSetsAndDetails } from '../../types/ActiveWorkout';
 import { FinishedWorkoutExerciseWithSets } from '../../example_type';
 import { FinishedWorkoutWithExerciseWithSets } from '../../types/FinishedWorkout';
@@ -86,7 +85,11 @@ export async function getFullActiveWorkout(
           orderNumber: 'asc',
         },
       },
-      checkins: true,
+      checkins: {
+        orderBy: {
+          at: 'asc',
+        },
+      },
     },
   });
 }
@@ -267,12 +270,12 @@ export async function replaceExercise(
   userId: string,
   exerciseIndex: number,
   newExerciseId: string
-): Promise<ActiveWorkoutExerciseWithSetsAndDetails> {
+) {
   const newExercise = await getExerciseById(userId, newExerciseId);
   if (!newExercise) {
     throw new ReplaceExerciseError('no active workout');
   }
-  return prisma.$transaction(async (prisma) => {
+  await prisma.$transaction(async (prisma) => {
     const result = await prisma.activeWorkoutExercise.deleteMany({
       where: {
         activeWorkout: {
@@ -313,21 +316,6 @@ export async function replaceExercise(
         },
       },
     });
-    const newRecordFound: ActiveWorkoutExerciseWithSetsAndDetails =
-      (await prisma.activeWorkoutExercise.findUnique({
-        where: {
-          id: newRecord.id,
-        },
-        include: {
-          exercise: true,
-          sets: {
-            orderBy: {
-              orderNumber: 'asc',
-            },
-          },
-        },
-      }))!;
-    return newRecordFound;
   });
 }
 
@@ -336,54 +324,57 @@ export async function addExercise(
   exerciseId: string,
   index: number
 ) {
-  const activeWorkoutId = await hasActiveWorkout(userId);
-  if (activeWorkoutId === null) {
-    return;
-  }
   const newExercise = await getExerciseById(userId, exerciseId);
   if (!newExercise) {
-    return;
+    throw new ReplaceExerciseError('no active workout');
   }
-  await prisma.activeWorkoutExercise.updateMany({
-    data: {
-      orderNumber: {
-        increment: 1,
-      },
-    },
-    where: {
-      activeWorkout: {
+  await prisma.$transaction(async (prisma) => {
+    const count = await prisma.activeWorkoutExercise.count({
+      where: { userId },
+    });
+    await prisma.activeWorkoutExercise.updateMany({
+      where: {
         userId,
-      },
-      orderNumber: {
-        gte: index,
-      },
-    },
-  });
-  await prisma.activeWorkoutExercise.create({
-    data: {
-      activeWorkout: {
-        connect: {
-          userId,
+        orderNumber: {
+          gte: index,
         },
       },
-      exercise: {
-        connect: {
-          id: newExercise.id,
+      data: {
+        orderNumber: {
+          increment: count + index,
         },
       },
-      orderNumber: index,
-      sets: {
-        createMany: {
-          data: new Array(newExercise.setCount).fill({
-            complete: false,
-            timeInSeconds:
-              newExercise.exerciseType === 'timed'
-                ? newExercise.timePerSetInSeconds
-                : undefined,
-          }),
+    });
+    const newRecord = await prisma.activeWorkoutExercise.create({
+      data: {
+        orderNumber: index,
+        activeWorkout: {
+          connect: {
+            userId,
+          },
+        },
+        exercise: {
+          connect: {
+            id: newExercise.id,
+          },
+        },
+        sets: {
+          createMany: {
+            data: new Array(newExercise.setCount)
+              .fill(null)
+              .map((_, orderNumber) => ({
+                orderNumber,
+                complete: false,
+                timeInSeconds:
+                  newExercise.exerciseType === 'timed'
+                    ? newExercise.timePerSetInSeconds
+                    : undefined,
+              })),
+          },
         },
       },
-    },
+    });
+    await reindexActiveWorkoutExercises(userId, prisma);
   });
 }
 
