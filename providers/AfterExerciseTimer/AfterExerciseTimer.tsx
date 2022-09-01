@@ -19,6 +19,7 @@ import { BREAK_TIME } from '../../pages/dashboard';
 import { CSSTransition } from 'react-transition-group';
 import { ExerciseMuscleGroup } from '@prisma/client';
 import FocusTrap from 'focus-trap-react';
+import LoadingButton from '../../components/LoadingButton/LoadingButton';
 import MuscleGroupTag from '../../components/MuscleGroupTag/MuscleGroupTag';
 import Portal from '../../components/Portal/Portal';
 import { WorkoutContext } from '../Workout/Workout';
@@ -224,14 +225,14 @@ export default function AfterExerciseTimerProvider({
     body = (
       <>
         <div className={styles.time}>{formattedTime}</div>
-        <button
+        <LoadingButton
           type='button'
           className={'standard-button primary slim'}
           onClick={() => endWorkout()}
         >
           <i className='fa-solid fa-save'></i>
           Save Workout and End
-        </button>
+        </LoadingButton>
         <button
           type='button'
           className={'standard-button outlined slim'}
