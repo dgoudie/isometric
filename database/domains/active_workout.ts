@@ -464,8 +464,8 @@ export async function getWorkoutInstancesByExerciseName(
   let take: number | undefined = undefined;
   let skip: number | undefined = undefined;
   if (typeof page !== 'undefined') {
-    take = 10;
-    skip = (page - 1) * 10;
+    take = 20;
+    skip = (page - 1) * 20;
   }
   return prisma.finishedWorkoutExercise.findMany({
     where: {

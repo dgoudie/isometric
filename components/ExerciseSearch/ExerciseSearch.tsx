@@ -151,7 +151,6 @@ export default function ExerciseSearch({
       <div className={styles.items} ref={itemsRef}>
         {!!data ? (
           <InfiniteScroll
-            //@ts-ignore
             className={styles.itemsInfiniteScroll}
             pageStart={1}
             loadMore={loadMore}

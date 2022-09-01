@@ -75,7 +75,6 @@ const History: NextPageWithLayout = ({}) => {
       <h1>Workout History</h1>
       <div className={styles.workouts}>
         <InfiniteScroll
-          //@ts-ignore
           className={styles.workoutsInner}
           pageStart={1}
           loadMore={loadMore}

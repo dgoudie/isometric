@@ -15,7 +15,10 @@
     margin-top: 0.75rem;
     display: grid;
     gap: 0.75rem;
-    overflow-y: auto;
+
+    &Wrapper {
+      overflow-y: auto;
+    }
 
     &Item {
       display: grid;
