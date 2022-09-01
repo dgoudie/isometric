@@ -1,10 +1,4 @@
-import React, {
-  useCallback,
-  useContext,
-  useEffect,
-  useRef,
-  useState,
-} from 'react';
+import { useCallback, useContext, useEffect, useRef, useState } from 'react';
 
 import { ActiveExercise } from '../../pages/workout';
 import ActiveExerciseViewExercise from '../ActiveExerciseViewExercise/ActiveExerciseViewExercise';
@@ -17,11 +11,15 @@ import { usePageVisibility } from 'react-page-visibility';
 
 interface Props {
   activeWorkoutExercises: ActiveWorkoutExerciseWithSetsAndDetails[];
+  activeWorkoutExercisesChanged: (
+    activeWorkoutExercises: ActiveWorkoutExerciseWithSetsAndDetails[]
+  ) => void;
   focusedExercise: ActiveExercise;
   focusedExerciseChanged: (exercise: ActiveExercise) => void;
 }
 export default function ActiveExerciseView({
   activeWorkoutExercises: activeWorkoutExercisesUnmemoized,
+  activeWorkoutExercisesChanged,
   focusedExercise,
   focusedExerciseChanged,
 }: Props) {
@@ -83,15 +81,16 @@ export default function ActiveExerciseView({
 
   const activeWorkoutExerciseChanged = useCallback(
     (activeWorkoutExercise: ActiveWorkoutExerciseWithSetsAndDetails) => {
-      setActiveWorkoutExercises(
-        activeWorkoutExercises.map((previous, i) =>
+      const newActiveWorkoutExercises = activeWorkoutExercises.map(
+        (previous, i) =>
           i === activeWorkoutExercise.orderNumber
             ? activeWorkoutExercise
             : previous
-        )
       );
+      setActiveWorkoutExercises(newActiveWorkoutExercises);
+      activeWorkoutExercisesChanged(newActiveWorkoutExercises);
     },
-    [activeWorkoutExercises]
+    [activeWorkoutExercises, activeWorkoutExercisesChanged]
   );
 
   const {

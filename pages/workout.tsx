@@ -20,6 +20,7 @@ import SwipeDeadZone from '../components/SwipeDeadZone/SwipeDeadZone';
 import { WorkoutContext } from '../providers/Workout/Workout';
 import WorkoutExercisesBottomSheet from '../components/BottomSheet/components/WorkoutExercisesBottomSheet/WorkoutExercisesBottomSheet';
 import classNames from 'classnames';
+import equal from 'deep-equal';
 import { getUserId } from '../utils/get-user-id';
 import { hasActiveWorkout } from '../database/domains/active_workout';
 import { requestNotificationPermission } from '../utils/notification';
@@ -118,9 +119,18 @@ const Workout: NextPageWithLayout = () => {
 
   const head = useHeadWithTitle('Workout');
 
-  const { data, error } = useSWR<{
+  const { data: dataUnmemoized, error } = useSWR<{
     workout: ActiveWorkoutWithExercisesWithExerciseWithSetsAndDetails;
   }>('/api/workout', fetcher);
+
+  const [data, setData] = useState(dataUnmemoized);
+
+  useEffect(() => {
+    if (!equal(data, dataUnmemoized)) {
+      setData(dataUnmemoized);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [dataUnmemoized]);
 
   if (error) throw error;
   if (!data) return <RouteLoader />;
@@ -155,6 +165,15 @@ const Workout: NextPageWithLayout = () => {
       <Suspense fallback={<RouteLoader className={styles.loader} />}>
         <ActiveExerciseView
           activeWorkoutExercises={data.workout.exercises}
+          activeWorkoutExercisesChanged={(newActiveWorkoutExercises) => {
+            setData({
+              ...data,
+              workout: {
+                ...data.workout,
+                exercises: newActiveWorkoutExercises,
+              },
+            });
+          }}
           focusedExercise={activeExercise}
           focusedExerciseChanged={focusedExerciseChanged}
         />
