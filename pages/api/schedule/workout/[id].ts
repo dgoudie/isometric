@@ -46,13 +46,15 @@ const handler: NextApiHandler = async (req, res) => {
         res.status(400).end();
         return;
       }
-      await prisma.scheduledWorkout.deleteMany({
-        where: {
-          id,
-          userId,
-        },
+      await prisma.$transaction(async (prisma) => {
+        await prisma.scheduledWorkout.deleteMany({
+          where: {
+            id,
+            userId,
+          },
+        });
+        await reindexScheduledWorkouts(userId, prisma);
       });
-      await reindexScheduledWorkouts(userId);
       await broadcastApiMutations(userId, [
         `/api/schedule/workouts`,
         `/api/schedule/workout/${id}`,

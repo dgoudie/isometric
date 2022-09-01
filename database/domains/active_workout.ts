@@ -1,3 +1,4 @@
+import { Prisma, PrismaClient } from '@prisma/client';
 import {
   differenceInMilliseconds,
   millisecondsToSeconds,
@@ -119,50 +120,52 @@ export async function startWorkout(userId: string): Promise<void> {
 
   const { nickname, orderNumber, exercises } = nextDaySchedule.day;
 
-  await prisma.activeWorkout.create({
-    data: {
-      userId,
-      orderNumber,
-      nickname,
-      checkins: {
-        create: {
-          at: new Date(),
+  await prisma.$transaction(async (prisma) => {
+    await prisma.activeWorkout.create({
+      data: {
+        userId,
+        orderNumber,
+        nickname,
+        checkins: {
+          create: {
+            at: new Date(),
+          },
         },
       },
-    },
-  });
-  await prisma.activeWorkoutExercise.createMany({
-    data: exercises.map((exerciseInSchedule) => ({
-      orderNumber: exerciseInSchedule.orderNumber,
-      userId: userId,
-      exerciseId: exerciseInSchedule.exerciseId,
-    })),
-  });
-  const activeWorkoutExercisesCreated =
-    await prisma.activeWorkoutExercise.findMany({
-      where: {
-        userId,
-      },
-      include: {
-        exercise: true,
-      },
     });
-  await prisma.activeWorkoutExerciseSet.createMany({
-    data: activeWorkoutExercisesCreated
-      .map((activeWorkoutExerciseCreated) =>
-        new Array(activeWorkoutExerciseCreated.exercise.setCount)
-          .fill(null)
-          .map((_, orderNumber) => ({
-            activeWorkoutExerciseId: activeWorkoutExerciseCreated.id,
-            orderNumber,
-            complete: false,
-            timeInSeconds:
-              activeWorkoutExerciseCreated.exercise.exerciseType === 'timed'
-                ? activeWorkoutExerciseCreated.exercise.timePerSetInSeconds
-                : undefined,
-          }))
-      )
-      .reduce((acc, setList) => [...acc, ...setList]),
+    await prisma.activeWorkoutExercise.createMany({
+      data: exercises.map((exerciseInSchedule) => ({
+        orderNumber: exerciseInSchedule.orderNumber,
+        userId: userId,
+        exerciseId: exerciseInSchedule.exerciseId,
+      })),
+    });
+    const activeWorkoutExercisesCreated =
+      await prisma.activeWorkoutExercise.findMany({
+        where: {
+          userId,
+        },
+        include: {
+          exercise: true,
+        },
+      });
+    await prisma.activeWorkoutExerciseSet.createMany({
+      data: activeWorkoutExercisesCreated
+        .map((activeWorkoutExerciseCreated) =>
+          new Array(activeWorkoutExerciseCreated.exercise.setCount)
+            .fill(null)
+            .map((_, orderNumber) => ({
+              activeWorkoutExerciseId: activeWorkoutExerciseCreated.id,
+              orderNumber,
+              complete: false,
+              timeInSeconds:
+                activeWorkoutExerciseCreated.exercise.exerciseType === 'timed'
+                  ? activeWorkoutExerciseCreated.exercise.timePerSetInSeconds
+                  : undefined,
+            }))
+        )
+        .reduce((acc, setList) => [...acc, ...setList]),
+    });
   });
 }
 
@@ -172,33 +175,35 @@ export async function persistSetComplete(
   orderNumber: number,
   complete: boolean
 ) {
-  await prisma.activeWorkoutExerciseSet.updateMany({
-    data: {
-      complete: true,
-    },
-    where: {
-      orderNumber: {
-        lte: complete ? orderNumber : orderNumber - 1,
+  await prisma.$transaction(async (prisma) => {
+    await prisma.activeWorkoutExerciseSet.updateMany({
+      data: {
+        complete: true,
       },
-      activeWorkoutExerciseId,
-      activeWorkoutExercise: {
-        userId,
+      where: {
+        orderNumber: {
+          lte: complete ? orderNumber : orderNumber - 1,
+        },
+        activeWorkoutExerciseId,
+        activeWorkoutExercise: {
+          userId,
+        },
       },
-    },
-  });
-  await prisma.activeWorkoutExerciseSet.updateMany({
-    data: {
-      complete: false,
-    },
-    where: {
-      orderNumber: {
-        gte: complete ? orderNumber + 1 : orderNumber,
+    });
+    await prisma.activeWorkoutExerciseSet.updateMany({
+      data: {
+        complete: false,
       },
-      activeWorkoutExercise: {
-        userId,
-        id: activeWorkoutExerciseId,
+      where: {
+        orderNumber: {
+          gte: complete ? orderNumber + 1 : orderNumber,
+        },
+        activeWorkoutExercise: {
+          userId,
+          id: activeWorkoutExerciseId,
+        },
       },
-    },
+    });
   });
 }
 
@@ -268,41 +273,42 @@ export async function replaceExercise(
   if (!newExercise) {
     return;
   }
-  await prisma.activeWorkoutExercise.deleteMany({
-    where: {
-      activeWorkout: {
-        userId,
-      },
-      orderNumber: exerciseIndex,
-    },
-  });
-  await prisma.activeWorkoutExercise.create({
-    data: {
-      orderNumber: exerciseIndex,
-      activeWorkout: {
-        connect: {
+  await prisma.$transaction(async (prisma) => {
+    await prisma.activeWorkoutExercise.deleteMany({
+      where: {
+        activeWorkout: {
           userId,
         },
+        orderNumber: exerciseIndex,
       },
-      exercise: {
-        connect: {
-          id: newExercise.id,
+    });
+    await prisma.activeWorkoutExercise.create({
+      data: {
+        orderNumber: exerciseIndex,
+        activeWorkout: {
+          connect: {
+            userId,
+          },
+        },
+        exercise: {
+          connect: {
+            id: newExercise.id,
+          },
+        },
+        sets: {
+          createMany: {
+            data: new Array(newExercise.setCount).fill({
+              complete: false,
+              timeInSeconds:
+                newExercise.exerciseType === 'timed'
+                  ? newExercise.timePerSetInSeconds
+                  : undefined,
+            }),
+          },
         },
       },
-      sets: {
-        createMany: {
-          data: new Array(newExercise.setCount).fill({
-            complete: false,
-            timeInSeconds:
-              newExercise.exerciseType === 'timed'
-                ? newExercise.timePerSetInSeconds
-                : undefined,
-          }),
-        },
-      },
-    },
+    });
   });
-  return getActiveWorkout(userId);
 }
 
 export async function addExercise(
@@ -362,36 +368,38 @@ export async function addExercise(
 }
 
 export async function deleteExercise(userId: string, index: number) {
-  const result = await prisma.activeWorkoutExercise.deleteMany({
-    where: {
-      activeWorkout: {
-        userId,
+  await prisma.$transaction(async (prisma) => {
+    const result = await prisma.activeWorkoutExercise.deleteMany({
+      where: {
+        activeWorkout: {
+          userId,
+        },
+        orderNumber: index,
       },
-      orderNumber: index,
-    },
+    });
+    if (result.count === 0) {
+      return;
+    }
+    const activeWorkoutExercise = await prisma.activeWorkoutExercise.count({
+      where: { userId },
+    });
+    await prisma.activeWorkoutExercise.updateMany({
+      data: {
+        orderNumber: {
+          increment: activeWorkoutExercise + 1,
+        },
+      },
+      where: {
+        activeWorkout: {
+          userId,
+        },
+        orderNumber: {
+          gt: index,
+        },
+      },
+    });
+    await reindexActiveWorkoutExercises(userId, prisma);
   });
-  if (result.count === 0) {
-    return;
-  }
-  const activeWorkoutExercise = await prisma.activeWorkoutExercise.count({
-    where: { userId },
-  });
-  await prisma.activeWorkoutExercise.updateMany({
-    data: {
-      orderNumber: {
-        increment: activeWorkoutExercise + 1,
-      },
-    },
-    where: {
-      activeWorkout: {
-        userId,
-      },
-      orderNumber: {
-        gt: index,
-      },
-    },
-  });
-  await reindexActiveWorkoutExercises(userId);
 }
 
 export async function endWorkout(userId: string) {
@@ -500,7 +508,8 @@ export async function getWorkoutInstancesByExerciseName(
 }
 
 export async function reindexActiveWorkoutExercises(
-  userId: string
+  userId: string,
+  prisma: PrismaClient | Prisma.TransactionClient
 ): Promise<void> {
   const maxOrderNumberRecord = await prisma.activeWorkoutExercise.findFirst({
     where: { userId },
@@ -512,11 +521,15 @@ export async function reindexActiveWorkoutExercises(
     return;
   }
   const maxOrderNumber = maxOrderNumberRecord.orderNumber;
-  await reindex(userId, maxOrderNumber + 1);
-  await reindex(userId, 0);
+  await reindex(userId, maxOrderNumber + 1, prisma);
+  await reindex(userId, 0, prisma);
 }
 
-async function reindex(userId: string, padding: number) {
+async function reindex(
+  userId: string,
+  padding: number,
+  prisma: PrismaClient | Prisma.TransactionClient
+) {
   await prisma.$executeRaw`
     update
       "ActiveWorkoutExercise" awe

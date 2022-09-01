@@ -33,27 +33,33 @@ const handler: NextApiHandler = async (req, res) => {
           res.status(404).end();
           return;
         }
-        let day = await prisma.scheduledWorkout.create({
-          data: {
-            user: {
-              connect: { userId },
+        let dayId = await prisma.$transaction(async (prisma) => {
+          let day = await prisma.scheduledWorkout.create({
+            data: {
+              user: {
+                connect: { userId },
+              },
+              orderNumber: dayCount,
+              nickname: dayToCopy.nickname,
             },
-            orderNumber: dayCount,
-            nickname: dayToCopy.nickname,
-          },
+          });
+          await prisma.scheduledWorkoutExercise.createMany({
+            data: dayToCopy.exercises.map(
+              (scheduledWorkoutExercise, index) => ({
+                scheduledWorkoutId: day.id,
+                orderNumber: index,
+                exerciseId: scheduledWorkoutExercise.exerciseId,
+              })
+            ),
+          });
+          return day.id;
         });
-        await prisma.scheduledWorkoutExercise.createMany({
-          data: dayToCopy.exercises.map((scheduledWorkoutExercise, index) => ({
-            scheduledWorkoutId: day.id,
-            orderNumber: index,
-            exerciseId: scheduledWorkoutExercise.exerciseId,
-          })),
-        });
+
         await broadcastApiMutations(userId, [
           `/api/schedule/upcoming`,
           `/api/schedule/workouts`,
         ]);
-        res.send(day.id);
+        res.send(dayId);
       } else {
         let day = await prisma.scheduledWorkout.create({
           data: {

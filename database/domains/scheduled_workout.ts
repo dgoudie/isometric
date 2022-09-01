@@ -1,3 +1,5 @@
+import { Prisma, PrismaClient } from '@prisma/client';
+
 import { ScheduledWorkoutWithExerciseInSchedulesWithExercise } from '../../types/ScheduledWorkout';
 import prisma from '../prisma';
 
@@ -68,7 +70,10 @@ export async function getNextDaySchedule(
   return { day, dayCount };
 }
 
-export async function reindexScheduledWorkouts(userId: string): Promise<void> {
+export async function reindexScheduledWorkouts(
+  userId: string,
+  prisma: PrismaClient | Prisma.TransactionClient
+): Promise<void> {
   const maxOrderNumberRecord = await prisma.scheduledWorkout.findFirst({
     where: { userId },
     orderBy: {
@@ -79,11 +84,15 @@ export async function reindexScheduledWorkouts(userId: string): Promise<void> {
     return;
   }
   const maxOrderNumber = maxOrderNumberRecord.orderNumber;
-  await reindex(userId, maxOrderNumber + 1);
-  await reindex(userId, 0);
+  await reindex(userId, maxOrderNumber + 1, prisma);
+  await reindex(userId, 0, prisma);
 }
 
-async function reindex(userId: string, padding: number) {
+async function reindex(
+  userId: string,
+  padding: number,
+  prisma: PrismaClient | Prisma.TransactionClient
+) {
   await prisma.$executeRaw`
     update
       "ScheduledWorkout" sw

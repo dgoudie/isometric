@@ -1,7 +1,8 @@
-import prisma from '../prisma';
+import { Prisma, PrismaClient } from '@prisma/client';
 
 export async function reindexScheduledWorkoutExercises(
-  scheduledWorkoutId: string
+  scheduledWorkoutId: string,
+  prisma: PrismaClient | Prisma.TransactionClient
 ): Promise<void> {
   const maxOrderNumberRecord = await prisma.scheduledWorkoutExercise.findFirst({
     where: { scheduledWorkoutId },
@@ -13,11 +14,15 @@ export async function reindexScheduledWorkoutExercises(
     return;
   }
   const maxOrderNumber = maxOrderNumberRecord.orderNumber;
-  await reindex(scheduledWorkoutId, maxOrderNumber + 1);
-  await reindex(scheduledWorkoutId, 0);
+  await reindex(scheduledWorkoutId, maxOrderNumber + 1, prisma);
+  await reindex(scheduledWorkoutId, 0, prisma);
 }
 
-async function reindex(scheduledWorkoutId: string, padding: number) {
+async function reindex(
+  scheduledWorkoutId: string,
+  padding: number,
+  prisma: PrismaClient | Prisma.TransactionClient
+) {
   await prisma.$executeRaw`
     update
       "ScheduledWorkoutExercise" swe

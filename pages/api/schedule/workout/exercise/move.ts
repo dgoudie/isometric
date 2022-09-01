@@ -32,7 +32,8 @@ const handler: NextApiHandler = async (req, res) => {
         }))!;
       if (from > to) {
         // move up, ex. day 2 becomes day 1
-        await prisma.$executeRaw`
+        await prisma.$transaction(async (prisma) => {
+          await prisma.$executeRaw`
         update
           "ScheduledWorkoutExercise" sw
         set
@@ -48,12 +49,15 @@ const handler: NextApiHandler = async (req, res) => {
           and "orderNumber" >= cast(${to} as int) 
           and "orderNumber" != cast(${from} as int)
       `;
-        await reindexScheduledWorkoutExercises(
-          scheduledWorkoutForProvidedId.id
-        );
+          await reindexScheduledWorkoutExercises(
+            scheduledWorkoutForProvidedId.id,
+            prisma
+          );
+        });
       } else {
         // move down, ex day 1 becomes day 2
-        await prisma.$executeRaw`
+        await prisma.$transaction(async (prisma) => {
+          await prisma.$executeRaw`
           update
             "ScheduledWorkoutExercise" sw
           set
@@ -68,17 +72,19 @@ const handler: NextApiHandler = async (req, res) => {
             "scheduledWorkoutId" = ${scheduledWorkoutForProvidedId.id}
             and "orderNumber" > cast(${to} as int)
         `;
-        await prisma.scheduledWorkoutExercise.update({
-          where: {
-            id,
-          },
-          data: {
-            orderNumber: to + 1,
-          },
+          await prisma.scheduledWorkoutExercise.update({
+            where: {
+              id,
+            },
+            data: {
+              orderNumber: to + 1,
+            },
+          });
+          await reindexScheduledWorkoutExercises(
+            scheduledWorkoutForProvidedId.id,
+            prisma
+          );
         });
-        await reindexScheduledWorkoutExercises(
-          scheduledWorkoutForProvidedId.id
-        );
       }
       await broadcastApiMutations(userId, [
         `/api/schedule/upcoming`,
