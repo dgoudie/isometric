@@ -1,8 +1,4 @@
 import {
-  ActiveWorkoutExerciseSet,
-  FinishedWorkoutExerciseSet,
-} from '@prisma/client';
-import {
   differenceInMilliseconds,
   millisecondsToSeconds,
   minutesToMilliseconds,
@@ -135,39 +131,39 @@ export async function startWorkout(userId: string): Promise<void> {
       },
     },
   });
-  await Promise.all(
-    exercises.map(async (exerciseInSchedule) => {
-      return prisma.activeWorkoutExercise.create({
-        data: {
-          orderNumber: exerciseInSchedule.orderNumber,
-          activeWorkout: {
-            connect: {
-              userId,
-            },
-          },
-          exercise: {
-            connect: {
-              id: exerciseInSchedule.exerciseId,
-            },
-          },
-          sets: {
-            createMany: {
-              data: new Array(exerciseInSchedule.exercise.setCount)
-                .fill(null)
-                .map((_, orderNumber) => ({
-                  orderNumber,
-                  complete: false,
-                  timeInSeconds:
-                    exerciseInSchedule.exercise.exerciseType === 'timed'
-                      ? exerciseInSchedule.exercise.timePerSetInSeconds
-                      : undefined,
-                })),
-            },
-          },
-        },
-      });
-    })
-  );
+  await prisma.activeWorkoutExercise.createMany({
+    data: exercises.map((exerciseInSchedule) => ({
+      orderNumber: exerciseInSchedule.orderNumber,
+      userId: userId,
+      exerciseId: exerciseInSchedule.exerciseId,
+    })),
+  });
+  const activeWorkoutExercisesCreated =
+    await prisma.activeWorkoutExercise.findMany({
+      where: {
+        userId,
+      },
+      include: {
+        exercise: true,
+      },
+    });
+  await prisma.activeWorkoutExerciseSet.createMany({
+    data: activeWorkoutExercisesCreated
+      .map((activeWorkoutExerciseCreated) =>
+        new Array(activeWorkoutExerciseCreated.exercise.setCount)
+          .fill(null)
+          .map((_, orderNumber) => ({
+            activeWorkoutExerciseId: activeWorkoutExerciseCreated.id,
+            orderNumber,
+            complete: false,
+            timeInSeconds:
+              activeWorkoutExerciseCreated.exercise.exerciseType === 'timed'
+                ? activeWorkoutExerciseCreated.exercise.timePerSetInSeconds
+                : undefined,
+          }))
+      )
+      .reduce((acc, setList) => [...acc, ...setList]),
+  });
 }
 
 export async function persistSetComplete(

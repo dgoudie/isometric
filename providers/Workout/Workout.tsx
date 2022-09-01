@@ -41,27 +41,29 @@ export default function WorkoutProvider({
   children,
 }: React.PropsWithChildren<{}>) {
   const startWorkout = useCallback(() => {
-    fetch(`/api/workout/start`);
+    navigator.sendBeacon(`/api/workout/start`);
   }, []);
   const endWorkout = useCallback(() => {
-    fetch(`/api/workout/end`);
+    navigator.sendBeacon(`/api/workout/end`);
   }, []);
   const discardWorkout = useCallback(() => {
-    fetch(`/api/workout/discard`);
+    navigator.sendBeacon(`/api/workout/discard`);
   }, []);
   const persistSetComplete = useCallback(
     (activeWorkoutExerciseId: string, setIndex: number, complete: boolean) => {
-      fetch(`/api/workout/persist_set_complete`, {
-        method: 'PUT',
-        headers: {
-          'content-type': 'application/json',
-        },
-        body: JSON.stringify({
-          activeWorkoutExerciseId,
-          setIndex,
-          complete,
-        }),
-      });
+      navigator.sendBeacon(
+        `/api/workout/persist_set_complete`,
+        new Blob(
+          [
+            JSON.stringify({
+              activeWorkoutExerciseId,
+              setIndex,
+              complete,
+            }),
+          ],
+          { type: 'application/json' }
+        )
+      );
     },
     []
   );
@@ -100,17 +102,19 @@ export default function WorkoutProvider({
       setIndex: number,
       repetitions: number | null
     ) => {
-      fetch(`/api/workout/persist_set_repetitions`, {
-        method: 'PUT',
-        headers: {
-          'content-type': 'application/json',
-        },
-        body: JSON.stringify({
-          activeWorkoutExerciseId,
-          setIndex,
-          repetitions,
-        }),
-      });
+      navigator.sendBeacon(
+        `/api/workout/persist_set_repetitions`,
+        new Blob(
+          [
+            JSON.stringify({
+              activeWorkoutExerciseId,
+              setIndex,
+              repetitions,
+            }),
+          ],
+          { type: 'application/json' }
+        )
+      );
     },
     []
   );
@@ -120,17 +124,19 @@ export default function WorkoutProvider({
       setIndex: number,
       resistanceInPounds: number | null
     ) => {
-      fetch(`/api/workout/persist_set_resistance`, {
-        method: 'PUT',
-        headers: {
-          'content-type': 'application/json',
-        },
-        body: JSON.stringify({
-          activeWorkoutExerciseId,
-          setIndex,
-          resistanceInPounds,
-        }),
-      });
+      navigator.sendBeacon(
+        `/api/workout/persist_set_resistance`,
+        new Blob(
+          [
+            JSON.stringify({
+              activeWorkoutExerciseId,
+              setIndex,
+              resistanceInPounds,
+            }),
+          ],
+          { type: 'application/json' }
+        )
+      );
     },
     []
   );
