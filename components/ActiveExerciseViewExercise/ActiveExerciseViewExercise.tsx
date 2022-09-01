@@ -30,6 +30,7 @@ interface Props {
   onCompleted: (
     activeWorkoutExercise: ActiveWorkoutExerciseWithSetsAndDetails
   ) => void;
+  onDeleted: () => void;
   exerciseCount: number;
   scrolledIntoView: (i: number) => void;
 }
@@ -38,6 +39,7 @@ export default function ActiveExerciseViewExercise({
   activeWorkoutExercise: activeWorkoutExerciseUnmemoized,
   activeWorkoutExerciseChanged,
   onCompleted,
+  onDeleted,
   exerciseCount,
   scrolledIntoView,
 }: Props) {
@@ -168,13 +170,20 @@ export default function ActiveExerciseViewExercise({
   const removeExercise = useCallback(
     (removalConfirmed: boolean) => {
       if (!!removalConfirmed) {
-        deleteExercise(activeWorkoutExercise.id);
+        deleteExercise(activeWorkoutExercise.orderNumber);
+        onDeleted();
         openSnackbar(`Exercise removed.`, 2000);
         scrollToTop();
       }
       setShowDeleteExeciseConfirmationBottomSheet(false);
     },
-    [activeWorkoutExercise.id, deleteExercise, openSnackbar, scrollToTop]
+    [
+      activeWorkoutExercise.orderNumber,
+      deleteExercise,
+      onDeleted,
+      openSnackbar,
+      scrollToTop,
+    ]
   );
 
   const activeSetOrderNumber = useMemo(

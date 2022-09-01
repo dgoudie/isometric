@@ -24,7 +24,7 @@ export const WorkoutContext = createContext<{
     newExerciseId: string
   ) => void;
   addExercise: (exerciseId: string, index: number) => void;
-  deleteExercise: (activeWorkoutExerciseId: string) => void;
+  deleteExercise: (index: number) => void;
 }>({
   startWorkout: () => undefined,
   endWorkout: () => undefined,
@@ -88,13 +88,18 @@ export default function WorkoutProvider({
     //   })
     // );
   }, []);
-  const deleteExercise = useCallback((activeWorkoutExerciseId: string) => {
-    // sendJsonMessage(
-    //   verifyType<WSWorkoutUpdate>({
-    //     type: 'DELETE_EXERCISE',
-    //     index,
-    //   })
-    // );
+  const deleteExercise = useCallback((index: number) => {
+    navigator.sendBeacon(
+      `/api/workout/delete_exercise`,
+      new Blob(
+        [
+          JSON.stringify({
+            index,
+          }),
+        ],
+        { type: 'application/json' }
+      )
+    );
   }, []);
   const persistSetRepetitions = useCallback(
     (

@@ -93,6 +93,17 @@ export default function ActiveExerciseView({
     [activeWorkoutExercises, activeWorkoutExercisesChanged]
   );
 
+  const activeWorkoutExerciseDeleted = useCallback(
+    (index: number) => {
+      const newActiveWorkoutExercises = activeWorkoutExercises
+        .filter((_, i) => i !== index)
+        .map((awe, i) => ({ ...awe, orderNumber: i }));
+      setActiveWorkoutExercises(newActiveWorkoutExercises);
+      activeWorkoutExercisesChanged(newActiveWorkoutExercises);
+    },
+    [activeWorkoutExercises, activeWorkoutExercisesChanged]
+  );
+
   const {
     isOpenAndMinimized: timerIsOpenAndMinimized,
     cancel,
@@ -172,6 +183,9 @@ export default function ActiveExerciseView({
           activeWorkoutExercise={activeWorkoutExercise}
           activeWorkoutExerciseChanged={activeWorkoutExerciseChanged}
           onCompleted={onCompleted}
+          onDeleted={() =>
+            activeWorkoutExerciseDeleted(activeWorkoutExercise.orderNumber)
+          }
           exerciseCount={activeWorkoutExercises.length}
           scrolledIntoView={scrolledIntoView}
         />

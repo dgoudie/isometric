@@ -362,7 +362,7 @@ export async function addExercise(
 }
 
 export async function deleteExercise(userId: string, index: number) {
-  await prisma.activeWorkoutExercise.deleteMany({
+  const result = await prisma.activeWorkoutExercise.deleteMany({
     where: {
       activeWorkout: {
         userId,
@@ -370,10 +370,16 @@ export async function deleteExercise(userId: string, index: number) {
       orderNumber: index,
     },
   });
+  if (result.count === 0) {
+    return;
+  }
+  const activeWorkoutExercise = await prisma.activeWorkoutExercise.count({
+    where: { userId },
+  });
   await prisma.activeWorkoutExercise.updateMany({
     data: {
       orderNumber: {
-        decrement: 1,
+        increment: activeWorkoutExercise + 1,
       },
     },
     where: {
@@ -381,10 +387,11 @@ export async function deleteExercise(userId: string, index: number) {
         userId,
       },
       orderNumber: {
-        gte: index,
+        gt: index,
       },
     },
   });
+  await reindexActiveWorkoutExercises(userId);
 }
 
 export async function endWorkout(userId: string) {
@@ -490,4 +497,44 @@ export async function getWorkoutInstancesByExerciseName(
     take,
     skip,
   });
+}
+
+export async function reindexActiveWorkoutExercises(
+  userId: string
+): Promise<void> {
+  const maxOrderNumberRecord = await prisma.activeWorkoutExercise.findFirst({
+    where: { userId },
+    orderBy: {
+      orderNumber: 'desc',
+    },
+  });
+  if (!maxOrderNumberRecord) {
+    return;
+  }
+  const maxOrderNumber = maxOrderNumberRecord.orderNumber;
+  await reindex(userId, maxOrderNumber + 1);
+  await reindex(userId, 0);
+}
+
+async function reindex(userId: string, padding: number) {
+  await prisma.$executeRaw`
+    update
+      "ActiveWorkoutExercise" awe
+    set
+      "orderNumber" = derivedOrder.order - 1 + cast(${padding} as int)
+    from
+      (
+      select
+        row_number() over (
+      order by
+        "orderNumber") as order,
+        id
+      from
+        "ActiveWorkoutExercise" awe
+      where
+        "userId" = ${userId} ) derivedOrder
+    where
+      "userId" = ${userId}
+      and awe.id = derivedOrder.id
+  `;
 }
