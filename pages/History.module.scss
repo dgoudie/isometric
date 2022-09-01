@@ -4,6 +4,10 @@
   height: var(--between-bars);
 }
 
+.noHistory {
+  margin: 0 1rem;
+}
+
 .workouts {
   overflow-y: auto;
   &Inner {

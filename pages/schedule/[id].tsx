@@ -112,7 +112,7 @@ const ScheduleWorkout: NextPageWithLayout = () => {
             <div className={classNames(styles.nickname, 'fade-in')}>
               <h3>Workout Nickname</h3>
               <div className={styles.nicknameTip}>
-                Add a nickname to help distinguish this workout
+                Add a nickname to help distinguish this workout.
               </div>
               <input
                 type='text'
@@ -136,8 +136,8 @@ const ScheduleWorkout: NextPageWithLayout = () => {
             ) : (
               <div className={classNames(styles.noExercises, 'fade-in')}>
                 <span>
-                  Here, you can build a workout schedule. Start by adding a day,
-                  and adding some exercises.
+                  You haven&apos;t selected any exercises for this day yet.
+                  Click the button below to add one.
                 </span>
                 <button
                   className={'standard-button primary'}

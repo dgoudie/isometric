@@ -73,17 +73,24 @@ const History: NextPageWithLayout = ({}) => {
     <div className={styles.root}>
       {head}
       <h1>Workout History</h1>
-      <div className={styles.workouts}>
-        <InfiniteScroll
-          className={styles.workoutsInner}
-          pageStart={1}
-          loadMore={loadMore}
-          hasMore={moreWorkouts}
-          useWindow={false}
-        >
-          {items}
-        </InfiniteScroll>
-      </div>
+      {!!items.length ? (
+        <div className={styles.workouts}>
+          <InfiniteScroll
+            className={styles.workoutsInner}
+            pageStart={1}
+            loadMore={loadMore}
+            hasMore={moreWorkouts}
+            useWindow={false}
+          >
+            {items}
+          </InfiniteScroll>
+        </div>
+      ) : (
+        <div className={classNames(styles.noHistory, 'fade-in')}>
+          Completed workouts will show up here. You haven&apos;t completed any
+          workouts yet.
+        </div>
+      )}
     </div>
   );
 };
