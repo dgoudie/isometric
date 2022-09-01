@@ -80,11 +80,12 @@ export default function ActiveExerciseViewExercise({
       let sets = activeWorkoutExercise.sets.map((currentSet, index) =>
         updatedSet.orderNumber === index ? updatedSet : currentSet
       );
-      if (isResistanceChange) {
+      if (isResistanceChange && updatedSet.resistanceInPounds !== null) {
         sets = sets.map((set) => {
           if (
             set.orderNumber > updatedSet.orderNumber &&
-            set.resistanceInPounds === null
+            !set.complete &&
+            (set.resistanceInPounds === null || set.repetitions === null)
           ) {
             set.resistanceInPounds = updatedSet.resistanceInPounds;
           }

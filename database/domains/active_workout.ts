@@ -236,11 +236,15 @@ export async function persistSetResistance(
       OR: [
         { orderNumber: setIndex },
         {
-          orderNumber: {
-            gt: setIndex,
-          },
-          resistanceInPounds: null,
-          repetitions: null,
+          // this weird snippet basically disables updating future sets if resistanceInPounds is null so we dont clear future sets
+          orderNumber:
+            resistanceInPounds !== null
+              ? {
+                  gt: setIndex,
+                }
+              : { lt: -1 },
+          complete: false,
+          OR: [{ resistanceInPounds: null }, { repetitions: null }],
         },
       ],
       activeWorkoutExercise: {
