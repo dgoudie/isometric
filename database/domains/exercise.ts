@@ -5,6 +5,7 @@ import {
 } from '../utils/personal-best';
 
 import { XOR } from '../../utils/xor';
+import { getLastPerformedForExerciseIds } from '../utils/last-performed';
 import prisma from '../prisma';
 
 type GetExerciseOptions = {
@@ -15,9 +16,9 @@ type GetExerciseOptions = {
   name?: XOR<{ search?: string }, { equals?: string }>;
 };
 
-type ExerciseWithPersonalBestAndLastPerformed = Exercise & {
+export type ExerciseWithPersonalBestAndLastPerformed = Exercise & {
   personalBest: PersonalBestSet | null;
-  lastPerformed: Date;
+  lastPerformed: Date | null;
 };
 
 export async function getExercises(
@@ -139,10 +140,15 @@ export async function getExercises(
     ...exercise,
     personalBest: personalBestMap.get(exercise.id) ?? null,
   }));
+  const lastPerformedMap = await getLastPerformedForExerciseIds(
+    userId,
+    exerciseIds,
+    prisma
+  );
   const exercisesWithPersonalBestWithLastPerformed =
     exercisesWithPersonalBest.map((exercise) => ({
       ...exercise,
-      lastPerformed: new Date(),
+      lastPerformed: lastPerformedMap.get(exercise.id) ?? null,
     }));
   return exercisesWithPersonalBestWithLastPerformed;
 }

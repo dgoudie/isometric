@@ -13,6 +13,7 @@ import { ActiveWorkoutExerciseSet } from '@prisma/client';
 import { ActiveWorkoutExerciseWithSetsAndDetails } from '../../types/ActiveWorkoutExercise';
 import { AfterExerciseTimerContext } from '../../providers/AfterExerciseTimer/AfterExerciseTimer';
 import ConfirmationBottomSheet from '../BottomSheet/components/ConfirmationBottomSheet/ConfirmationBottomSheet';
+import ExerciseMetadata from '../ExerciseMetadata/ExerciseMetadata';
 import ExercisePickerBottomSheet from '../BottomSheet/components/ExercisePickerBottomSheet/ExercisePickerBottomSheet';
 import MuscleGroupTag from '../MuscleGroupTag/MuscleGroupTag';
 import { SnackbarContext } from '../../providers/Snackbar/Snackbar';
@@ -218,9 +219,10 @@ export default function ActiveExerciseViewExercise({
                 <MuscleGroupTag key={group} muscleGroup={group} />
               ))}
             </div>
-            {/* {!!workoutExercise.exercise.lastPerformed && (
-              <ExerciseMetadata className={styles.metadata} exercise={data} />
-            )} */}
+            <ExerciseMetadata
+              className={styles.metadata}
+              exercise={activeWorkoutExercise.exercise}
+            />
             <div className={styles.exerciseActions}>
               <button
                 type='button'

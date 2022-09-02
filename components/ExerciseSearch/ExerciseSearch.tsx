@@ -17,6 +17,7 @@ import {
 } from 'react';
 
 import ExerciseMetadata from '../ExerciseMetadata/ExerciseMetadata';
+import { ExerciseWithPersonalBestAndLastPerformed } from '../../database/domains/exercise';
 import InfiniteScroll from '../InfiniteScroll/InfiniteScroll';
 import Link from 'next/link';
 import MuscleGroupPicker from '../MuscleGroupPicker/MuscleGroupPicker';
@@ -72,13 +73,15 @@ export default function ExerciseSearch({
     inputRef.current?.focus();
   }, [inputRef]);
 
-  const [exercises, setExercises] = useState<Exercise[]>([]);
+  const [exercises, setExercises] = useState<
+    ExerciseWithPersonalBestAndLastPerformed[]
+  >([]);
   const [moreExercises, setMoreExercises] = useState(exercises.length >= 10);
   const [page, setPage] = useState(2);
 
   const fetcher = useFetchJSONWith403Redirect();
 
-  const { data, error } = useSWR<Exercise[]>(
+  const { data, error } = useSWR<ExerciseWithPersonalBestAndLastPerformed[]>(
     `/api/exercises?${searchParams.toString()}`,
     fetcher
   );
@@ -98,7 +101,9 @@ export default function ExerciseSearch({
   const loadMore = useCallback(async () => {
     const params = new URLSearchParams();
     params.set('page', page.toString());
-    const nextPage = await fetchFromApi<Exercise[]>(`/api/exercises`, params);
+    const nextPage = await fetchFromApi<
+      ExerciseWithPersonalBestAndLastPerformed[]
+    >(`/api/exercises`, params);
     if (nextPage.length < 10) {
       setMoreExercises(false);
     }
@@ -170,7 +175,7 @@ export default function ExerciseSearch({
 }
 
 interface ExerciseButtonProps {
-  exercise: Exercise;
+  exercise: ExerciseWithPersonalBestAndLastPerformed;
   onSelect?: (exerciseId: string) => void;
 }
 

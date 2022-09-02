@@ -5,7 +5,7 @@ import {
   PrismaClient,
 } from '@prisma/client';
 
-export type PersonalBestSetWithRank = {
+type PersonalBestSetWithRank = {
   exerciseId: string;
   performedAt: Date;
   rank: BigInt;
@@ -21,6 +21,9 @@ export async function getPersonalBestsForExerciseIds(
   exerciseIds: string[],
   prisma: PrismaClient | Prisma.TransactionClient
 ): Promise<Map<string, PersonalBestSet>> {
+  if (exerciseIds.length === 0) {
+    return new Map();
+  }
   const result = await prisma.$queryRaw<PersonalBestSetWithRank[]>`
   with allSetsWithDataJoined as (
   select
@@ -48,7 +51,7 @@ export async function getPersonalBestsForExerciseIds(
       *,
       row_number() over(partition by "exerciseId"
     order by
-      "resistanceInPounds" desc nulls last, repetitions desc nulls last) as rank
+      "resistanceInPounds" desc nulls last, repetitions desc nulls last, "performedAt" asc) as rank
     from
       allSetsWithDataJoined
     where
@@ -65,7 +68,7 @@ export async function getPersonalBestsForExerciseIds(
       *,
       row_number() over(partition by "exerciseId"
     order by
-      repetitions desc nulls last) as rank
+      repetitions desc nulls last, "performedAt" asc) as rank
     from
       allSetsWithDataJoined
     where
@@ -82,7 +85,7 @@ export async function getPersonalBestsForExerciseIds(
       *,
       row_number() over(partition by "exerciseId"
     order by
-      "timeInSeconds"  desc nulls last) as rank
+      "timeInSeconds"  desc nulls last, "performedAt" asc) as rank
     from
       allSetsWithDataJoined
     where
@@ -99,7 +102,7 @@ export async function getPersonalBestsForExerciseIds(
       *,
       row_number() over(partition by "exerciseId"
     order by
-      "resistanceInPounds" asc nulls last, repetitions desc nulls last) as rank
+      "resistanceInPounds" asc nulls last, repetitions desc nulls last, "performedAt" asc) as rank
     from
       allSetsWithDataJoined
     where

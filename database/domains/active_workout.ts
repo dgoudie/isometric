@@ -9,7 +9,9 @@ import { ActiveWorkoutWithExercisesWithExerciseWithSetsAndDetails } from '../../
 import { FinishedWorkoutExerciseWithSets } from '../../example_type';
 import { FinishedWorkoutWithExerciseWithSets } from '../../types/FinishedWorkout';
 import { getExerciseById } from './exercise';
+import { getLastPerformedForExerciseIds } from '../utils/last-performed';
 import { getNextDaySchedule } from './scheduled_workout';
+import { getPersonalBestsForExerciseIds } from '../utils/personal-best';
 import prisma from '../prisma';
 
 export async function getFinishedWorkouts(
@@ -67,7 +69,7 @@ export async function getActiveWorkout(userId: string) {
 export async function getFullActiveWorkout(
   userId: string
 ): Promise<ActiveWorkoutWithExercisesWithExerciseWithSetsAndDetails | null> {
-  return prisma.activeWorkout.findUnique({
+  const activeWorkout = await prisma.activeWorkout.findUnique({
     where: {
       userId,
     },
@@ -92,6 +94,47 @@ export async function getFullActiveWorkout(
       },
     },
   });
+  if (!activeWorkout) {
+    return activeWorkout;
+  }
+  const exerciseIds = activeWorkout.exercises.map(
+    ({ exerciseId }) => exerciseId
+  );
+  const personalBestMap = await getPersonalBestsForExerciseIds(
+    userId,
+    exerciseIds,
+    prisma
+  );
+  const exercisesWithPersonalBest = activeWorkout.exercises.map(
+    (activeWorkoutExercise) => ({
+      ...activeWorkoutExercise,
+      exercise: {
+        ...activeWorkoutExercise.exercise,
+        personalBest:
+          personalBestMap.get(activeWorkoutExercise.exerciseId) ?? null,
+      },
+    })
+  );
+  const lastPerformedMap = await getLastPerformedForExerciseIds(
+    userId,
+    exerciseIds,
+    prisma
+  );
+  const exercisesWithPersonalBestWithLastPerformed =
+    exercisesWithPersonalBest.map((activeWorkoutExercise) => ({
+      ...activeWorkoutExercise,
+      exercise: {
+        ...activeWorkoutExercise.exercise,
+        lastPerformed:
+          lastPerformedMap.get(activeWorkoutExercise.exerciseId) ?? null,
+      },
+    }));
+  const activeWorkoutWithData = {
+    ...activeWorkout,
+    exercises: exercisesWithPersonalBestWithLastPerformed,
+  };
+
+  return activeWorkoutWithData;
 }
 
 export async function addCheckInToActiveWorkout(userId: string) {

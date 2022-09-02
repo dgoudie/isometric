@@ -1,14 +1,11 @@
-import { Prisma } from '@prisma/client';
+import {
+  ActiveWorkoutExercise,
+  ActiveWorkoutExerciseSet,
+} from '@prisma/client';
 
-const ActiveWorkoutExerciseWithSetsAndDetails =
-  Prisma.validator<Prisma.ActiveWorkoutExerciseArgs>()({
-    include: {
-      exercise: true,
-      sets: true,
-    },
-  });
+import { ExerciseWithPersonalBestAndLastPerformed } from '../database/domains/exercise';
 
-export type ActiveWorkoutExerciseWithSetsAndDetails =
-  Prisma.ActiveWorkoutExerciseGetPayload<
-    typeof ActiveWorkoutExerciseWithSetsAndDetails
-  >;
+export type ActiveWorkoutExerciseWithSetsAndDetails = ActiveWorkoutExercise & {
+  exercise: ExerciseWithPersonalBestAndLastPerformed;
+  sets: ActiveWorkoutExerciseSet[];
+};
