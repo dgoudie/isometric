@@ -13,7 +13,6 @@ import { ActiveWorkoutExerciseWithSetsAndDetails } from '../types/ActiveWorkoutE
 import { ActiveWorkoutWithExercisesWithExerciseWithSetsAndDetails } from '../types/ActiveWorkout';
 import EndWorkoutBottomSheet from '../components/BottomSheet/components/EndWorkoutBottomSheet/EndWorkoutBottomSheet';
 import ExercisePickerBottomSheet from '../components/BottomSheet/components/ExercisePickerBottomSheet/ExercisePickerBottomSheet';
-import { GetServerSideProps } from 'next';
 import { NextPageWithLayout } from './_app';
 import RouteGuard from '../components/RouteGuard/RouteGuard';
 import RouteLoader from '../components/RouteLoader/RouteLoader';
@@ -23,8 +22,6 @@ import { WorkoutContext } from '../providers/Workout/Workout';
 import WorkoutExercisesBottomSheet from '../components/BottomSheet/components/WorkoutExercisesBottomSheet/WorkoutExercisesBottomSheet';
 import classNames from 'classnames';
 import equal from 'deep-equal';
-import { getUserId } from '../utils/get-user-id';
-import { hasActiveWorkout } from '../database/domains/active_workout';
 import { requestNotificationPermission } from '../utils/notification';
 import styles from './Workout.module.scss';
 import { useFetchJSONWith403Redirect } from '../utils/fetch-with-403-redirect';
@@ -97,11 +94,7 @@ const Workout: NextPageWithLayout = () => {
 
   const head = useHeadWithTitle('Workout');
 
-  const {
-    data: dataUnmemoized,
-    error,
-    mutate,
-  } = useSWR<{
+  const { data: dataUnmemoized, error } = useSWR<{
     workout: ActiveWorkoutWithExercisesWithExerciseWithSetsAndDetails;
   }>('/api/workout/active', fetcher);
 

@@ -156,8 +156,23 @@ export async function getExerciseById(userId: string, id: string) {
   return prisma.exercise.findFirst({ where: { userId, id } });
 }
 
-export async function getExerciseByName(userId: string, name: string) {
-  return prisma.exercise.findFirst({ where: { userId, name } });
+export async function getExerciseByName(
+  userId: string,
+  name: string
+): Promise<ExerciseWithPersonalBestAndLastPerformed | null> {
+  const exercise = await prisma.exercise.findFirst({ where: { userId, name } });
+  if (exercise === null) {
+    return null;
+  }
+  const personalBest =
+    (await getPersonalBestsForExerciseIds(userId, [exercise.id], prisma)).get(
+      exercise.id
+    ) ?? null;
+  const lastPerformed =
+    (await getLastPerformedForExerciseIds(userId, [exercise.id], prisma)).get(
+      exercise.id
+    ) ?? null;
+  return { ...exercise, personalBest, lastPerformed };
 }
 
 export async function saveExercise(

@@ -58,7 +58,7 @@ export default function ExerciseSearch({
   onSelect,
 }: Props) {
   const searchParams = useMemo(() => {
-    const searchParams = new URLSearchParams();
+    const searchParams = new URLSearchParams({ page: '1' });
     !!search && searchParams.set('search', search);
     !!muscleGroup && searchParams.set('muscleGroup', muscleGroup);
     history === 'only_performed' && searchParams.set('onlyPerformed', '1');
@@ -68,6 +68,10 @@ export default function ExerciseSearch({
 
   const itemsRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    itemsRef?.current?.scrollTo({ top: 0 });
+  }, [searchParams]);
 
   useEffect(() => {
     inputRef.current?.focus();
@@ -86,6 +90,12 @@ export default function ExerciseSearch({
     fetcher
   );
 
+  const nextPageSearchParams = useMemo(() => {
+    const nextPageSearchParams = new URLSearchParams(searchParams);
+    nextPageSearchParams.set('page', page.toString());
+    return nextPageSearchParams;
+  }, [searchParams, page]);
+
   const [_pending, startTransition] = useTransition();
 
   useEffect(() => {
@@ -99,17 +109,15 @@ export default function ExerciseSearch({
   }, [data]);
 
   const loadMore = useCallback(async () => {
-    const params = new URLSearchParams();
-    params.set('page', page.toString());
-    const nextPage = await fetchFromApi<
-      ExerciseWithPersonalBestAndLastPerformed[]
-    >(`/api/exercises`, params);
+    const nextPage = await fetcher(
+      `/api/exercises?${nextPageSearchParams.toString()}`
+    );
     if (nextPage.length < 10) {
       setMoreExercises(false);
     }
     setExercises([...exercises!, ...nextPage]);
     setPage(page + 1);
-  }, [exercises, page]);
+  }, [exercises, fetcher, nextPageSearchParams, page]);
 
   if (error) throw error;
 
