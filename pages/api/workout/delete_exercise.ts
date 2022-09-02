@@ -1,9 +1,8 @@
 import {
+  DeleteExerciseError,
   addCheckInToActiveWorkout,
   deleteExercise,
-  persistSetComplete,
 } from '../../../database/domains/active_workout';
-import { isNaB, parseBoolean } from '../../../utils/boolean';
 
 import { NextApiHandler } from 'next';
 import broadcastApiMutations from '../../../utils/broadcast-api-mutations';
@@ -15,15 +14,23 @@ const handler: NextApiHandler = async (req, res) => {
     res.status(403).end();
     return;
   }
-  const { index } = req.body;
-  if (typeof index !== 'number') {
-    res.status(400).send(`Parameter index is invalid.`);
+  const { activeWorkoutExerciseId } = req.body;
+  if (typeof activeWorkoutExerciseId !== 'string') {
+    res.status(400).send(`Parameter activeWorkoutExerciseId is invalid.`);
     return;
   }
-  await deleteExercise(userId, index);
-  await addCheckInToActiveWorkout(userId);
-  // await broadcastApiMutations(userId, [`/api/workout`]);
-  res.end();
+  try {
+    await deleteExercise(userId, activeWorkoutExerciseId);
+    await addCheckInToActiveWorkout(userId);
+    await broadcastApiMutations(userId, ['/api/workout/active']);
+    res.end();
+  } catch (e) {
+    if (e instanceof DeleteExerciseError) {
+      res.status(400).end(e);
+    } else {
+      throw e;
+    }
+  }
 };
 
 export default handler;

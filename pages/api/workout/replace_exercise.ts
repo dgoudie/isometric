@@ -14,9 +14,9 @@ const handler: NextApiHandler = async (req, res) => {
     res.status(403).end();
     return;
   }
-  const { index, newExerciseId } = req.body;
-  if (typeof index !== 'number') {
-    res.status(400).send(`Parameter index is invalid.`);
+  const { activeWorkoutExerciseId, newExerciseId } = req.body;
+  if (typeof activeWorkoutExerciseId !== 'string') {
+    res.status(400).send(`Parameter activeWorkoutExerciseId is invalid.`);
     return;
   }
   if (typeof newExerciseId !== 'string') {
@@ -24,7 +24,7 @@ const handler: NextApiHandler = async (req, res) => {
     return;
   }
   try {
-    await replaceExercise(userId, index, newExerciseId);
+    await replaceExercise(userId, activeWorkoutExerciseId, newExerciseId);
     await addCheckInToActiveWorkout(userId);
     await broadcastApiMutations(userId, ['/api/workout/active']);
     res.end();

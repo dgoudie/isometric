@@ -111,6 +111,20 @@ export async function addCheckInToActiveWorkout(userId: string) {
   });
 }
 
+async function getActiveWorkoutExerciseById(
+  userId: string,
+  activeWorkoutExerciseId: string,
+  prisma: PrismaClient | Prisma.TransactionClient
+) {
+  return prisma.activeWorkoutExercise.findFirst({
+    where: {
+      userId,
+      id: activeWorkoutExerciseId,
+    },
+    select: { orderNumber: true },
+  });
+}
+
 export async function startWorkout(userId: string): Promise<void> {
   const _hasActiveWorkout = await hasActiveWorkout(userId);
   if (_hasActiveWorkout) {
@@ -268,7 +282,7 @@ export class ReplaceExerciseError extends Error {}
 
 export async function replaceExercise(
   userId: string,
-  exerciseIndex: number,
+  activeWorkoutExerciseId: string,
   newExerciseId: string
 ) {
   const newExercise = await getExerciseById(userId, newExerciseId);
@@ -276,20 +290,24 @@ export async function replaceExercise(
     throw new ReplaceExerciseError('no active workout');
   }
   await prisma.$transaction(async (prisma) => {
-    const result = await prisma.activeWorkoutExercise.deleteMany({
+    const currentActiveWorkoutExercise = await getActiveWorkoutExerciseById(
+      userId,
+      activeWorkoutExerciseId,
+      prisma
+    );
+    if (currentActiveWorkoutExercise === null) {
+      throw new ReplaceExerciseError(
+        `No active workout exercise found with id ${activeWorkoutExerciseId}.`
+      );
+    }
+    await prisma.activeWorkoutExercise.deleteMany({
       where: {
-        activeWorkout: {
-          userId,
-        },
-        orderNumber: exerciseIndex,
+        id: activeWorkoutExerciseId,
       },
     });
-    if (result.count === 0) {
-      throw new ReplaceExerciseError('No record could be deleted.');
-    }
-    const newRecord = await prisma.activeWorkoutExercise.create({
+    await prisma.activeWorkoutExercise.create({
       data: {
-        orderNumber: exerciseIndex,
+        orderNumber: currentActiveWorkoutExercise.orderNumber,
         activeWorkout: {
           connect: {
             userId,
@@ -378,34 +396,40 @@ export async function addExercise(
   });
 }
 
-export async function deleteExercise(userId: string, index: number) {
+export class DeleteExerciseError extends Error {}
+
+export async function deleteExercise(
+  userId: string,
+  activeWorkoutExerciseId: string
+) {
   await prisma.$transaction(async (prisma) => {
-    const result = await prisma.activeWorkoutExercise.deleteMany({
-      where: {
-        activeWorkout: {
-          userId,
-        },
-        orderNumber: index,
-      },
-    });
-    if (result.count === 0) {
-      return;
+    const currentActiveWorkoutExercise = await getActiveWorkoutExerciseById(
+      userId,
+      activeWorkoutExerciseId,
+      prisma
+    );
+    if (currentActiveWorkoutExercise === null) {
+      throw new DeleteExerciseError(
+        `No active workout exercise found with id ${activeWorkoutExerciseId}.`
+      );
     }
-    const activeWorkoutExercise = await prisma.activeWorkoutExercise.count({
-      where: { userId },
+    await prisma.activeWorkoutExercise.delete({
+      where: { id: activeWorkoutExerciseId },
     });
+    const activeWorkoutExerciseCount = await prisma.activeWorkoutExercise.count(
+      {
+        where: { userId },
+      }
+    );
     await prisma.activeWorkoutExercise.updateMany({
       data: {
         orderNumber: {
-          increment: activeWorkoutExercise + 1,
+          increment: activeWorkoutExerciseCount + 1,
         },
       },
       where: {
         activeWorkout: {
           userId,
-        },
-        orderNumber: {
-          gt: index,
         },
       },
     });

@@ -6,6 +6,7 @@ import {
   useState,
   useTransition,
 } from 'react';
+import useSWR, { useSWRConfig } from 'swr';
 
 import ActiveExerciseView from '../components/ActiveExerciseView/ActiveExerciseView';
 import { ActiveWorkoutExerciseWithSetsAndDetails } from '../types/ActiveWorkoutExercise';
@@ -28,23 +29,10 @@ import { requestNotificationPermission } from '../utils/notification';
 import styles from './Workout.module.scss';
 import { useFetchJSONWith403Redirect } from '../utils/fetch-with-403-redirect';
 import { useHeadWithTitle } from '../utils/use-head-with-title';
-import useSWR from 'swr';
 
 export type ActiveExercise = {
   index: number;
   scrollIntoView: boolean;
-};
-
-export const getServerSideProps: GetServerSideProps = async (context) => {
-  const userId = await getUserId(context.req, context.res);
-  if (!userId) {
-    return { redirect: { destination: '/', permanent: false } };
-  }
-  const activeWorkoutId = hasActiveWorkout(userId);
-  if (!activeWorkoutId) {
-    return { redirect: { destination: '/dashboard', permanent: false } };
-  }
-  return { props: {} };
 };
 
 const Workout: NextPageWithLayout = () => {
@@ -109,9 +97,22 @@ const Workout: NextPageWithLayout = () => {
 
   const head = useHeadWithTitle('Workout');
 
-  const { data: dataUnmemoized, error } = useSWR<{
+  const {
+    data: dataUnmemoized,
+    error,
+    mutate,
+  } = useSWR<{
     workout: ActiveWorkoutWithExercisesWithExerciseWithSetsAndDetails;
   }>('/api/workout/active', fetcher);
+
+  const { cache } = useSWRConfig();
+
+  useEffect(() => {
+    return () => {
+      cache.delete('/api/workout/active');
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const [data, setData] = useState(dataUnmemoized);
 

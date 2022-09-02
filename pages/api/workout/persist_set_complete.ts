@@ -2,10 +2,8 @@ import {
   addCheckInToActiveWorkout,
   persistSetComplete,
 } from '../../../database/domains/active_workout';
-import { isNaB, parseBoolean } from '../../../utils/boolean';
 
 import { NextApiHandler } from 'next';
-import broadcastApiMutations from '../../../utils/broadcast-api-mutations';
 import { getUserId } from '../../../utils/get-user-id';
 
 const handler: NextApiHandler = async (req, res) => {

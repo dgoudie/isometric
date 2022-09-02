@@ -10,6 +10,10 @@
     grid-template-rows: 100% 100%;
     gap: 1rem;
     height: 100%;
+
+    &Loading {
+      overflow-y: hidden;
+    }
   }
 
   &:first-child {
@@ -30,6 +34,7 @@
   overflow-y: auto;
   display: grid;
   grid-template-rows: auto max-content;
+  position: relative;
 
   &Footer {
     display: flex;
@@ -37,6 +42,25 @@
     align-items: center;
     gap: 0.5rem;
     margin-top: 0.75rem;
+  }
+
+  .loading {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(0, 0, 0, 0.9);
+    animation: loading_fade_in 150ms forwards;
+  }
+}
+
+@keyframes loading_fade_in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
   }
 }
 
@@ -50,6 +74,8 @@
 .exerciseActions {
   display: flex;
   gap: 0.75rem;
+  margin-top: 0.75rem;
+
   .replaceExercise {
     flex: 1;
   }

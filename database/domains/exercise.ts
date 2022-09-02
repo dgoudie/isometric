@@ -1,4 +1,8 @@
-import { ExerciseMuscleGroup, Prisma } from '@prisma/client';
+import { Exercise, ExerciseMuscleGroup, Prisma } from '@prisma/client';
+import {
+  PersonalBestSet,
+  getPersonalBestsForExerciseIds,
+} from '../utils/personal-best';
 
 import { XOR } from '../../utils/xor';
 import prisma from '../prisma';
@@ -11,11 +15,16 @@ type GetExerciseOptions = {
   name?: XOR<{ search?: string }, { equals?: string }>;
 };
 
+type ExerciseWithPersonalBestAndLastPerformed = Exercise & {
+  personalBest: PersonalBestSet | null;
+  lastPerformed: Date;
+};
+
 export async function getExercises(
   userId: string,
   options: GetExerciseOptions = {},
   page?: number
-) {
+): Promise<ExerciseWithPersonalBestAndLastPerformed[]> {
   let take: number | undefined = undefined;
   let skip: number | undefined = undefined;
   if (typeof page !== 'undefined') {
@@ -110,7 +119,7 @@ export async function getExercises(
       });
     }
   }
-  return prisma.exercise.findMany({
+  const exercises = await prisma.exercise.findMany({
     where: {
       AND: filters,
     },
@@ -120,6 +129,22 @@ export async function getExercises(
     take,
     skip,
   });
+  const exerciseIds = exercises.map((e) => e.id);
+  const personalBestMap = await getPersonalBestsForExerciseIds(
+    userId,
+    exerciseIds,
+    prisma
+  );
+  const exercisesWithPersonalBest = exercises.map((exercise) => ({
+    ...exercise,
+    personalBest: personalBestMap.get(exercise.id) ?? null,
+  }));
+  const exercisesWithPersonalBestWithLastPerformed =
+    exercisesWithPersonalBest.map((exercise) => ({
+      ...exercise,
+      lastPerformed: new Date(),
+    }));
+  return exercisesWithPersonalBestWithLastPerformed;
 }
 export async function getExerciseById(userId: string, id: string) {
   return prisma.exercise.findFirst({ where: { userId, id } });

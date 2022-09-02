@@ -5,10 +5,11 @@ import { secondsToMilliseconds } from 'date-fns';
 import styles from './ThreeDotLoader.module.scss';
 
 interface Props {
+  text?: string;
   className?: string;
 }
 
-export default function ThreeDotLoader({ className }: Props) {
+export default function ThreeDotLoader({ text = 'Loading', className }: Props) {
   const [counter, setCounter] = useState(1);
 
   useEffect(() => {
@@ -23,7 +24,7 @@ export default function ThreeDotLoader({ className }: Props) {
 
   return (
     <span className={classNames(styles.root, className)}>
-      Loading
+      {text}
       <span className={styles.dots}>{'.'.repeat(counter)}</span>
     </span>
   );

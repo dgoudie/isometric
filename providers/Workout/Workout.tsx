@@ -21,9 +21,12 @@ export const WorkoutContext = createContext<{
     setIndex: number,
     resistanceInPounds: number | null
   ) => void;
-  replaceExercise: (index: number, newExerciseId: string) => Promise<void>;
+  replaceExercise: (
+    activeWorkoutExerciseId: string,
+    newExerciseId: string
+  ) => Promise<void>;
   addExercise: (exerciseId: string, index: number) => Promise<void>;
-  deleteExercise: (index: number) => void;
+  deleteExercise: (activeWorkoutExerciseId: string) => Promise<void>;
 }>({
   startWorkout: () => undefined,
   endWorkout: () => undefined,
@@ -33,7 +36,7 @@ export const WorkoutContext = createContext<{
   persistSetResistance: () => undefined,
   replaceExercise: () => Promise.reject(),
   addExercise: () => Promise.reject(),
-  deleteExercise: () => undefined,
+  deleteExercise: () => Promise.reject(),
 });
 
 export default function WorkoutProvider({
@@ -68,14 +71,14 @@ export default function WorkoutProvider({
     []
   );
   const replaceExercise = useCallback(
-    async (index: number, newExerciseId: string) => {
+    async (activeWorkoutExerciseId: string, newExerciseId: string) => {
       await fetch(`/api/workout/replace_exercise`, {
         method: 'PUT',
         headers: {
           'content-type': 'application/json',
         },
         body: JSON.stringify({
-          index,
+          activeWorkoutExerciseId,
           newExerciseId,
         }),
       });
@@ -94,19 +97,20 @@ export default function WorkoutProvider({
       }),
     });
   }, []);
-  const deleteExercise = useCallback((index: number) => {
-    navigator.sendBeacon(
-      `/api/workout/delete_exercise`,
-      new Blob(
-        [
-          JSON.stringify({
-            index,
-          }),
-        ],
-        { type: 'application/json' }
-      )
-    );
-  }, []);
+  const deleteExercise = useCallback(
+    async (activeWorkoutExerciseId: string) => {
+      await fetch(`/api/workout/delete_exercise`, {
+        method: 'PUT',
+        headers: {
+          'content-type': 'application/json',
+        },
+        body: JSON.stringify({
+          activeWorkoutExerciseId,
+        }),
+      });
+    },
+    []
+  );
   const persistSetRepetitions = useCallback(
     (
       activeWorkoutExerciseId: string,

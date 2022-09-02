@@ -16,6 +16,7 @@ import ConfirmationBottomSheet from '../BottomSheet/components/ConfirmationBotto
 import ExercisePickerBottomSheet from '../BottomSheet/components/ExercisePickerBottomSheet/ExercisePickerBottomSheet';
 import MuscleGroupTag from '../MuscleGroupTag/MuscleGroupTag';
 import { SnackbarContext } from '../../providers/Snackbar/Snackbar';
+import ThreeDotLoader from '../ThreeDotLoader/ThreeDotLoader';
 import { WorkoutContext } from '../../providers/Workout/Workout';
 import classNames from 'classnames';
 import equal from 'deep-equal';
@@ -155,35 +156,34 @@ export default function ActiveExerciseViewExercise({
 
   const { openSnackbar } = useContext(SnackbarContext);
 
+  const [loading, setLoading] = useState(false);
+
   const newExerciseSelected = useCallback(
     async (exerciseId: string | undefined) => {
       if (!!exerciseId) {
-        await replaceExercise(activeWorkoutExercise.orderNumber, exerciseId);
-        openSnackbar(`Exercise replaced.`, 2000);
+        setLoading(true);
         scrollToTop();
+        await replaceExercise(activeWorkoutExercise.id, exerciseId);
+        openSnackbar(`Exercise replaced.`, 2000);
       }
       setShowExercisePicker(false);
     },
-    [
-      activeWorkoutExercise.orderNumber,
-      openSnackbar,
-      replaceExercise,
-      scrollToTop,
-    ]
+    [activeWorkoutExercise.id, openSnackbar, replaceExercise, scrollToTop]
   );
 
   const removeExercise = useCallback(
-    (removalConfirmed: boolean) => {
+    async (removalConfirmed: boolean) => {
       if (!!removalConfirmed) {
-        deleteExercise(activeWorkoutExercise.orderNumber);
+        setLoading(true);
+        scrollToTop();
+        await deleteExercise(activeWorkoutExercise.id);
         onDeleted();
         openSnackbar(`Exercise removed.`, 2000);
-        scrollToTop();
       }
       setShowDeleteExeciseConfirmationBottomSheet(false);
     },
     [
-      activeWorkoutExercise.orderNumber,
+      activeWorkoutExercise.id,
       deleteExercise,
       onDeleted,
       openSnackbar,
@@ -197,8 +197,14 @@ export default function ActiveExerciseViewExercise({
   );
 
   return (
-    <section ref={ref} className={styles.section}>
-      <div className={styles.sectionInner} ref={sectionInnerRef}>
+    <section ref={ref} className={classNames(styles.section, 'fade-in')}>
+      <div
+        className={classNames(
+          styles.sectionInner,
+          loading && styles.sectionInnerLoading
+        )}
+        ref={sectionInnerRef}
+      >
         <div className={styles.main}>
           <div className={styles.mainContent}>
             <div className={styles.header}>
@@ -215,6 +221,30 @@ export default function ActiveExerciseViewExercise({
             {/* {!!workoutExercise.exercise.lastPerformed && (
               <ExerciseMetadata className={styles.metadata} exercise={data} />
             )} */}
+            <div className={styles.exerciseActions}>
+              <button
+                type='button'
+                onClick={() => setShowExercisePicker(true)}
+                className={classNames(
+                  'standard-button slim outlined',
+                  styles.replaceExercise
+                )}
+              >
+                <i className='fa-solid fa-dumbbell'></i>
+                Replace Exercise
+              </button>
+              {exerciseCount > 1 && (
+                <button
+                  type='button'
+                  onClick={() =>
+                    setShowDeleteExeciseConfirmationBottomSheet(true)
+                  }
+                  className={classNames('standard-button slim danger')}
+                >
+                  <i className='fa-solid fa-trash'></i>
+                </button>
+              )}
+            </div>
             <div className={styles.sets}>
               {activeWorkoutExercise.sets.map((set) => (
                 <ActiveExerciseViewExerciseSet
@@ -247,32 +277,16 @@ export default function ActiveExerciseViewExercise({
             <i className='fa-solid fa-chevron-up'></i>
             <span>Swipe up to view options & history</span>
           </div>
+          {loading && (
+            <div
+              className={styles.loading}
+              onClick={(event) => event.stopPropagation()}
+            >
+              <ThreeDotLoader />
+            </div>
+          )}
         </div>
         <div className={styles.footer}>
-          <div className={styles.exerciseActions}>
-            <button
-              type='button'
-              onClick={() => setShowExercisePicker(true)}
-              className={classNames(
-                'standard-button slim outlined',
-                styles.replaceExercise
-              )}
-            >
-              <i className='fa-solid fa-dumbbell'></i>
-              Replace Exercise
-            </button>
-            {exerciseCount > 1 && (
-              <button
-                type='button'
-                onClick={() =>
-                  setShowDeleteExeciseConfirmationBottomSheet(true)
-                }
-                className={classNames('standard-button slim danger')}
-              >
-                <i className='fa-solid fa-trash'></i>
-              </button>
-            )}
-          </div>
           <ActiveExerciseViewExerciseInstances
             exerciseName={activeWorkoutExercise.exercise.name}
           />
