@@ -10,26 +10,36 @@ export const initializeUserDataIfNecessary = async (
         email,
       },
     });
-    if (!!user) {
-      return;
+    if (!user) {
+      user = await prisma.user.create({
+        data: {
+          email,
+          exercises: {
+            create: DEFAULT_EXERCISES,
+          },
+        },
+      });
     }
-    let newUser = await prisma.user.create({
-      data: {
-        email,
-        exercises: {
-          create: DEFAULT_EXERCISES,
-        },
-      },
-    });
     await prisma.setting.createMany({
-      data: {
-        userId: newUser.userId,
-        key: 'theme',
-        setting: {
+      data: [
+        {
+          userId: user.userId,
           key: 'theme',
-          value: 'default',
+          setting: {
+            key: 'theme',
+            value: 'default',
+          },
         },
-      },
+        {
+          userId: user.userId,
+          key: 'dark_mode',
+          setting: {
+            key: 'dark_mode',
+            value: 'system',
+          },
+        },
+      ],
+      skipDuplicates: true,
     });
   });
 };

@@ -1,3 +1,13 @@
+@mixin dark {
+  --secondary-color: hsl(0, 0%, 65%);
+  --accent-color: hsl(var(--accent-color-hs), 70%);
+  --background: hsla(var(--background-dark-hs), 9%);
+  --background-alt: hsla(var(--background-dark-hs), 17%);
+  --background-alt-2: hsla(var(--background-dark-hs), 25%);
+  --divider: hsl(var(--accent-color-hs), 40%);
+  --header-background: hsla(var(--background-dark-hs), 9%, 80%);
+  --background-inverse: hsl(var(--background-light-hs), 80%);
+}
 .default {
   --background-dark-hs: 225, 59%;
   --accent-color-hs: 225, 40%;
@@ -12,15 +22,13 @@
   --header-background: hsl(var(--background-light-hs), 80%, 80%);
   --background-inverse: hsl(var(--accent-color-hs), 30%);
 
-  @media (prefers-color-scheme: dark) {
-    --color: white;
-    --secondary-color: hsl(0, 0%, 65%);
-    --accent-color: hsl(var(--accent-color-hs), 70%);
-    --background: hsla(var(--background-dark-hs), 9%);
-    --background-alt: hsla(var(--background-dark-hs), 17%);
-    --background-alt-2: hsla(var(--background-dark-hs), 25%);
-    --divider: hsl(var(--accent-color-hs), 40%);
-    --header-background: hsla(var(--background-dark-hs), 9%, 80%);
-    --background-inverse: hsl(var(--background-light-hs), 80%);
+  &.dark {
+    @include dark;
+  }
+
+  &:not(.light) {
+    @media (prefers-color-scheme: dark) {
+      @include dark;
+    }
   }
 }

@@ -3,6 +3,16 @@
 
 @import './themes.scss';
 
+@mixin dark {
+  --color: white;
+  --color-secondary: #999;
+  --color-inverse: black;
+  --placeholder: #ffffff55;
+  --completed-color: springgreen;
+  --error: #e23737;
+  --warn: #fc0;
+}
+
 html,
 body {
   padding: 0;
@@ -28,14 +38,14 @@ body {
     100vh - calc(var(--top-bar-height) + var(--bottom-bar-height))
   );
 
-  @media (prefers-color-scheme: dark) {
-    --color: white;
-    --color-secondary: #999;
-    --color-inverse: black;
-    --placeholder: #ffffff55;
-    --completed-color: springgreen;
-    --error: #e23737;
-    --warn: #fc0;
+  &.dark {
+    @include dark;
+  }
+
+  &:not(.light) {
+    @media (prefers-color-scheme: dark) {
+      @include dark;
+    }
   }
 }
 

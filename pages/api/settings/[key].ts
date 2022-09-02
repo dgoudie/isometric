@@ -37,7 +37,7 @@ const handler: NextApiHandler = async (req, res) => {
         res.status(415).end();
         return;
       }
-      const value = validateThemeAndGetValue(setting);
+      const value = validateAndGetValue(key, setting);
       if (!value) {
         res.status(400).end();
         return;
@@ -68,11 +68,35 @@ const handler: NextApiHandler = async (req, res) => {
 
 export default handler;
 
+const validateAndGetValue = (key: string, setting: { value: string }) => {
+  switch (key) {
+    case 'theme': {
+      return validateThemeAndGetValue(setting);
+    }
+    case 'dark_mode': {
+      return validateDarkModeAndGetValue(setting);
+    }
+  }
+  return null;
+};
+
 const validateThemeAndGetValue = (setting: { value: string }) => {
   if (!setting?.value) {
     return null;
   }
   if (themes.has(setting.value)) {
+    return setting.value;
+  }
+  return null;
+};
+
+const darkModeValues = new Set(['system', 'light', 'dark']);
+
+const validateDarkModeAndGetValue = (setting: { value: string }) => {
+  if (!setting?.value) {
+    return null;
+  }
+  if (darkModeValues.has(setting.value)) {
     return setting.value;
   }
   return null;

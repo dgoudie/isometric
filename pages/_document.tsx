@@ -18,7 +18,8 @@ export default function Document() {
           href='/images/isometric.png'
           crossOrigin='use-credentials'
         />
-        <meta name='color-scheme' content='light dark'></meta>
+        <meta name='color-scheme' content='light'></meta>
+        <meta name='theme-color' content='#bdcadb' />
         <meta
           name='theme-color'
           media='(prefers-color-scheme: light)'

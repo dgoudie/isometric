@@ -37,6 +37,7 @@ const Settings: NextPageWithLayout = ({}) => {
       <h1>User Settings</h1>
       <div className={styles.settings}>
         <ThemeSetting current={settingsMap.get('theme')} />
+        <DarkModeSetting current={settingsMap.get('dark_mode')} />
       </div>
     </div>
   );
@@ -49,6 +50,27 @@ Settings.getLayout = (page) => (
     <RouteGuard>{page}</RouteGuard>
   </AppBarWithAppHeaderLayout>
 );
+
+interface SettingProps {
+  name: string;
+  description: string;
+}
+
+function Setting({
+  name,
+  description,
+  children,
+}: PropsWithChildren<SettingProps>) {
+  return (
+    <div className={classNames(styles.setting, 'fade-in')}>
+      <div className={styles.settingNameAndChildren}>
+        <div>{name}</div>
+        <div>{children}</div>
+      </div>
+      <div className={styles.settingDescription}>{description}</div>
+    </div>
+  );
+}
 
 function ThemeSetting({ current }: { current: string }) {
   const [themeName, setThemeName] = useState(current);
@@ -64,15 +86,8 @@ function ThemeSetting({ current }: { current: string }) {
       initialRender.current = false;
       return;
     }
-    localStorage.setItem(themeLocalStorageKey, themeName);
-    const theme = themes.get(themeName)!;
-    document.body.classList.value = themeName;
-    document.head.querySelector<HTMLMetaElement>(
-      '[name="theme-color"][media="(prefers-color-scheme: light)"]'
-    )!.content = theme.light;
-    document.head.querySelector<HTMLMetaElement>(
-      '[name="theme-color"][media="(prefers-color-scheme: dark)"]'
-    )!.content = theme.dark;
+    //@ts-ignore - defined in public/scripts/apply_theme.js
+    applyTheme(themeName);
     fetch(`/api/settings/theme`, {
       method: 'PUT',
       headers: {
@@ -106,23 +121,46 @@ function ThemeSetting({ current }: { current: string }) {
   );
 }
 
-interface SettingProps {
-  name: string;
-  description: string;
-}
+function DarkModeSetting({ current }: { current: string }) {
+  const [darkMode, setDarkMode] = useState(current);
 
-function Setting({
-  name,
-  description,
-  children,
-}: PropsWithChildren<SettingProps>) {
+  useEffect(() => {
+    setDarkMode(current);
+  }, [current]);
+
+  const initialRender = useRef(true);
+
+  useEffect(() => {
+    if (initialRender.current) {
+      initialRender.current = false;
+      return;
+    }
+    //@ts-ignore - defined in public/scripts/apply_theme.js
+    applyDarkMode(darkMode);
+    fetch(`/api/settings/dark_mode`, {
+      method: 'PUT',
+      headers: {
+        'content-type': 'application/json',
+      },
+      body: JSON.stringify({ key: 'dark_mode', value: darkMode }),
+    });
+  }, [darkMode]);
+
   return (
-    <div className={classNames(styles.setting, 'fade-in')}>
-      <div className={styles.settingNameAndChildren}>
-        <div>{name}</div>
-        <div>{children}</div>
+    <Setting
+      name='Dark Mode'
+      description='Manually enable or disable dark mode. Uses your system setting by default.'
+    >
+      <div className={styles.selectWrapper}>
+        <div className={styles.icon}>
+          <i className='fa-solid fa-chevron-down'></i>
+        </div>
+        <select value={darkMode} onChange={(e) => setDarkMode(e.target.value)}>
+          <option value='system'>System</option>
+          <option value='light'>Light</option>
+          <option value='dark'>Dark</option>
+        </select>
       </div>
-      <div className={styles.settingDescription}>{description}</div>
-    </div>
+    </Setting>
   );
 }
