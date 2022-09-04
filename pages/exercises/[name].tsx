@@ -1,11 +1,19 @@
-import { useContext, useEffect } from 'react';
+import {
+  CartesianGrid,
+  Line,
+  LineChart,
+  ResponsiveContainer,
+  Tooltip,
+  XAxis,
+  YAxis,
+} from 'recharts';
+import { useContext, useEffect, useMemo } from 'react';
 
 import AppBarWithAppHeaderLayout from '../../layouts/AppBarWithAppHeaderLayout/AppBarWithAppHeaderLayout';
 import { ExerciseWithGraphData } from '../api/exercise/[name]';
 import { NextPageWithLayout } from '../_app';
 import RouteGuard from '../../components/RouteGuard/RouteGuard';
 import RouteLoader from '../../components/RouteLoader/RouteLoader';
-import { ScheduledWorkoutWithExerciseInSchedulesWithExercise } from '../../types/ScheduledWorkout';
 import { SnackbarContext } from '../../providers/Snackbar/Snackbar';
 import styles from './Exercise.module.scss';
 import { useFetchJSONWith403Redirect } from '../../utils/fetch-with-403-redirect';
@@ -34,6 +42,13 @@ const Exercise: NextPageWithLayout = () => {
     }
   }, [error, openSnackbar, router]);
 
+  const chartData = useMemo(() => {
+    if (!data?.graphData) {
+      return null;
+    }
+    return data.graphData;
+  }, [data]);
+
   const head = useHeadWithTitle(exerciseName ?? 'Exercise Details');
 
   if (!data)
@@ -50,9 +65,24 @@ const Exercise: NextPageWithLayout = () => {
         {head}
         <>
           <h1>{exerciseName}</h1>
-          <pre style={{ whiteSpace: 'pre-wrap' }}>
-            {JSON.stringify(data.graphData, null, 4)}
-          </pre>
+          <div className={styles.chart}>
+            {!!chartData && (
+              <ResponsiveContainer width='100%' height='100%'>
+                <LineChart data={chartData}>
+                  <CartesianGrid horizontal={false} vertical={false} />
+                  <XAxis dataKey='performedAt' hide={true} />
+                  <YAxis hide={true} />
+                  <Tooltip cursor={false} />
+                  <Line
+                    type='monotone'
+                    dataKey='resistanceInPounds'
+                    stroke='#8884d8'
+                    activeDot={{ r: 8 }}
+                  />
+                </LineChart>
+              </ResponsiveContainer>
+            )}
+          </div>
         </>
       </div>
     </>
