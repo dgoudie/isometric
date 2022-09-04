@@ -5,5 +5,17 @@
 }
 
 .chart {
-  height: 200px;
+  background-color: var(--background-alt);
+  border-radius: 8px;
+  margin: 0 1rem 1rem;
+
+  &Header {
+    padding: 0.75rem 0.75rem 0 0.75rem;
+  }
+
+  .rechart {
+    height: 160px;
+    margin-right: 0.75rem;
+    margin-bottom: 0.5rem;
+  }
 }

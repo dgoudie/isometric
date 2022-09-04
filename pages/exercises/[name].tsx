@@ -1,12 +1,15 @@
 import {
   CartesianGrid,
+  Label,
   Line,
   LineChart,
+  ReferenceLine,
   ResponsiveContainer,
   Tooltip,
   XAxis,
   YAxis,
 } from 'recharts';
+import { addYears, format, isBefore } from 'date-fns';
 import { useContext, useEffect, useMemo } from 'react';
 
 import AppBarWithAppHeaderLayout from '../../layouts/AppBarWithAppHeaderLayout/AppBarWithAppHeaderLayout';
@@ -43,7 +46,7 @@ const Exercise: NextPageWithLayout = () => {
   }, [error, openSnackbar, router]);
 
   const chartData = useMemo(() => {
-    if (!data?.graphData) {
+    if (!data?.graphData.length) {
       return null;
     }
     return data.graphData;
@@ -59,30 +62,86 @@ const Exercise: NextPageWithLayout = () => {
       </>
     );
 
+  const dateFormatter = (isoString: string | Date) => {
+    const date = new Date(isoString);
+    const isMoreThanOneYearOld = isBefore(addYears(new Date(), 1), date);
+    if (isMoreThanOneYearOld) {
+      return format(new Date(date), 'M/d/yy');
+    } else {
+      return format(new Date(date), 'M/d');
+    }
+  };
+
   return (
     <>
       <div className={styles.root}>
         {head}
         <>
           <h1>{exerciseName}</h1>
-          <div className={styles.chart}>
-            {!!chartData && (
-              <ResponsiveContainer width='100%' height='100%'>
-                <LineChart data={chartData}>
-                  <CartesianGrid horizontal={false} vertical={false} />
-                  <XAxis dataKey='performedAt' hide={true} />
-                  <YAxis hide={true} />
-                  <Tooltip cursor={false} />
-                  <Line
-                    type='monotone'
-                    dataKey='resistanceInPounds'
-                    stroke='#8884d8'
-                    activeDot={{ r: 8 }}
-                  />
-                </LineChart>
-              </ResponsiveContainer>
-            )}
-          </div>
+          {!!chartData && (
+            <div className={styles.chart}>
+              <div className={styles.chartHeader}>History</div>
+              <div className={styles.rechart}>
+                <ResponsiveContainer width='100%' height='100%'>
+                  <LineChart data={chartData} margin={{ top: 16 }}>
+                    <CartesianGrid horizontal={false} vertical={false} />
+                    <XAxis
+                      tick={{
+                        fill: 'var(--color-secondary)',
+                      }}
+                      tickLine={{
+                        stroke: 'var(--color-secondary)',
+                      }}
+                      axisLine={{
+                        stroke: 'var(--color-secondary)',
+                      }}
+                      dataKey='performedAt'
+                      tickFormatter={dateFormatter}
+                    />
+                    <YAxis
+                      tick={{
+                        fill: 'var(--color-secondary)',
+                      }}
+                      tickLine={{
+                        stroke: 'var(--color-secondary)',
+                      }}
+                      axisLine={{
+                        stroke: 'var(--color-secondary)',
+                      }}
+                      name='Pounds'
+                      domain={['dataMin - 10', 'dataMax + 10']}
+                    />
+                    <Tooltip cursor={false} />
+                    <Line
+                      type='monotone'
+                      dataKey='resistanceInPounds'
+                      stroke='var(--pop-color)'
+                      strokeWidth={3}
+                      dot={false}
+                      activeDot={{ stroke: 'red', strokeWidth: 0, r: 4 }}
+                      animationDuration={1000}
+                    />
+                    <ReferenceLine
+                      y={data.personalBest?.resistanceInPounds!}
+                      stroke='var(--accent-color)'
+                      strokeDasharray='3 3'
+                    >
+                      <Label
+                        fill='var(--color)'
+                        position={'top'}
+                        fontWeight={200}
+                        fontSize={14}
+                      >
+                        {`Personal Best (${dateFormatter(
+                          data.personalBest?.performedAt!
+                        )})`}
+                      </Label>
+                    </ReferenceLine>
+                  </LineChart>
+                </ResponsiveContainer>
+              </div>
+            </div>
+          )}
         </>
       </div>
     </>
