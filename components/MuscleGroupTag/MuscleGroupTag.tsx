@@ -1,13 +1,11 @@
 import {
   ExerciseMuscleGroup,
-  ExerciseMuscleGroups,
-} from '@dgoudie/isometric-types';
+  ExerciseMuscleGroup as PrismaExerciseMuscleGroup,
+} from '@prisma/client';
 import chroma, { contrast } from 'chroma-js';
 
-import { ExerciseMuscleGroup as PrismaExerciseMuscleGroup } from '@prisma/client';
 import classNames from 'classnames';
 import styles from './MuscleGroupTag.module.scss';
-import { useMemo } from 'react';
 import { useMuscleGroupStyles } from '../../utils/muscle-group-tag-styling';
 
 const colorScale = chroma
@@ -21,7 +19,7 @@ const colorScale = chroma
     'hotpink',
   ])
   .mode('lch')
-  .colors(ExerciseMuscleGroups.length);
+  .colors(Object.keys(ExerciseMuscleGroup).length);
 
 interface Props {
   muscleGroup?: ExerciseMuscleGroup | PrismaExerciseMuscleGroup;

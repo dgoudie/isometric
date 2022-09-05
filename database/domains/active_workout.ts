@@ -552,6 +552,7 @@ export async function discardWorkout(userId: string) {
 export async function getWorkoutInstancesByExerciseName(
   userId: string,
   name: string,
+  order: 'asc' | 'desc',
   page?: number
 ): Promise<FinishedWorkoutExerciseWithSets[]> {
   let take: number | undefined = undefined;
@@ -577,7 +578,7 @@ export async function getWorkoutInstancesByExerciseName(
     },
     orderBy: {
       finishedWorkout: {
-        startedAt: 'desc',
+        startedAt: order,
       },
     },
     take,

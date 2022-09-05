@@ -10,10 +10,13 @@ import {
   YAxis,
 } from 'recharts';
 import { addYears, format, isBefore } from 'date-fns';
-import { useContext, useEffect, useMemo } from 'react';
+import { useCallback, useContext, useEffect, useMemo } from 'react';
 
 import AppBarWithAppHeaderLayout from '../../layouts/AppBarWithAppHeaderLayout/AppBarWithAppHeaderLayout';
+import ExerciseGraph from '../../components/ExerciseGraph/ExerciseGraph';
+import ExerciseMetadata from '../../components/ExerciseMetadata/ExerciseMetadata';
 import { ExerciseWithGraphData } from '../api/exercise/[name]';
+import MuscleGroupTag from '../../components/MuscleGroupTag/MuscleGroupTag';
 import { NextPageWithLayout } from '../_app';
 import RouteGuard from '../../components/RouteGuard/RouteGuard';
 import RouteLoader from '../../components/RouteLoader/RouteLoader';
@@ -45,13 +48,6 @@ const Exercise: NextPageWithLayout = () => {
     }
   }, [error, openSnackbar, router]);
 
-  const chartData = useMemo(() => {
-    if (!data?.graphData.length) {
-      return null;
-    }
-    return data.graphData;
-  }, [data]);
-
   const head = useHeadWithTitle(exerciseName ?? 'Exercise Details');
 
   if (!data)
@@ -62,83 +58,28 @@ const Exercise: NextPageWithLayout = () => {
       </>
     );
 
-  const dateFormatter = (isoString: string | Date) => {
-    const date = new Date(isoString);
-    const isMoreThanOneYearOld = isBefore(addYears(new Date(), 1), date);
-    if (isMoreThanOneYearOld) {
-      return format(new Date(date), 'M/d/yy');
-    } else {
-      return format(new Date(date), 'M/d');
-    }
-  };
-
   return (
     <>
       <div className={styles.root}>
         {head}
         <>
           <h1>{exerciseName}</h1>
-          {!!chartData && (
+          <div className={styles.muscleGroups}>
+            <MuscleGroupTag muscleGroup={data.primaryMuscleGroup} />
+            {data.secondaryMuscleGroups.map((muscleGroup) => (
+              <MuscleGroupTag key={muscleGroup} muscleGroup={muscleGroup} />
+            ))}
+          </div>
+          <ExerciseMetadata exercise={data} className={styles.metadata} />
+          {!!data.graphData.length && (
             <div className={styles.chart}>
               <div className={styles.chartHeader}>History</div>
               <div className={styles.rechart}>
-                <ResponsiveContainer width='100%' height='100%'>
-                  <LineChart data={chartData} margin={{ top: 16 }}>
-                    <CartesianGrid horizontal={false} vertical={false} />
-                    <XAxis
-                      tick={{
-                        fill: 'var(--color-secondary)',
-                      }}
-                      tickLine={{
-                        stroke: 'var(--color-secondary)',
-                      }}
-                      axisLine={{
-                        stroke: 'var(--color-secondary)',
-                      }}
-                      dataKey='performedAt'
-                      tickFormatter={dateFormatter}
-                    />
-                    <YAxis
-                      tick={{
-                        fill: 'var(--color-secondary)',
-                      }}
-                      tickLine={{
-                        stroke: 'var(--color-secondary)',
-                      }}
-                      axisLine={{
-                        stroke: 'var(--color-secondary)',
-                      }}
-                      name='Pounds'
-                      domain={['dataMin - 10', 'dataMax + 10']}
-                    />
-                    <Tooltip cursor={false} />
-                    <Line
-                      type='monotone'
-                      dataKey='resistanceInPounds'
-                      stroke='var(--pop-color)'
-                      strokeWidth={3}
-                      dot={false}
-                      activeDot={{ stroke: 'red', strokeWidth: 0, r: 4 }}
-                      animationDuration={1000}
-                    />
-                    <ReferenceLine
-                      y={data.personalBest?.resistanceInPounds!}
-                      stroke='var(--accent-color)'
-                      strokeDasharray='3 3'
-                    >
-                      <Label
-                        fill='var(--color)'
-                        position={'top'}
-                        fontWeight={200}
-                        fontSize={14}
-                      >
-                        {`Personal Best (${dateFormatter(
-                          data.personalBest?.performedAt!
-                        )})`}
-                      </Label>
-                    </ReferenceLine>
-                  </LineChart>
-                </ResponsiveContainer>
+                <ExerciseGraph
+                  exerciseType={data.exerciseType}
+                  exerciseName={data.name}
+                  personalBest={data.personalBest}
+                />
               </div>
             </div>
           )}

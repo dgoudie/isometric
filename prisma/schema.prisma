@@ -12,23 +12,23 @@ datasource db {
 }
 
 enum ExerciseMuscleGroup {
-  shoulders
-  chest
-  forearms
-  obliques
-  quads
   cardio
-  biceps
-  abs
-  adductors
-  traps
-  triceps
   abductors
-  hamstrings
-  calves
-  lats
+  adductors
   glutes
+  hamstrings
+  quads
+  calves
+  obliques
+  abs
+  lats
+  chest
+  traps
   lower_back
+  shoulders
+  forearms
+  triceps
+  biceps
 }
 
 enum ExerciseType {

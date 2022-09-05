@@ -1,10 +1,10 @@
 import {
   ActiveWorkoutExerciseSet,
+  ExerciseType,
   FinishedWorkoutExerciseSet,
 } from '@prisma/client';
 import { intervalToDuration, secondsToMilliseconds } from 'date-fns';
 
-import { ExerciseType } from '@dgoudie/isometric-types';
 import classNames from 'classnames';
 import styles from './SetView.module.scss';
 import { useMemo } from 'react';

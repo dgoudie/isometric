@@ -1,6 +1,6 @@
 import { FieldHookConfig, useField } from 'formik';
 
-import { ExerciseType } from '@dgoudie/isometric-types';
+import { ExerciseType } from '@prisma/client';
 import ExerciseTypePicker from '../ExerciseTypePicker/ExerciseTypePicker';
 
 export default function ExerciseTypePickerField(

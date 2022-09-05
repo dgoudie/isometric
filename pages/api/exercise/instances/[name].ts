@@ -5,13 +5,19 @@ import { getWorkoutInstancesByExerciseName } from '../../../../database/domains/
 const handler: NextApiHandler = async (req, res) => {
   switch (req.method) {
     case 'GET': {
-      const { name, page } = req.query;
+      const { name, page, order } = req.query;
       if (typeof name !== 'string') {
         res.status(400).end();
         return;
       }
       if (typeof page !== 'undefined') {
         if (typeof page !== 'string' || isNaN(parseInt(page))) {
+          res.status(400).end();
+          return;
+        }
+      }
+      if (typeof order !== 'undefined') {
+        if (order !== 'asc' && order !== 'desc') {
           res.status(400).end();
           return;
         }
@@ -24,6 +30,7 @@ const handler: NextApiHandler = async (req, res) => {
       const history = await getWorkoutInstancesByExerciseName(
         userId,
         name,
+        order ?? 'desc',
         !!page ? parseInt(page) : undefined
       );
       res.send(history);

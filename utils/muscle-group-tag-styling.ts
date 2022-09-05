@@ -1,10 +1,9 @@
 import {
   ExerciseMuscleGroup,
-  ExerciseMuscleGroups,
-} from '@dgoudie/isometric-types';
+  ExerciseMuscleGroup as PrismaExerciseMuscleGroup,
+} from '@prisma/client';
 import chroma, { contrast } from 'chroma-js';
 
-import { ExerciseMuscleGroup as PrismaExerciseMuscleGroup } from '@prisma/client';
 import { useMemo } from 'react';
 
 export interface MuscleGroupStyles {
@@ -24,19 +23,14 @@ const colorScale = chroma
     'hotpink',
   ])
   .mode('lch')
-  .colors(ExerciseMuscleGroups.length);
+  .colors(Object.keys(ExerciseMuscleGroup).length);
 
 export const getMuscleGroupStyles = (
   group: ExerciseMuscleGroup | PrismaExerciseMuscleGroup | undefined
 ): MuscleGroupStyles => {
-  let backgroundColor: string;
-  if (group === 'lower_back') {
-    backgroundColor = colorScale[ExerciseMuscleGroups.indexOf('lower back')];
-  } else {
-    backgroundColor = group
-      ? colorScale[ExerciseMuscleGroups.indexOf(group)]
-      : 'var(--background-color)';
-  }
+  const backgroundColor = group
+    ? colorScale[Object.keys(ExerciseMuscleGroup).indexOf(group)]
+    : 'var(--background-color)';
   let color = 'black';
   let borderColor = 'transparent';
   if (!group) {

@@ -1,4 +1,4 @@
-import { ExerciseType } from '@dgoudie/isometric-types';
+import { ExerciseType } from '@prisma/client';
 import classNames from 'classnames';
 import styles from './ExerciseTypePicker.module.scss';
 
