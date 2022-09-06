@@ -50,6 +50,10 @@
   &.slim {
     min-height: 2.5rem;
   }
+
+  &.micro {
+    min-height: 2rem;
+  }
 }
 
 .standard-button:not(:disabled) {

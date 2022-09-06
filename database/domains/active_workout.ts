@@ -549,19 +549,32 @@ export async function discardWorkout(userId: string) {
   });
 }
 
+export interface WorkoutInstancesResponse {
+  instances: FinishedWorkoutExerciseWithSets[];
+  pageCount: number;
+}
+
 export async function getWorkoutInstancesByExerciseName(
   userId: string,
   name: string,
   order: 'asc' | 'desc',
   page?: number
-): Promise<FinishedWorkoutExerciseWithSets[]> {
+): Promise<WorkoutInstancesResponse> {
   let take: number | undefined = undefined;
   let skip: number | undefined = undefined;
   if (typeof page !== 'undefined') {
     take = 20;
     skip = (page - 1) * 20;
   }
-  return prisma.finishedWorkoutExercise.findMany({
+  const recordCount = await prisma.finishedWorkoutExercise.count({
+    where: {
+      name,
+      finishedWorkout: {
+        userId,
+      },
+    },
+  });
+  const instances = await prisma.finishedWorkoutExercise.findMany({
     where: {
       name,
       finishedWorkout: {
@@ -584,6 +597,10 @@ export async function getWorkoutInstancesByExerciseName(
     take,
     skip,
   });
+  return {
+    instances,
+    pageCount: Math.ceil(recordCount / 20),
+  };
 }
 
 export async function reindexActiveWorkoutExercises(

@@ -27,13 +27,13 @@ const handler: NextApiHandler = async (req, res) => {
         res.status(403).end();
         return;
       }
-      const history = await getWorkoutInstancesByExerciseName(
+      const instancesAndCount = await getWorkoutInstancesByExerciseName(
         userId,
         name,
         order ?? 'desc',
         !!page ? parseInt(page) : undefined
       );
-      res.send(history);
+      res.send(instancesAndCount);
       return;
     }
     default: {

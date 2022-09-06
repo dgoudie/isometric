@@ -4,6 +4,7 @@ import { FinishedWorkoutExerciseWithSets } from '../../example_type';
 import InfiniteScroll from '../InfiniteScroll/InfiniteScroll';
 import RouteLoader from '../RouteLoader/RouteLoader';
 import SetView from '../SetView/SetView';
+import { WorkoutInstancesResponse } from '../../database/domains/active_workout';
 import styles from './ActiveExerciseViewExerciseInstances.module.scss';
 import { useFetchJSONWith403Redirect } from '../../utils/fetch-with-403-redirect';
 import useSWR from 'swr/immutable';
@@ -20,11 +21,11 @@ export default function ActiveExerciseViewExerciseInstances({
   const [instances, setInstances] = useState<FinishedWorkoutExerciseWithSets[]>(
     []
   );
-  const [moreInstances, setMoreInstances] = useState(instances.length >= 10);
+  const [pageCount, setPageCount] = useState(0);
   const [page, setPage] = useState(2);
 
   const fetcher = useFetchJSONWith403Redirect();
-  const { data, error } = useSWR<FinishedWorkoutExerciseWithSets[]>(
+  const { data, error } = useSWR<WorkoutInstancesResponse>(
     `/api/exercise/instances/${exerciseName}?page=1`,
     fetcher,
     { revalidateIfStale: false }
@@ -35,8 +36,8 @@ export default function ActiveExerciseViewExerciseInstances({
   useEffect(() => {
     if (!!data) {
       startTransition(() => {
-        setInstances(data);
-        setMoreInstances(data.length === 20);
+        setInstances(data.instances);
+        setPageCount(data.pageCount);
         setPage(2);
       });
     }
@@ -46,9 +47,6 @@ export default function ActiveExerciseViewExerciseInstances({
     const nextPage: FinishedWorkoutExerciseWithSets[] = await fetcher(
       `/api/exercise/instances/${exerciseName}?page=${page}`
     );
-    if (nextPage.length < 20) {
-      setMoreInstances(false);
-    }
     setInstances([...instances!, ...nextPage]);
     setPage(page + 1);
   }, [exerciseName, fetcher, instances, page]);
@@ -62,7 +60,7 @@ export default function ActiveExerciseViewExerciseInstances({
         {!!instances.length ? (
           <InfiniteScroll
             className={styles.instancesItems}
-            hasMore={moreInstances}
+            hasMore={page < pageCount}
             loadMore={loadMore}
             pageStart={1}
             useWindow={false}

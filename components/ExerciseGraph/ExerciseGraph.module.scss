@@ -6,3 +6,21 @@
   height: 100%;
   text-align: center;
 }
+
+.wrapper {
+  height: 200px;
+  display: flex;
+  flex-direction: column;
+}
+
+.graph {
+  flex: 1;
+  margin-bottom: 0.5rem;
+}
+
+.actions {
+  flex-shrink: 0;
+  display: flex;
+  justify-content: space-between;
+  gap: 0.5rem;
+}

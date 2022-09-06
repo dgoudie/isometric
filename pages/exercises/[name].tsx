@@ -74,13 +74,12 @@ const Exercise: NextPageWithLayout = () => {
           {!!data.graphData.length && (
             <div className={styles.chart}>
               <div className={styles.chartHeader}>History</div>
-              <div className={styles.rechart}>
-                <ExerciseGraph
-                  exerciseType={data.exerciseType}
-                  exerciseName={data.name}
-                  personalBest={data.personalBest}
-                />
-              </div>
+              <ExerciseGraph
+                className={styles.rechart}
+                exerciseType={data.exerciseType}
+                exerciseName={data.name}
+                personalBest={data.personalBest}
+              />
             </div>
           )}
         </>

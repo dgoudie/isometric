@@ -76,6 +76,7 @@ export async function getPersonalBestsForExerciseIds(
       row_number() over(partition by "exerciseId"
     order by
       repetitions desc nulls last,
+      "timeInSeconds" desc nulls last,
       "performedAt" asc) as rank
     from
       (
