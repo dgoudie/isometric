@@ -4,6 +4,10 @@
   flex-direction: column;
 }
 
+.header {
+  font-size: 1.35rem;
+}
+
 .muscleGroups {
   display: flex;
   margin: 0 1rem 0.75rem;
@@ -25,5 +29,20 @@
 
   .rechart {
     margin: 0 0.75rem 0.75rem;
+  }
+}
+
+.history {
+  margin: 0 1rem 1rem;
+
+  &Items {
+    margin-top: 0.75rem;
+    display: grid;
+    gap: 0.75rem;
+
+    &Item {
+      display: grid;
+      gap: 0.3rem;
+    }
   }
 }

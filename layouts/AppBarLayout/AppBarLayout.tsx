@@ -13,7 +13,11 @@ export default function AppBarLayout({
   children,
   header,
 }: React.PropsWithChildren<Props>) {
-  let body = <div className={styles.body}>{children}</div>;
+  let body = (
+    <div className={styles.body} id='isometric_body'>
+      {children}
+    </div>
+  );
   return (
     <div className={styles.root}>
       {header}

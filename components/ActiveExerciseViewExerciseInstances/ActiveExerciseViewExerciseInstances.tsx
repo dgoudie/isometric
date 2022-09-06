@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState, useTransition } from 'react';
 
-import { FinishedWorkoutExerciseWithSets } from '../../example_type';
+import { FinishedWorkoutExerciseWithSets } from '../../types/FinishedWorkout';
 import InfiniteScroll from '../InfiniteScroll/InfiniteScroll';
 import RouteLoader from '../RouteLoader/RouteLoader';
 import SetView from '../SetView/SetView';
@@ -44,10 +44,10 @@ export default function ActiveExerciseViewExerciseInstances({
   }, [data]);
 
   const loadMore = useCallback(async () => {
-    const nextPage: FinishedWorkoutExerciseWithSets[] = await fetcher(
+    const nextPage: WorkoutInstancesResponse = await fetcher(
       `/api/exercise/instances/${exerciseName}?page=${page}`
     );
-    setInstances([...instances!, ...nextPage]);
+    setInstances([...instances!, ...nextPage.instances]);
     setPage(page + 1);
   }, [exerciseName, fetcher, instances, page]);
 
@@ -60,7 +60,7 @@ export default function ActiveExerciseViewExerciseInstances({
         {!!instances.length ? (
           <InfiniteScroll
             className={styles.instancesItems}
-            hasMore={page < pageCount}
+            hasMore={page <= pageCount}
             loadMore={loadMore}
             pageStart={1}
             useWindow={false}

@@ -13,3 +13,16 @@ const FinishedWorkoutWithExerciseWithSets =
 
 export type FinishedWorkoutWithExerciseWithSets =
   Prisma.FinishedWorkoutGetPayload<typeof FinishedWorkoutWithExerciseWithSets>;
+
+const FinishedWorkoutExerciseWithSets =
+  Prisma.validator<Prisma.FinishedWorkoutExerciseArgs>()({
+    include: {
+      sets: true,
+      finishedWorkout: true,
+    },
+  });
+
+export type FinishedWorkoutExerciseWithSets =
+  Prisma.FinishedWorkoutExerciseGetPayload<
+    typeof FinishedWorkoutExerciseWithSets
+  >;

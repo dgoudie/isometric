@@ -1,3 +1,7 @@
+import {
+  FinishedWorkoutExerciseWithSets,
+  FinishedWorkoutWithExerciseWithSets,
+} from '../../types/FinishedWorkout';
 import { Prisma, PrismaClient } from '@prisma/client';
 import {
   differenceInMilliseconds,
@@ -6,8 +10,6 @@ import {
 } from 'date-fns';
 
 import { ActiveWorkoutWithExercisesWithExerciseWithSetsAndDetails } from '../../types/ActiveWorkout';
-import { FinishedWorkoutExerciseWithSets } from '../../example_type';
-import { FinishedWorkoutWithExerciseWithSets } from '../../types/FinishedWorkout';
 import { getExerciseById } from './exercise';
 import { getLastPerformedForExerciseIds } from '../utils/last-performed';
 import { getNextDaySchedule } from './scheduled_workout';
