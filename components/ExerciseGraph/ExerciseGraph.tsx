@@ -145,8 +145,10 @@ export default function ExerciseGraph({
 
   if (!graphData) {
     return (
-      <div className={classNames(className, styles.wrapper)}>
-        <ThreeDotLoader className={styles.loadingOrNone} />
+      <div
+        className={classNames(className, styles.wrapper, styles.loadingOrNone)}
+      >
+        <ThreeDotLoader />
       </div>
     );
   }

@@ -10,7 +10,7 @@ import {
 import AppBarWithAppHeaderLayout from '../../layouts/AppBarWithAppHeaderLayout/AppBarWithAppHeaderLayout';
 import ExerciseGraph from '../../components/ExerciseGraph/ExerciseGraph';
 import ExerciseMetadata from '../../components/ExerciseMetadata/ExerciseMetadata';
-import { ExerciseWithGraphData } from '../api/exercise/[name]';
+import { ExerciseWithPersonalBestAndLastPerformed } from '../../database/domains/exercise';
 import { FinishedWorkoutExerciseWithSets } from '../../types/FinishedWorkout';
 import InfiniteScroll from '../../components/InfiniteScroll/InfiniteScroll';
 import MuscleGroupTag from '../../components/MuscleGroupTag/MuscleGroupTag';
@@ -36,7 +36,7 @@ const Exercise: NextPageWithLayout = () => {
 
   const { openSnackbar } = useContext(SnackbarContext);
 
-  const { data, error } = useSWR<ExerciseWithGraphData>(
+  const { data, error } = useSWR<ExerciseWithPersonalBestAndLastPerformed>(
     router.isReady ? `/api/exercise/${exerciseName}` : null,
     fetcher
   );
@@ -71,19 +71,17 @@ const Exercise: NextPageWithLayout = () => {
             ))}
           </div>
           <ExerciseMetadata exercise={data} className={styles.metadata} />
-          {!!data.graphData.length && (
-            <div className={styles.chart}>
-              <div className={classNames(styles.header, styles.chartHeader)}>
-                Performance
-              </div>
-              <ExerciseGraph
-                className={styles.rechart}
-                exerciseType={data.exerciseType}
-                exerciseName={data.name}
-                personalBest={data.personalBest}
-              />
+          <div className={styles.chart}>
+            <div className={classNames(styles.header, styles.chartHeader)}>
+              Performance
             </div>
-          )}
+            <ExerciseGraph
+              className={styles.rechart}
+              exerciseType={data.exerciseType}
+              exerciseName={data.name}
+              personalBest={data.personalBest}
+            />
+          </div>
           <History exerciseName={exerciseName} />
         </>
       </div>
@@ -175,8 +173,7 @@ function History({ exerciseName }: HistoryProps) {
           </InfiniteScroll>
         ) : (
           <div className={styles.noInstances}>
-            <i className='fa-solid fa-circle-info'></i>
-            <span>You have not performed this exercise before.</span>
+            You haven&apos;t yet performed this exercise.
           </div>
         )}
       </div>

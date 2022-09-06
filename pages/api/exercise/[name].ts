@@ -1,8 +1,4 @@
 import {
-  ExerciseGraphListType,
-  getExerciseGraphData,
-} from '../../../database/utils/exercise-graph';
-import {
   ExerciseWithPersonalBestAndLastPerformed,
   getExerciseByName,
 } from '../../../database/domains/exercise';
@@ -10,10 +6,6 @@ import {
 import { NextApiHandler } from 'next';
 import { getUserId } from '../../../utils/get-user-id';
 import prisma from '../../../database/prisma';
-
-export type ExerciseWithGraphData = ExerciseWithPersonalBestAndLastPerformed & {
-  graphData: ExerciseGraphListType[];
-};
 
 const handler: NextApiHandler = async (req, res) => {
   switch (req.method) {
@@ -33,12 +25,7 @@ const handler: NextApiHandler = async (req, res) => {
         res.status(404).end();
         return;
       }
-      const graphData = await getExerciseGraphData(userId, exercise.id, prisma);
-      const exerciseWithGraphData: ExerciseWithGraphData = {
-        ...exercise,
-        graphData,
-      };
-      res.send(exerciseWithGraphData);
+      res.send(exercise);
       return;
     }
     default: {
