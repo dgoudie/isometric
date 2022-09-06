@@ -12,6 +12,7 @@ import ExerciseGraph from '../../components/ExerciseGraph/ExerciseGraph';
 import ExerciseMetadata from '../../components/ExerciseMetadata/ExerciseMetadata';
 import { ExerciseWithPersonalBestAndLastPerformed } from '../../database/domains/exercise';
 import { FinishedWorkoutExerciseWithSets } from '../../types/FinishedWorkout';
+import FloatingActionButton from '../../components/FloatingActionButton/FloatingActionButton';
 import InfiniteScroll from '../../components/InfiniteScroll/InfiniteScroll';
 import MuscleGroupTag from '../../components/MuscleGroupTag/MuscleGroupTag';
 import { NextPageWithLayout } from '../_app';
@@ -62,28 +63,32 @@ const Exercise: NextPageWithLayout = () => {
     <>
       <div className={styles.root}>
         {head}
-        <>
-          <h1>{exerciseName}</h1>
-          <div className={styles.muscleGroups}>
-            <MuscleGroupTag muscleGroup={data.primaryMuscleGroup} />
-            {data.secondaryMuscleGroups.map((muscleGroup) => (
-              <MuscleGroupTag key={muscleGroup} muscleGroup={muscleGroup} />
-            ))}
+        <h1>{exerciseName}</h1>
+        <div className={styles.muscleGroups}>
+          <MuscleGroupTag muscleGroup={data.primaryMuscleGroup} />
+          {data.secondaryMuscleGroups.map((muscleGroup) => (
+            <MuscleGroupTag key={muscleGroup} muscleGroup={muscleGroup} />
+          ))}
+        </div>
+        <ExerciseMetadata exercise={data} className={styles.metadata} />
+        <div className={styles.chart}>
+          <div className={classNames(styles.header, styles.chartHeader)}>
+            Performance
           </div>
-          <ExerciseMetadata exercise={data} className={styles.metadata} />
-          <div className={styles.chart}>
-            <div className={classNames(styles.header, styles.chartHeader)}>
-              Performance
-            </div>
-            <ExerciseGraph
-              className={styles.rechart}
-              exerciseType={data.exerciseType}
-              exerciseName={data.name}
-              personalBest={data.personalBest}
-            />
-          </div>
-          <History exerciseName={exerciseName} />
-        </>
+          <ExerciseGraph
+            className={styles.rechart}
+            exerciseType={data.exerciseType}
+            exerciseName={data.name}
+            personalBest={data.personalBest}
+          />
+        </div>
+        <History exerciseName={exerciseName} />
+        <FloatingActionButton
+          as='a'
+          href={`/exercises/${encodeURIComponent(exerciseName)}/edit`}
+          text='Edit Exercise'
+          iconName='edit'
+        />
       </div>
     </>
   );

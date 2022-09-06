@@ -1,0 +1,6 @@
+.root {
+  position: fixed;
+  bottom: calc(0.75rem + var(--bottom-bar-height));
+  right: 0.75rem;
+  border-radius: 1000px;
+}
