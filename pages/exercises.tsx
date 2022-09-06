@@ -2,7 +2,7 @@ import ExerciseSearch, {
   HistoryOption,
   HistoryOptions,
 } from '../components/ExerciseSearch/ExerciseSearch';
-import { useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 
 import AppBarWithAppHeaderLayout from '../layouts/AppBarWithAppHeaderLayout/AppBarWithAppHeaderLayout';
 import { ExerciseMuscleGroup } from '@prisma/client';
@@ -11,33 +11,67 @@ import RouteGuard from '../components/RouteGuard/RouteGuard';
 import styles from './Exercises.module.scss';
 import { useHeadWithTitle } from '../utils/use-head-with-title';
 import { useRouter } from 'next/router';
+import useUrlSearchParamsFromQuery from '../utils/use-url-search-params-from-query';
 
 const Exercises: NextPageWithLayout = () => {
-  const { query } = useRouter();
+  const { query, replace } = useRouter();
 
-  const { q, muscleGroup, history } = query;
-  const [muscleGroupDecoded, setMuscleGroupDecoded] = useState(
-    !!muscleGroup ? (muscleGroup as ExerciseMuscleGroup) : undefined
-  );
-  const [historyDecoded, setHistoryDecoded] = useState(
-    !!history ? (history as HistoryOption) : 'all'
-  );
+  const urlSearchParams = useUrlSearchParamsFromQuery(query);
 
-  const [searchTerm, setSearchTerm] = useState(q?.toString() ?? undefined);
+  const exerciseMuscleGroups = useMemo(
+    () => new Set<string>(Object.values(ExerciseMuscleGroup)),
+    []
+  );
+  const historyOptions = useMemo(() => new Set<string>(HistoryOptions), []);
+
+  const history = useMemo(() => {
+    const history = urlSearchParams.get('history');
+    if (!!history && historyOptions.has(history)) {
+      return history as HistoryOption;
+    }
+    return 'all';
+  }, [historyOptions, urlSearchParams]);
+
+  const muscleGroup = useMemo(() => {
+    const muscleGroup = urlSearchParams.get('muscleGroup');
+    if (!!muscleGroup && exerciseMuscleGroups.has(muscleGroup)) {
+      return muscleGroup as ExerciseMuscleGroup;
+    }
+    return undefined;
+  }, [exerciseMuscleGroups, urlSearchParams]);
 
   const head = useHeadWithTitle('Exercises');
+
+  const navigate = useCallback(
+    (key: string, newValue: string | undefined | null) => {
+      const params = new URLSearchParams(urlSearchParams);
+      if (!!newValue) {
+        params.set(key, newValue);
+      } else {
+        params.delete(key);
+      }
+      replace(`/exercises?${params.toString()}`);
+    },
+    [replace, urlSearchParams]
+  );
 
   return (
     <div className={styles.root}>
       {head}
       <ExerciseSearch
         className={styles.exerciseSearch}
-        search={searchTerm}
-        searchChanged={setSearchTerm}
-        muscleGroup={muscleGroupDecoded}
-        muscleGroupChanged={setMuscleGroupDecoded}
-        history={historyDecoded}
-        historyChanged={setHistoryDecoded}
+        search={urlSearchParams.get('q') ?? undefined}
+        searchChanged={(searchTerm) => {
+          navigate('q', searchTerm);
+        }}
+        muscleGroup={muscleGroup}
+        muscleGroupChanged={(muscleGroup) => {
+          navigate('muscleGroup', muscleGroup);
+        }}
+        history={history}
+        historyChanged={(history) => {
+          navigate('history', history);
+        }}
       />
     </div>
   );

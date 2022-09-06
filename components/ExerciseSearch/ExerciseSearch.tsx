@@ -127,7 +127,9 @@ export default function ExerciseSearch({
             defaultValue={search}
             type={'text'}
             placeholder='Enter a search term...'
-            onChange={(e) => searchChanged(e.target.value)}
+            onChange={(e) =>
+              searchChanged(e.target.value.replace(/\s+/g, ' ').trim())
+            }
           />
           <div className={styles.filtersInputClear}>
             {search && (
