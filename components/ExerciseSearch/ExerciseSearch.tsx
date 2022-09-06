@@ -1,13 +1,5 @@
 import { ElementOf, literals } from '../../utils/oneof-array';
-import { Exercise, ExerciseMuscleGroup } from '@prisma/client';
 import {
-  ReadableResource,
-  emptyReadableResource,
-  fetchFromApi,
-  fetchFromApiAsReadableResource,
-} from '../../utils/fetch-from-api';
-import {
-  Suspense,
   useCallback,
   useEffect,
   useMemo,
@@ -17,6 +9,7 @@ import {
 } from 'react';
 
 import ExerciseMetadata from '../ExerciseMetadata/ExerciseMetadata';
+import { ExerciseMuscleGroup } from '@prisma/client';
 import { ExerciseWithPersonalBestAndLastPerformed } from '../../database/domains/exercise';
 import InfiniteScroll from '../InfiniteScroll/InfiniteScroll';
 import Link from 'next/link';

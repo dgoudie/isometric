@@ -11,7 +11,6 @@ import RouteGuard from '../components/RouteGuard/RouteGuard';
 import RouteLoader from '../components/RouteLoader/RouteLoader';
 import SetView from '../components/SetView/SetView';
 import classNames from 'classnames';
-import { fetchFromApi } from '../utils/fetch-from-api';
 import { getFinishedWorkouts } from '../database/domains/active_workout';
 import { secondsToMilliseconds } from 'date-fns';
 import styles from './History.module.scss';
@@ -55,15 +54,15 @@ const History: NextPageWithLayout = ({}) => {
   const loadMore = useCallback(async () => {
     const params = new URLSearchParams();
     params.set('page', page.toString());
-    const nextPage = await fetchFromApi<
-      Awaited<ReturnType<typeof getFinishedWorkouts>>
-    >(`/api/workouts`, params);
+    const nextPage: FinishedWorkoutWithExerciseWithSets[] = await fetcher(
+      `/api/workouts?${params.toString()}`
+    );
     if (nextPage.length < 10) {
       setMoreWorkouts(false);
     }
     setWorkouts([...workouts!, ...nextPage]);
     setPage(page + 1);
-  }, [workouts, page]);
+  }, [page, fetcher, workouts]);
 
   const head = useHeadWithTitle('Workout History');
 

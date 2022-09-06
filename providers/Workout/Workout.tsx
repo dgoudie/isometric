@@ -1,6 +1,8 @@
-import React, { createContext, useCallback } from 'react';
+import React, { createContext, useCallback, useContext } from 'react';
 
+import { SnackbarContext } from '../Snackbar/Snackbar';
 import { useFetchJSONWith403Redirect } from '../../utils/fetch-with-403-redirect';
+import { useSWRConfig } from 'swr';
 
 export const WorkoutContext = createContext<{
   startWorkout: () => void;
@@ -42,37 +44,56 @@ export const WorkoutContext = createContext<{
 export default function WorkoutProvider({
   children,
 }: React.PropsWithChildren<{}>) {
-  const fetcher = useFetchJSONWith403Redirect();
+  const { openSnackbar } = useContext(SnackbarContext);
+  const { mutate } = useSWRConfig();
+
+  const fetcher = useCallback(
+    (...args: Parameters<typeof fetch>) =>
+      fetch(...args)
+        .then((res) => {
+          res;
+          if (res.ok) {
+            return;
+          } else {
+            throw res;
+          }
+        })
+        .catch((err) => {
+          console.error(err);
+          openSnackbar('An unexpected error occurred...');
+          mutate('/api/workout/active');
+        }),
+    [mutate, openSnackbar]
+  );
+
   const startWorkout = useCallback(() => {
-    navigator.sendBeacon(`/api/workout/start`);
-  }, []);
+    return fetcher(`/api/workout/start`);
+  }, [fetcher]);
   const endWorkout = useCallback(() => {
-    navigator.sendBeacon(`/api/workout/end`);
-  }, []);
+    return fetcher(`/api/workout/end`);
+  }, [fetcher]);
   const discardWorkout = useCallback(() => {
-    navigator.sendBeacon(`/api/workout/discard`);
-  }, []);
+    return fetcher(`/api/workout/discard`);
+  }, [fetcher]);
   const persistSetComplete = useCallback(
     (activeWorkoutExerciseId: string, setIndex: number, complete: boolean) => {
-      navigator.sendBeacon(
-        `/api/workout/persist_set_complete`,
-        new Blob(
-          [
-            JSON.stringify({
-              activeWorkoutExerciseId,
-              setIndex,
-              complete,
-            }),
-          ],
-          { type: 'application/json' }
-        )
-      );
+      return fetcher(`/api/workout/persist_set_complete`, {
+        method: 'POST',
+        body: JSON.stringify({
+          activeWorkoutExerciseId,
+          setIndex,
+          complete,
+        }),
+        headers: {
+          'content-type': 'application/json',
+        },
+      });
     },
-    []
+    [fetcher]
   );
   const replaceExercise = useCallback(
     async (activeWorkoutExerciseId: string, newExerciseId: string) => {
-      await fetch(`/api/workout/replace_exercise`, {
+      await fetcher(`/api/workout/replace_exercise`, {
         method: 'PUT',
         headers: {
           'content-type': 'application/json',
@@ -83,23 +104,26 @@ export default function WorkoutProvider({
         }),
       });
     },
-    []
+    [fetcher]
   );
-  const addExercise = useCallback(async (exerciseId: string, index: number) => {
-    await fetch(`/api/workout/add_exercise`, {
-      method: 'PUT',
-      headers: {
-        'content-type': 'application/json',
-      },
-      body: JSON.stringify({
-        index,
-        exerciseId,
-      }),
-    });
-  }, []);
+  const addExercise = useCallback(
+    async (exerciseId: string, index: number) => {
+      await fetcher(`/api/workout/add_exercise`, {
+        method: 'PUT',
+        headers: {
+          'content-type': 'application/json',
+        },
+        body: JSON.stringify({
+          index,
+          exerciseId,
+        }),
+      });
+    },
+    [fetcher]
+  );
   const deleteExercise = useCallback(
     async (activeWorkoutExerciseId: string) => {
-      await fetch(`/api/workout/delete_exercise`, {
+      await fetcher(`/api/workout/delete_exercise`, {
         method: 'PUT',
         headers: {
           'content-type': 'application/json',
@@ -109,7 +133,7 @@ export default function WorkoutProvider({
         }),
       });
     },
-    []
+    [fetcher]
   );
   const persistSetRepetitions = useCallback(
     (
@@ -117,21 +141,19 @@ export default function WorkoutProvider({
       setIndex: number,
       repetitions: number | null
     ) => {
-      navigator.sendBeacon(
-        `/api/workout/persist_set_repetitions`,
-        new Blob(
-          [
-            JSON.stringify({
-              activeWorkoutExerciseId,
-              setIndex,
-              repetitions,
-            }),
-          ],
-          { type: 'application/json' }
-        )
-      );
+      return fetcher(`/api/workout/persist_set_repetitions`, {
+        method: 'POST',
+        body: JSON.stringify({
+          activeWorkoutExerciseId,
+          setIndex,
+          repetitions,
+        }),
+        headers: {
+          'content-type': 'application/json',
+        },
+      });
     },
-    []
+    [fetcher]
   );
   const persistSetResistance = useCallback(
     (
@@ -139,21 +161,19 @@ export default function WorkoutProvider({
       setIndex: number,
       resistanceInPounds: number | null
     ) => {
-      navigator.sendBeacon(
-        `/api/workout/persist_set_resistance`,
-        new Blob(
-          [
-            JSON.stringify({
-              activeWorkoutExerciseId,
-              setIndex,
-              resistanceInPounds,
-            }),
-          ],
-          { type: 'application/json' }
-        )
-      );
+      return fetcher(`/api/workout/persist_set_resistance`, {
+        method: 'POST',
+        body: JSON.stringify({
+          activeWorkoutExerciseId,
+          setIndex,
+          resistanceInPounds,
+        }),
+        headers: {
+          'content-type': 'application/json',
+        },
+      });
     },
-    []
+    [fetcher]
   );
   return (
     <WorkoutContext.Provider
