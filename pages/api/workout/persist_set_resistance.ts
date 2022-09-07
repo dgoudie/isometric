@@ -7,8 +7,10 @@ import {
 import { isNaB, parseBoolean } from '../../../utils/boolean';
 
 import { NextApiHandler } from 'next';
+import { PrismaClientUnknownRequestError } from '@prisma/client/runtime';
 import broadcastApiMutations from '../../../utils/broadcast-api-mutations';
 import { getUserId } from '../../../utils/get-user-id';
+import { handlePrismaConflictError } from '../../../utils/handle-prisma-conflict-error';
 
 const handler: NextApiHandler = async (req, res) => {
   const userId = await getUserId(req, res);
@@ -29,12 +31,20 @@ const handler: NextApiHandler = async (req, res) => {
     res.status(400).send(`Parameter resistanceInPounds is invalid.`);
     return;
   }
-  await persistSetResistance(
-    userId,
-    activeWorkoutExerciseId,
-    setIndex,
-    resistanceInPounds
-  );
+
+  try {
+    await persistSetResistance(
+      userId,
+      activeWorkoutExerciseId,
+      setIndex,
+      resistanceInPounds
+    );
+  } catch (e) {
+    if (handlePrismaConflictError(e, res)) {
+      return;
+    }
+    throw e;
+  }
   await addCheckInToActiveWorkout(userId);
   // await broadcastApiMutations(userId, [`/api/workout/active`]);
   res.end();

@@ -1,4 +1,5 @@
 import React, { createContext, useCallback, useContext } from 'react';
+import pRetry, { AbortError } from 'p-retry';
 
 import { SnackbarContext } from '../Snackbar/Snackbar';
 import { useFetchJSONWith403Redirect } from '../../utils/fetch-with-403-redirect';
@@ -48,21 +49,24 @@ export default function WorkoutProvider({
   const { mutate } = useSWRConfig();
 
   const fetcher = useCallback(
-    (...args: Parameters<typeof fetch>) =>
-      fetch(...args)
-        .then((res) => {
-          res;
+    async (...args: Parameters<typeof fetch>) => {
+      const run = () =>
+        fetch(...args).then((res) => {
           if (res.ok) {
             return;
+          } else if (res.status === 409) {
+            throw new Error(res.statusText);
           } else {
-            throw res;
+            throw new AbortError(res.statusText);
           }
-        })
-        .catch((err) => {
-          console.error(err);
-          openSnackbar('An unexpected error occurred...');
-          mutate('/api/workout/active');
-        }),
+        });
+      try {
+        return await pRetry(run, { retries: 5 });
+      } catch {
+        openSnackbar('An unexpected error occurred...');
+        mutate('/api/workout/active');
+      }
+    },
     [mutate, openSnackbar]
   );
 
