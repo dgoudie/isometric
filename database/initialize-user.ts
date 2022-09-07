@@ -1,46 +1,37 @@
-import { Prisma } from '@prisma/client';
+import { Prisma, User } from '@prisma/client';
+
 import prisma from './prisma';
 
 export const initializeUserDataIfNecessary = async (
   email: string
-): Promise<void> => {
-  await prisma.$transaction(async (prisma) => {
-    let user = await prisma.user.findUnique({
-      where: {
-        email,
+): Promise<User> => {
+  return prisma.user.create({
+    data: {
+      email,
+      exercises: {
+        create: DEFAULT_EXERCISES,
       },
-    });
-    if (!user) {
-      user = await prisma.user.create({
-        data: {
-          email,
-          exercises: {
-            create: DEFAULT_EXERCISES,
-          },
+      settings: {
+        createMany: {
+          data: [
+            {
+              key: 'theme',
+              setting: {
+                key: 'theme',
+                value: 'default',
+              },
+            },
+            {
+              key: 'dark_mode',
+              setting: {
+                key: 'dark_mode',
+                value: 'system',
+              },
+            },
+          ],
         },
-      });
-    }
-    await prisma.setting.createMany({
-      data: [
-        {
-          userId: user.userId,
-          key: 'theme',
-          setting: {
-            key: 'theme',
-            value: 'default',
-          },
-        },
-        {
-          userId: user.userId,
-          key: 'dark_mode',
-          setting: {
-            key: 'dark_mode',
-            value: 'system',
-          },
-        },
-      ],
-      skipDuplicates: true,
-    });
+      },
+    },
   });
 };
 
