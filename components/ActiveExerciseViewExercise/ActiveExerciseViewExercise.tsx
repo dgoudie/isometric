@@ -13,9 +13,11 @@ import { ActiveWorkoutExerciseSet } from '@prisma/client';
 import { ActiveWorkoutExerciseWithSetsAndDetails } from '../../types/ActiveWorkoutExercise';
 import { AfterExerciseTimerContext } from '../../providers/AfterExerciseTimer/AfterExerciseTimer';
 import ConfirmationBottomSheet from '../BottomSheet/components/ConfirmationBottomSheet/ConfirmationBottomSheet';
+import ExerciseGraph from '../ExerciseGraph/ExerciseGraph';
 import ExerciseMetadata from '../ExerciseMetadata/ExerciseMetadata';
 import ExercisePickerBottomSheet from '../BottomSheet/components/ExercisePickerBottomSheet/ExercisePickerBottomSheet';
 import MuscleGroupTag from '../MuscleGroupTag/MuscleGroupTag';
+import RenderWhenOnScreen from '../RenderWhenOnScreen/RenderWhenOnScreen';
 import { SnackbarContext } from '../../providers/Snackbar/Snackbar';
 import ThreeDotLoader from '../ThreeDotLoader/ThreeDotLoader';
 import { WorkoutContext } from '../../providers/Workout/Workout';
@@ -288,11 +290,22 @@ export default function ActiveExerciseViewExercise({
             </div>
           )}
         </div>
-        <div className={styles.footer}>
+        <RenderWhenOnScreen className={styles.footer}>
+          <div className={classNames(styles.chart, 'fade-in')}>
+            <div className={classNames(styles.header, styles.chartHeader)}>
+              Performance
+            </div>
+            <ExerciseGraph
+              className={styles.rechart}
+              exerciseType={activeWorkoutExercise.exercise.exerciseType}
+              exerciseName={activeWorkoutExercise.exercise.name}
+              personalBest={activeWorkoutExercise.exercise.personalBest}
+            />
+          </div>
           <ActiveExerciseViewExerciseInstances
             exerciseName={activeWorkoutExercise.exercise.name}
           />
-        </div>
+        </RenderWhenOnScreen>
       </div>
     </section>
   );

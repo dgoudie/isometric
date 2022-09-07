@@ -52,10 +52,10 @@ export default function ActiveExerciseViewExerciseInstances({
   }, [exerciseName, fetcher, instances, page]);
 
   if (error) throw error;
-  if (!instances) return <RouteLoader />;
+  if (!data) return <RouteLoader />;
   return (
     <div className={styles.instances}>
-      <div className={styles.instancesHeader}>Recent History</div>
+      <div className={styles.instancesHeader}>History</div>
       <div className={styles.instancesItemsWrapper}>
         {!!instances.length ? (
           <InfiniteScroll
