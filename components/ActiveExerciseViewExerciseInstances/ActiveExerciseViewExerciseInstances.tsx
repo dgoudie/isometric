@@ -6,7 +6,7 @@ import RouteLoader from '../RouteLoader/RouteLoader';
 import SetView from '../SetView/SetView';
 import { WorkoutInstancesResponse } from '../../database/domains/active_workout';
 import styles from './ActiveExerciseViewExerciseInstances.module.scss';
-import { useFetchJSONWith403Redirect } from '../../utils/fetch-with-403-redirect';
+import { useFetchJSON } from '../../utils/fetch-json';
 import useSWR from 'swr/immutable';
 
 const format = new Intl.DateTimeFormat('en-US');
@@ -24,7 +24,7 @@ export default function ActiveExerciseViewExerciseInstances({
   const [pageCount, setPageCount] = useState(0);
   const [page, setPage] = useState(2);
 
-  const fetcher = useFetchJSONWith403Redirect();
+  const fetcher = useFetchJSON();
   const { data, error } = useSWR<WorkoutInstancesResponse>(
     `/api/exercise/instances/${exerciseName}?page=1`,
     fetcher,

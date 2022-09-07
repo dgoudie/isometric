@@ -18,7 +18,7 @@ import MuscleGroupTag from '../MuscleGroupTag/MuscleGroupTag';
 import RouteLoader from '../RouteLoader/RouteLoader';
 import classNames from 'classnames';
 import styles from './ExerciseSearch.module.scss';
-import { useFetchJSONWith403Redirect } from '../../utils/fetch-with-403-redirect';
+import { useFetchJSON } from '../../utils/fetch-json';
 import useSWR from 'swr';
 
 export const HistoryOptions = literals(
@@ -76,7 +76,7 @@ export default function ExerciseSearch({
   const [moreExercises, setMoreExercises] = useState(exercises.length >= 10);
   const [page, setPage] = useState(2);
 
-  const fetcher = useFetchJSONWith403Redirect();
+  const fetcher = useFetchJSON();
 
   const { data, error } = useSWR<ExerciseWithPersonalBestAndLastPerformed[]>(
     `/api/exercises?${searchParams.toString()}`,

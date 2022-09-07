@@ -13,7 +13,7 @@ export const getUserId = async (
     const user = await prisma.user.findUnique({
       where: { email: session.user!.email! },
     });
-    userId = user!.userId;
+    userId = user?.userId ?? null;
   }
   return userId;
 };

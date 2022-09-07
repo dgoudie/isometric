@@ -3,13 +3,13 @@
 import '../styles/globals.scss';
 
 import { ReactElement, ReactNode, useEffect, useRef } from 'react';
+import { SessionProvider, useSession } from 'next-auth/react';
 
 import AfterExerciseTimerProvider from '../providers/AfterExerciseTimer/AfterExerciseTimer';
 import type { AppProps } from 'next/app';
 import type { NextPage } from 'next';
 import PageWrapper from '../components/PageWrapper/PageWrapper';
 import PusherProviderWithConfig from '../providers/Pusher/Pusher';
-import { SessionProvider } from 'next-auth/react';
 import SnackbarProvider from '../providers/Snackbar/Snackbar';
 import WorkoutProvider from '../providers/Workout/Workout';
 import useBuildId from '../utils/use-build-id';
@@ -36,6 +36,7 @@ export default function MyApp({
     }
     prevBuildId.current = buildId;
   }, [buildId, router]);
+
   // Use the layout defined at the page level, if available
   const getLayout = Component.getLayout ?? ((page) => page);
   const pageWithLayout = getLayout(<Component {...pageProps} />);

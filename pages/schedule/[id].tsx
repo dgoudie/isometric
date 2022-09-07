@@ -20,7 +20,7 @@ import { SnackbarContext } from '../../providers/Snackbar/Snackbar';
 import classNames from 'classnames';
 import { moveItemInArray } from '../../utils/array-helpers';
 import styles from './ScheduleWorkout.module.scss';
-import { useFetchJSONWith403Redirect } from '../../utils/fetch-with-403-redirect';
+import { useFetchJSON } from '../../utils/fetch-json';
 import { useHeadWithTitle } from '../../utils/use-head-with-title';
 import { useRouter } from 'next/router';
 import useSWR from 'swr';
@@ -30,7 +30,7 @@ const ScheduleWorkout: NextPageWithLayout = () => {
 
   const scheduledWorkoutId = router.query.id as string;
 
-  const fetcher = useFetchJSONWith403Redirect();
+  const fetcher = useFetchJSON();
 
   const { openSnackbar } = useContext(SnackbarContext);
 

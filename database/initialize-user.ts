@@ -4,8 +4,11 @@ import prisma from './prisma';
 
 export const initializeUserDataIfNecessary = async (
   email: string
-): Promise<User> => {
-  return prisma.user.create({
+): Promise<void> => {
+  if (await prisma.user.findFirst({ where: { email } })) {
+    return;
+  }
+  await prisma.user.create({
     data: {
       email,
       exercises: {

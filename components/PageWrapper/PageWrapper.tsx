@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect } from 'react';
 
 import styles from './PageWrapper.module.scss';
-import { useFetchJSONWith403Redirect } from '../../utils/fetch-with-403-redirect';
+import { useFetchJSON } from '../../utils/fetch-json';
 import { usePageVisibility } from 'react-page-visibility';
 import { usePusher } from '@harelpls/use-pusher';
 import { useRouter } from 'next/router';
@@ -23,7 +23,7 @@ export default function PageWrapper({ children }: React.PropsWithChildren<{}>) {
     }
   }, [client, pageVisible]);
 
-  const fetcher = useFetchJSONWith403Redirect<{
+  const fetcher = useFetchJSON<{
     userHasActiveWorkout: boolean;
   }>();
 
@@ -37,7 +37,11 @@ export default function PageWrapper({ children }: React.PropsWithChildren<{}>) {
   const router = useRouter();
 
   useEffect(() => {
-    if (typeof data !== 'undefined' && router.isReady) {
+    if (
+      typeof data !== 'undefined' &&
+      router.isReady &&
+      router.pathname !== '/setup'
+    ) {
       if (data.userHasActiveWorkout && router.pathname !== '/workout') {
         router.replace('/workout');
       } else if (!data.userHasActiveWorkout && router.pathname === '/workout') {
@@ -45,6 +49,15 @@ export default function PageWrapper({ children }: React.PropsWithChildren<{}>) {
       }
     }
   }, [data, router, session]);
+
+  useEffect(() => {
+    if (!router.isReady || router.pathname === '/setup') {
+      return;
+    }
+    if (session.status === 'authenticated' && !session.data.isInitialized) {
+      router.replace('/setup');
+    }
+  }, [router, session]);
 
   return <div className={styles.pageWrapper}>{children}</div>;
 }

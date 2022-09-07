@@ -1,21 +1,17 @@
 import { useCallback } from 'react';
 import { useRouter } from 'next/router';
 
-export const useFetchJSONWith403Redirect = <T = any>() => {
-  const router = useRouter();
-
+export const useFetchJSON = <T = any>() => {
   const fetcher = useCallback(
     (...args: Parameters<typeof fetch>) =>
       fetch(...args).then((res) => {
-        if (res.status === 403) {
-          router.replace('/');
-        } else if (res.ok) {
+        if (res.ok) {
           return res.json() as Promise<T>;
         } else {
           throw res;
         }
       }),
-    [router]
+    []
   );
 
   return fetcher;

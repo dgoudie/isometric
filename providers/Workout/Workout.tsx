@@ -2,7 +2,7 @@ import React, { createContext, useCallback, useContext } from 'react';
 import pRetry, { AbortError } from 'p-retry';
 
 import { SnackbarContext } from '../Snackbar/Snackbar';
-import { useFetchJSONWith403Redirect } from '../../utils/fetch-with-403-redirect';
+import { useFetchJSON } from '../../utils/fetch-json';
 import { useSWRConfig } from 'swr';
 
 export const WorkoutContext = createContext<{

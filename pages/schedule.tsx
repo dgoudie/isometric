@@ -18,7 +18,7 @@ import { ScheduledWorkoutWithExerciseInSchedulesWithExercise } from '../types/Sc
 import classNames from 'classnames';
 import { moveItemInArray } from '../utils/array-helpers';
 import styles from './Schedule.module.scss';
-import { useFetchJSONWith403Redirect } from '../utils/fetch-with-403-redirect';
+import { useFetchJSON } from '../utils/fetch-json';
 import { useHeadWithTitle } from '../utils/use-head-with-title';
 import { useRouter } from 'next/router';
 import useSWR from 'swr';
@@ -26,7 +26,7 @@ import useSWR from 'swr';
 const url = `/api/schedule/workouts`;
 
 const WorkoutPlan: NextPageWithLayout = () => {
-  const fetcher = useFetchJSONWith403Redirect();
+  const fetcher = useFetchJSON();
 
   const { data: scheduledWorkouts, error: fetchScheduleError } = useSWR<
     ScheduledWorkoutWithExerciseInSchedulesWithExercise[]

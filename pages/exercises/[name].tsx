@@ -23,7 +23,7 @@ import { SnackbarContext } from '../../providers/Snackbar/Snackbar';
 import { WorkoutInstancesResponse } from '../../database/domains/active_workout';
 import classNames from 'classnames';
 import styles from './Exercise.module.scss';
-import { useFetchJSONWith403Redirect } from '../../utils/fetch-with-403-redirect';
+import { useFetchJSON } from '../../utils/fetch-json';
 import { useHeadWithTitle } from '../../utils/use-head-with-title';
 import { useRouter } from 'next/router';
 import useSWR from 'swr';
@@ -33,7 +33,7 @@ const Exercise: NextPageWithLayout = () => {
 
   const exerciseName = router.query.name as string;
 
-  const fetcher = useFetchJSONWith403Redirect();
+  const fetcher = useFetchJSON();
 
   const { openSnackbar } = useContext(SnackbarContext);
 
@@ -115,7 +115,7 @@ function History({ exerciseName }: HistoryProps) {
   const [pageCount, setPageCount] = useState(0);
   const [page, setPage] = useState(2);
 
-  const fetcher = useFetchJSONWith403Redirect();
+  const fetcher = useFetchJSON();
   const { data, error } = useSWR<WorkoutInstancesResponse>(
     `/api/exercise/instances/${exerciseName}?page=1`,
     fetcher

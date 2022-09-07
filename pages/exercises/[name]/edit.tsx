@@ -18,7 +18,7 @@ import { SnackbarContext } from '../../../providers/Snackbar/Snackbar';
 import classNames from 'classnames';
 import { getFormikInitiallyTouchedFields } from '../../../utils/formik-initially-touched';
 import styles from './ExerciseEdit.module.scss';
-import { useFetchJSONWith403Redirect } from '../../../utils/fetch-with-403-redirect';
+import { useFetchJSON } from '../../../utils/fetch-json';
 import { useHeadWithTitle } from '../../../utils/use-head-with-title';
 import { useRouter } from 'next/router';
 import useSWR from 'swr';
@@ -125,7 +125,7 @@ const ExerciseEdit: NextPageWithLayout = () => {
 
   const { openSnackbar } = useContext(SnackbarContext);
 
-  const fetcher = useFetchJSONWith403Redirect();
+  const fetcher = useFetchJSON();
 
   const { data: exercise, error } =
     useSWR<ExerciseWithPersonalBestAndLastPerformed>(

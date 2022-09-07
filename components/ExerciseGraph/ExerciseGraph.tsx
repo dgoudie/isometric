@@ -18,7 +18,7 @@ import ThreeDotLoader from '../ThreeDotLoader/ThreeDotLoader';
 import { WorkoutInstancesResponse } from '../../database/domains/active_workout';
 import classNames from 'classnames';
 import styles from './ExerciseGraph.module.scss';
-import { useFetchJSONWith403Redirect } from '../../utils/fetch-with-403-redirect';
+import { useFetchJSON } from '../../utils/fetch-json';
 import useSWR from 'swr';
 
 type ExerciseGraphProps = {
@@ -35,7 +35,7 @@ export default function ExerciseGraph({
   className,
 }: ExerciseGraphProps) {
   const [page, setPage] = useState(1);
-  const fetcher = useFetchJSONWith403Redirect();
+  const fetcher = useFetchJSON();
   const { data, error } = useSWR<WorkoutInstancesResponse>(
     `/api/exercise/instances/${exerciseName}?page=${page}&order=desc`,
     fetcher

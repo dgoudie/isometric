@@ -2,6 +2,7 @@ import GoogleOneTapProvider from './google-one-tap-provider';
 import GoogleProvider from 'next-auth/providers/google';
 import { NextAuthOptions } from 'next-auth';
 import { initializeUserDataIfNecessary } from '../database/initialize-user';
+import prisma from '../database/prisma';
 
 const nextAuthOptions: NextAuthOptions = {
   providers: [
@@ -19,15 +20,19 @@ const nextAuthOptions: NextAuthOptions = {
     }),
   ],
   callbacks: {
-    async signIn({ user, account, profile }) {
+    async signIn({ account, profile }) {
       let verified = true;
       if (account.provider === 'google') {
         verified = profile.email_verified as boolean;
       }
-      if (verified) {
-        await initializeUserDataIfNecessary(user.email!);
-      }
       return verified;
+    },
+    async session({ session }) {
+      const userInDatabase = await prisma.user.findFirst({
+        where: { email: session.user!.email! },
+      });
+      session.isInitialized = !!userInDatabase;
+      return session;
     },
   },
   pages: {

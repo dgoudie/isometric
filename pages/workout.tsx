@@ -24,7 +24,7 @@ import classNames from 'classnames';
 import equal from 'deep-equal';
 import { requestNotificationPermission } from '../utils/notification';
 import styles from './Workout.module.scss';
-import { useFetchJSONWith403Redirect } from '../utils/fetch-with-403-redirect';
+import { useFetchJSON } from '../utils/fetch-json';
 import { useHeadWithTitle } from '../utils/use-head-with-title';
 
 export type ActiveExercise = {
@@ -40,7 +40,7 @@ const Workout: NextPageWithLayout = () => {
   const { endWorkout, discardWorkout, addExercise } =
     useContext(WorkoutContext);
 
-  const fetcher = useFetchJSONWith403Redirect();
+  const fetcher = useFetchJSON();
 
   const { openSnackbar } = useContext(SnackbarContext);
 

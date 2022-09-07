@@ -13,7 +13,7 @@ import classNames from 'classnames';
 import { getGreeting } from '../utils/get-greeting';
 import { secondsToMinutes } from 'date-fns';
 import styles from './Dashboard.module.scss';
-import { useFetchJSONWith403Redirect } from '../utils/fetch-with-403-redirect';
+import { useFetchJSON } from '../utils/fetch-json';
 import { useHeadWithTitle } from '../utils/use-head-with-title';
 import useSWR from 'swr';
 
@@ -27,7 +27,7 @@ const Dashboard: NextPageWithLayout = () => {
     setGreeting(getGreeting());
   }, []);
 
-  const fetcher = useFetchJSONWith403Redirect();
+  const fetcher = useFetchJSON();
 
   const { data: schedule, error } = useSWR<NextDaySchedule>(
     `/api/schedule/upcoming`,
