@@ -524,6 +524,7 @@ export async function endWorkout(userId: string) {
       .map((workoutExercise) =>
         prisma.finishedWorkoutExercise.create({
           data: {
+            exerciseId: workoutExercise.exercise.id,
             name: workoutExercise.exercise.name,
             exerciseType: workoutExercise.exercise.exerciseType,
             primaryMuscleGroup: workoutExercise.exercise.primaryMuscleGroup,

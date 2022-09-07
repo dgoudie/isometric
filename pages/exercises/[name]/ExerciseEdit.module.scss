@@ -1,0 +1,45 @@
+.root {
+  padding: 1rem;
+  label {
+    &:not(:first-child) {
+      margin-top: 2rem;
+    }
+  }
+}
+
+.input {
+  width: 100%;
+}
+
+.errorMessage {
+  color: var(--error);
+  font-size: 0.9rem;
+  padding-top: 0.3rem;
+  display: block;
+  position: absolute;
+  background: var(--background);
+  margin: 0;
+  font-family: inherit;
+  height: 1.4rem;
+  overflow: hidden;
+}
+
+.repetitions {
+  display: grid;
+  grid-template-columns: 1fr max-content 1fr;
+  gap: 1rem;
+  align-items: center;
+}
+
+.muscleGroupPicker + .muscleGroupPicker {
+  margin-top: 0.5rem;
+  display: block;
+}
+
+.buttonBar {
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: min-content min-content;
+  justify-content: end;
+  margin-top: 2rem;
+}

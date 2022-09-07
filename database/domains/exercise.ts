@@ -5,6 +5,7 @@ import {
 } from '../utils/personal-best';
 
 import { XOR } from '../../utils/xor';
+import { da } from 'date-fns/locale';
 import { getLastPerformedForExerciseIds } from '../utils/last-performed';
 import prisma from '../prisma';
 
@@ -177,14 +178,22 @@ export async function getExerciseByName(
 
 export async function saveExercise(
   userId: string,
-  exerciseId: string,
-  exercise: Prisma.ExerciseUpdateInput
+  id: string,
+  data: Omit<Prisma.ExerciseCreateInput, 'user'>
 ) {
-  await prisma.exercise.updateMany({
-    data: exercise,
-    where: {
-      id: exerciseId,
-      userId,
-    },
+  return prisma.$transaction(async (prisma) => {
+    const existing = await prisma.exercise.findFirst({
+      where: {
+        id,
+        userId,
+      },
+    });
+    if (!!existing) {
+      return prisma.exercise.update({ where: { id }, data });
+    } else {
+      return prisma.exercise.create({
+        data: { ...data, user: { connect: { userId } } },
+      });
+    }
   });
 }

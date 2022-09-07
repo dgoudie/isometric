@@ -117,6 +117,7 @@ summary {
 @import './fade-in.scss';
 
 .standard-form-input {
+  color: var(--color);
   border: none;
   border-bottom: 2px solid rgba(128, 128, 128, 0.2);
   outline: none;
