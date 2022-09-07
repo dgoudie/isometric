@@ -7,10 +7,10 @@ import styles from './DurationInputField.module.scss';
 export default function DurationInputField({
   className,
   ...props
-}: FieldHookConfig<number | undefined> & {
+}: FieldHookConfig<number | undefined | null> & {
   className?: string;
 }) {
-  const [_field, meta, helpers] = useField<number | undefined>(props);
+  const [_field, meta, helpers] = useField<number | undefined | null>(props);
   const { value } = meta;
   const { setValue } = helpers;
 
@@ -20,7 +20,7 @@ export default function DurationInputField({
   useEffect(() => {
     let mins = 0;
     let seconds = 0;
-    if (typeof value !== 'undefined' && value > 0) {
+    if (typeof value === 'number' && value > 0) {
       mins = Math.floor(value / 60);
       seconds = value % 60;
     }

@@ -8,6 +8,7 @@ import DurationInputField from '../../../components/DurationInputField/DurationI
 import { ExerciseType } from '@prisma/client';
 import ExerciseTypePickerField from '../../../components/ExerciseTypePickerField/ExerciseTypePickerField';
 import { ExerciseWithPersonalBestAndLastPerformed } from '../../../database/domains/exercise';
+import LoadingButton from '../../../components/LoadingButton/LoadingButton';
 import MuscleGroupPickerField from '../../../components/MuscleGroupPickerField/MuscleGroupPickerField';
 import { NextPageWithLayout } from '../../_app';
 import RouteGuard from '../../../components/RouteGuard/RouteGuard';
@@ -56,6 +57,7 @@ const ExerciseSchema = Yup.object().shape({
     //@ts-ignore
     .unique('All muscle groups must be unique\n'),
   minimumRecommendedRepetitions: Yup.number()
+    .nullable()
     .integer('Minimum must be a number')
     .positive('Minimum must be more than zero')
     .when(
@@ -77,6 +79,7 @@ const ExerciseSchema = Yup.object().shape({
       }
     ),
   maximumRecommendedRepetitions: Yup.number()
+    .nullable()
     .integer('Maximum must be a number')
     .positive('Maximum must be more than zero')
     .when(
@@ -90,6 +93,8 @@ const ExerciseSchema = Yup.object().shape({
       }
     ),
   timePerSetInSeconds: Yup.number()
+    .nullable()
+    .integer('Maximum must be a number')
     .positive('Time Per Set must be more than zero')
     .max(18000, 'Time Per Set must be less than 5 hours')
     .when(
@@ -154,10 +159,11 @@ const ExerciseEdit: NextPageWithLayout = () => {
             values.exerciseType === 'timed' ||
             values.exerciseType === 'rep_based'
           ) {
-            //@ts-ignore
-            delete values.minimumRecommendedRepetitions;
-            //@ts-ignore
-            delete values.maximumRecommendedRepetitions;
+            values.minimumRecommendedRepetitions = null;
+            values.maximumRecommendedRepetitions = null;
+          }
+          if (values.exerciseType !== 'timed') {
+            values.timePerSetInSeconds = null;
           }
           const { id, name } = await fetch(`/api/exercise`, {
             method: 'PUT',
@@ -177,8 +183,8 @@ const ExerciseEdit: NextPageWithLayout = () => {
             values,
             setFieldValue,
             validateForm,
+            errors,
           } = formik;
-
           // eslint-disable-next-line react-hooks/rules-of-hooks
           useEffect(() => {
             if (
@@ -190,11 +196,10 @@ const ExerciseEdit: NextPageWithLayout = () => {
               validateForm();
             }
             if (values.exerciseType !== 'timed') {
-              setFieldValue('timePerSetInSeconds', undefined);
+              setFieldValue('timePerSetInSeconds', null);
               validateForm();
             }
-            // eslint-disable-next-line react-hooks/exhaustive-deps
-          }, [values.exerciseType]);
+          }, [setFieldValue, validateForm, values.exerciseType]);
 
           return (
             <Form>
@@ -318,14 +323,15 @@ const ExerciseEdit: NextPageWithLayout = () => {
                   <i className='fa-solid fa-rotate-left'></i>
                   Reset
                 </button>
-                <button
+                <LoadingButton
                   className='standard-button primary'
                   type='submit'
-                  disabled={!isValid || isSubmitting}
+                  disabled={!isValid}
+                  loadingText='Saving'
                 >
                   <i className='fa-solid fa-floppy-disk'></i>
                   Save
-                </button>
+                </LoadingButton>
               </div>
             </Form>
           );

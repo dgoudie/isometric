@@ -36,7 +36,9 @@ export default function MuscleGroupPicker({
       {Object.keys(ExerciseMuscleGroup)
         .sort()
         .map((group) => (
-          <option key={group}>{group.replace('_', ' ')}</option>
+          <option key={group} value={group}>
+            {group.replace('_', ' ')}
+          </option>
         ))}
     </select>
   );

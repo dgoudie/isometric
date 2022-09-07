@@ -71,7 +71,7 @@ const Exercise: NextPageWithLayout = () => {
           ))}
         </div>
         <ExerciseMetadata exercise={data} className={styles.metadata} />
-        <div className={styles.chart}>
+        <div className={classNames(styles.chart, 'fade-in')}>
           <div className={classNames(styles.header, styles.chartHeader)}>
             Performance
           </div>

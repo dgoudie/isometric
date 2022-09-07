@@ -569,9 +569,21 @@ export async function getWorkoutInstancesByExerciseName(
     take = 20;
     skip = (page - 1) * 20;
   }
+  const exerciseByName = await prisma.exercise.findFirst({
+    where: {
+      userId,
+      name,
+    },
+  });
+  let criteria: Prisma.FinishedWorkoutExerciseWhereInput = { name };
+  if (!!exerciseByName) {
+    criteria = {
+      OR: [{ name }, { exerciseId: exerciseByName.id }],
+    };
+  }
   const recordCount = await prisma.finishedWorkoutExercise.count({
     where: {
-      name,
+      ...criteria,
       finishedWorkout: {
         userId,
       },
@@ -579,7 +591,7 @@ export async function getWorkoutInstancesByExerciseName(
   });
   const instances = await prisma.finishedWorkoutExercise.findMany({
     where: {
-      name,
+      ...criteria,
       finishedWorkout: {
         userId,
       },

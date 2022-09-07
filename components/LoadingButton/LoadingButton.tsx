@@ -2,21 +2,24 @@ import React, { useCallback, useState } from 'react';
 
 import ThreeDotLoader from '../ThreeDotLoader/ThreeDotLoader';
 
+type LoadingButtonProps = React.DetailedHTMLProps<
+  React.ButtonHTMLAttributes<HTMLButtonElement>,
+  HTMLButtonElement
+> & { loadingText?: string };
+
 export default function LoadingButton({
+  loadingText,
   children,
   disabled,
   onClick,
   ...props
-}: React.DetailedHTMLProps<
-  React.ButtonHTMLAttributes<HTMLButtonElement>,
-  HTMLButtonElement
->) {
+}: LoadingButtonProps) {
   const [isLoading, setIsLoading] = useState(false);
 
   const onClickWrapped = useCallback(
     (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
       onClick && onClick(event);
-      setIsLoading(true);
+      setTimeout(() => setIsLoading(true));
     },
     [onClick]
   );
@@ -27,7 +30,7 @@ export default function LoadingButton({
       onClick={onClickWrapped}
       disabled={disabled || isLoading}
     >
-      {isLoading ? <ThreeDotLoader /> : children}
+      {isLoading ? <ThreeDotLoader text={loadingText} /> : children}
     </button>
   );
 }

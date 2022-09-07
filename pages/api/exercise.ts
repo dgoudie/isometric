@@ -1,5 +1,7 @@
+import { Exercise } from '@prisma/client';
 import { NextApiHandler } from 'next';
 import { PrismaClientValidationError } from '@prisma/client/runtime';
+import broadcastApiMutations from '../../utils/broadcast-api-mutations';
 import { getUserId } from '../../utils/get-user-id';
 import { saveExercise } from '../../database/domains/exercise';
 
@@ -20,8 +22,9 @@ const handler: NextApiHandler = async (req, res) => {
     maximumRecommendedRepetitions,
     timePerSetInSeconds,
   } = req.body;
+  let result: Exercise;
   try {
-    const result = await saveExercise(userId, id, {
+    result = await saveExercise(userId, id, {
       name,
       primaryMuscleGroup,
       secondaryMuscleGroups,
@@ -31,10 +34,6 @@ const handler: NextApiHandler = async (req, res) => {
       maximumRecommendedRepetitions,
       timePerSetInSeconds,
     });
-    res.send({
-      id: result.id,
-      name: result.name,
-    });
   } catch (e) {
     if (e instanceof PrismaClientValidationError) {
       res.status(400).end();
@@ -43,5 +42,14 @@ const handler: NextApiHandler = async (req, res) => {
       throw e;
     }
   }
+  await broadcastApiMutations(userId, [
+    '/api/exercises',
+    `/api/exercises/${encodeURIComponent(name)}`,
+    `/api/exercises/${encodeURIComponent(result.name)}`,
+  ]);
+  res.send({
+    id: result.id,
+    name: result.name,
+  });
 };
 export default handler;
