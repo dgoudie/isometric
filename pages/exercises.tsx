@@ -2,12 +2,11 @@ import ExerciseSearch, {
   HistoryOption,
   HistoryOptions,
 } from '../components/ExerciseSearch/ExerciseSearch';
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useMemo } from 'react';
 
 import AppBarWithAppHeaderLayout from '../layouts/AppBarWithAppHeaderLayout/AppBarWithAppHeaderLayout';
 import { ExerciseMuscleGroup } from '@prisma/client';
 import { NextPageWithLayout } from './_app';
-import RouteGuard from '../components/RouteGuard/RouteGuard';
 import styles from './Exercises.module.scss';
 import { useHeadWithTitle } from '../utils/use-head-with-title';
 import { useRouter } from 'next/router';
@@ -78,9 +77,7 @@ const Exercises: NextPageWithLayout = () => {
 };
 
 Exercises.getLayout = (page) => (
-  <AppBarWithAppHeaderLayout>
-    <RouteGuard>{page}</RouteGuard>
-  </AppBarWithAppHeaderLayout>
+  <AppBarWithAppHeaderLayout>{page}</AppBarWithAppHeaderLayout>
 );
 
 export default Exercises;

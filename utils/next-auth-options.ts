@@ -1,7 +1,6 @@
 import GoogleOneTapProvider from './google-one-tap-provider';
 import GoogleProvider from 'next-auth/providers/google';
 import { NextAuthOptions } from 'next-auth';
-import { initializeUserDataIfNecessary } from '../database/initialize-user';
 import prisma from '../database/prisma';
 
 const nextAuthOptions: NextAuthOptions = {

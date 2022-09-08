@@ -11,9 +11,7 @@ import ExercisePickerBottomSheet from '../../components/BottomSheet/components/E
 import Link from 'next/link';
 import MuscleGroupTag from '../../components/MuscleGroupTag/MuscleGroupTag';
 import { NextPageWithLayout } from '../_app';
-import RouteGuard from '../../components/RouteGuard/RouteGuard';
 import RouteLoader from '../../components/RouteLoader/RouteLoader';
-import { ScheduledWorkoutExercise } from '@prisma/client';
 import { ScheduledWorkoutExerciseWithExercise } from '../../types/ScheduledWorkoutExercise';
 import { ScheduledWorkoutWithExerciseInSchedulesWithExercise } from '../../types/ScheduledWorkout';
 import { SnackbarContext } from '../../providers/Snackbar/Snackbar';
@@ -171,9 +169,7 @@ const ScheduleWorkout: NextPageWithLayout = () => {
 };
 
 ScheduleWorkout.getLayout = (page) => (
-  <AppBarWithAppHeaderLayout>
-    <RouteGuard>{page}</RouteGuard>
-  </AppBarWithAppHeaderLayout>
+  <AppBarWithAppHeaderLayout>{page}</AppBarWithAppHeaderLayout>
 );
 
 export default ScheduleWorkout;

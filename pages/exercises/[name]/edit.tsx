@@ -11,7 +11,6 @@ import { ExerciseWithPersonalBestAndLastPerformed } from '../../../database/doma
 import LoadingButton from '../../../components/LoadingButton/LoadingButton';
 import MuscleGroupPickerField from '../../../components/MuscleGroupPickerField/MuscleGroupPickerField';
 import { NextPageWithLayout } from '../../_app';
-import RouteGuard from '../../../components/RouteGuard/RouteGuard';
 import RouteLoader from '../../../components/RouteLoader/RouteLoader';
 import SetCountPickerField from '../../../components/SetCountPickerField/SetCountPickerField';
 import { SnackbarContext } from '../../../providers/Snackbar/Snackbar';
@@ -342,9 +341,7 @@ const ExerciseEdit: NextPageWithLayout = () => {
 };
 
 ExerciseEdit.getLayout = (page) => (
-  <AppBarWithAppHeaderLayout>
-    <RouteGuard>{page}</RouteGuard>
-  </AppBarWithAppHeaderLayout>
+  <AppBarWithAppHeaderLayout>{page}</AppBarWithAppHeaderLayout>
 );
 
 export default ExerciseEdit;

@@ -7,11 +7,9 @@ import { FinishedWorkoutWithExerciseWithSets } from '../types/FinishedWorkout';
 import InfiniteScroll from '../components/InfiniteScroll/InfiniteScroll';
 import MuscleGroupTag from '../components/MuscleGroupTag/MuscleGroupTag';
 import { NextPageWithLayout } from './_app';
-import RouteGuard from '../components/RouteGuard/RouteGuard';
 import RouteLoader from '../components/RouteLoader/RouteLoader';
 import SetView from '../components/SetView/SetView';
 import classNames from 'classnames';
-import { getFinishedWorkouts } from '../database/domains/active_workout';
 import { secondsToMilliseconds } from 'date-fns';
 import styles from './History.module.scss';
 import { useFetchJSON } from '../utils/fetch-json';
@@ -210,7 +208,5 @@ function Workout({ workout, reload }: WorkoutProps) {
 export default History;
 
 History.getLayout = (page) => (
-  <AppBarWithAppHeaderLayout>
-    <RouteGuard>{page}</RouteGuard>
-  </AppBarWithAppHeaderLayout>
+  <AppBarWithAppHeaderLayout>{page}</AppBarWithAppHeaderLayout>
 );

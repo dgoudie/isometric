@@ -14,7 +14,6 @@ import { ActiveWorkoutWithExercisesWithExerciseWithSetsAndDetails } from '../typ
 import EndWorkoutBottomSheet from '../components/BottomSheet/components/EndWorkoutBottomSheet/EndWorkoutBottomSheet';
 import ExercisePickerBottomSheet from '../components/BottomSheet/components/ExercisePickerBottomSheet/ExercisePickerBottomSheet';
 import { NextPageWithLayout } from './_app';
-import RouteGuard from '../components/RouteGuard/RouteGuard';
 import RouteLoader from '../components/RouteLoader/RouteLoader';
 import { SnackbarContext } from '../providers/Snackbar/Snackbar';
 import SwipeDeadZone from '../components/SwipeDeadZone/SwipeDeadZone';
@@ -209,7 +208,5 @@ const Workout: NextPageWithLayout = () => {
     </div>
   );
 };
-
-Workout.getLayout = (page) => <RouteGuard>{page}</RouteGuard>;
 
 export default Workout;

@@ -12,7 +12,6 @@ import Link from 'next/link';
 import LoadingButton from '../components/LoadingButton/LoadingButton';
 import MuscleGroupTag from '../components/MuscleGroupTag/MuscleGroupTag';
 import { NextPageWithLayout } from './_app';
-import RouteGuard from '../components/RouteGuard/RouteGuard';
 import RouteLoader from '../components/RouteLoader/RouteLoader';
 import { ScheduledWorkoutWithExerciseInSchedulesWithExercise } from '../types/ScheduledWorkout';
 import classNames from 'classnames';
@@ -99,9 +98,7 @@ const WorkoutPlan: NextPageWithLayout = () => {
 };
 
 WorkoutPlan.getLayout = (page) => (
-  <AppBarWithAppHeaderLayout>
-    <RouteGuard>{page}</RouteGuard>
-  </AppBarWithAppHeaderLayout>
+  <AppBarWithAppHeaderLayout>{page}</AppBarWithAppHeaderLayout>
 );
 
 export default WorkoutPlan;

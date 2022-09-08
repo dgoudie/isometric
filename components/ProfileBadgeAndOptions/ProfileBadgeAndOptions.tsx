@@ -72,7 +72,7 @@ export default function ProfileBadgeAndOptions({ className }: Props) {
         )}
         <button
           onClick={() => {
-            signOut();
+            signOut({ callbackUrl: '/' });
             closeDetails();
           }}
         >

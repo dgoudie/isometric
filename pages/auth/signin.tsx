@@ -1,44 +1,14 @@
-import {
-  ClientSafeProvider,
-  LiteralUnion,
-  getProviders,
-  signIn,
-} from 'next-auth/react';
-import { GetServerSidePropsContext, GetServerSidePropsResult } from 'next';
-
-import { BuiltInProviderType } from 'next-auth/providers';
 import Image from 'next/image';
 import Link from 'next/link';
 import { NextPageWithLayout } from '../_app';
 import classNames from 'classnames';
-import { getUserId } from '../../utils/get-user-id';
+import { signIn } from 'next-auth/react';
 import styles from './Signin.module.scss';
 import { useHeadWithTitle } from '../../utils/use-head-with-title';
+import { useRouter } from 'next/router';
 
-const format = new Intl.DateTimeFormat('en-US', {
-  dateStyle: 'medium',
-  timeStyle: 'short',
-});
-
-type SignInProps = {
-  providers: Record<
-    LiteralUnion<BuiltInProviderType, string>,
-    ClientSafeProvider
-  > | null;
-};
-
-export async function getServerSideProps(
-  context: GetServerSidePropsContext
-): Promise<GetServerSidePropsResult<SignInProps>> {
-  const userId = await getUserId(context.req, context.res);
-  if (!!userId) {
-    return { redirect: { destination: '/', permanent: false } };
-  }
-  const providers = await getProviders();
-  return { props: { providers } };
-}
-
-const SignIn: NextPageWithLayout<SignInProps> = ({ providers }) => {
+const SignIn: NextPageWithLayout = () => {
+  const { query, replace } = useRouter();
   const head = useHeadWithTitle('Sign in');
   return (
     <div className={styles.root}>
@@ -57,7 +27,9 @@ const SignIn: NextPageWithLayout<SignInProps> = ({ providers }) => {
         <div className={styles.signinButtons}>
           <button
             type='button'
-            onClick={() => signIn('google')}
+            onClick={() =>
+              signIn('google', { callbackUrl: query.callbackUrl as string })
+            }
             className={styles.signinButton}
           >
             <Image
@@ -80,5 +52,3 @@ const SignIn: NextPageWithLayout<SignInProps> = ({ providers }) => {
 };
 
 export default SignIn;
-
-SignIn.getLayout = (page) => <>{page}</>;

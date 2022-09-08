@@ -1,8 +1,8 @@
 import { PropsWithChildren, useEffect, useMemo, useRef, useState } from 'react';
 
 import { Setting } from '@prisma/client';
+import classNames from 'classnames';
 import useSWR from 'swr';
-import RouteGuard from '../components/RouteGuard/RouteGuard';
 import RouteLoader from '../components/RouteLoader/RouteLoader';
 import AppBarWithAppHeaderLayout from '../layouts/AppBarWithAppHeaderLayout/AppBarWithAppHeaderLayout';
 import { useFetchJSON } from '../utils/fetch-json';
@@ -10,7 +10,6 @@ import themes from '../utils/themes';
 import { useHeadWithTitle } from '../utils/use-head-with-title';
 import styles from './Settings.module.scss';
 import { NextPageWithLayout } from './_app';
-import classNames from 'classnames';
 
 const themeLocalStorageKey = `isometric.theme_name`;
 
@@ -46,9 +45,7 @@ const Settings: NextPageWithLayout = ({}) => {
 export default Settings;
 
 Settings.getLayout = (page) => (
-  <AppBarWithAppHeaderLayout>
-    <RouteGuard>{page}</RouteGuard>
-  </AppBarWithAppHeaderLayout>
+  <AppBarWithAppHeaderLayout>{page}</AppBarWithAppHeaderLayout>
 );
 
 interface SettingProps {

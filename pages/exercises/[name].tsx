@@ -2,7 +2,6 @@ import {
   useCallback,
   useContext,
   useEffect,
-  useRef,
   useState,
   useTransition,
 } from 'react';
@@ -16,7 +15,6 @@ import FloatingActionButton from '../../components/FloatingActionButton/Floating
 import InfiniteScroll from '../../components/InfiniteScroll/InfiniteScroll';
 import MuscleGroupTag from '../../components/MuscleGroupTag/MuscleGroupTag';
 import { NextPageWithLayout } from '../_app';
-import RouteGuard from '../../components/RouteGuard/RouteGuard';
 import RouteLoader from '../../components/RouteLoader/RouteLoader';
 import SetView from '../../components/SetView/SetView';
 import { SnackbarContext } from '../../providers/Snackbar/Snackbar';
@@ -95,9 +93,7 @@ const Exercise: NextPageWithLayout = () => {
 };
 
 Exercise.getLayout = (page) => (
-  <AppBarWithAppHeaderLayout>
-    <RouteGuard>{page}</RouteGuard>
-  </AppBarWithAppHeaderLayout>
+  <AppBarWithAppHeaderLayout>{page}</AppBarWithAppHeaderLayout>
 );
 
 export default Exercise;

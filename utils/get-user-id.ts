@@ -1,17 +1,16 @@
 import { GetServerSidePropsContext } from 'next';
-import nextAuthOptions from './next-auth-options';
+import { getToken } from 'next-auth/jwt';
 import prisma from '../database/prisma';
-import { unstable_getServerSession } from 'next-auth';
 
 export const getUserId = async (
   req: GetServerSidePropsContext['req'],
   res: GetServerSidePropsContext['res']
 ) => {
   let userId: string | null = null;
-  const session = await unstable_getServerSession(req, res, nextAuthOptions);
-  if (!!session) {
+  const token = await getToken({ req });
+  if (!!token) {
     const user = await prisma.user.findUnique({
-      where: { email: session.user!.email! },
+      where: { email: token.email! },
     });
     userId = user?.userId ?? null;
   }

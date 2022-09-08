@@ -1,23 +1,22 @@
 import { NextApiHandler } from 'next';
+import { getToken } from 'next-auth/jwt';
 import { initializeUserDataIfNecessary } from '../../../database/initialize-user';
-import nextAuthOptions from '../../../utils/next-auth-options';
 import prisma from '../../../database/prisma';
-import { unstable_getServerSession } from 'next-auth';
 
 const buildId: NextApiHandler = async (req, res) => {
-  const session = await unstable_getServerSession(req, res, nextAuthOptions);
-  if (!session) {
+  const token = await getToken({ req });
+  if (!token) {
     res.status(403).end();
     return;
   }
   const user = await prisma.user.findUnique({
-    where: { email: session.user!.email! },
+    where: { email: token.email! },
   });
   if (user) {
     res.end();
     return;
   }
-  await initializeUserDataIfNecessary(session.user!.email!);
+  await initializeUserDataIfNecessary(token.email!);
   res.end();
 };
 export default buildId;
