@@ -19,6 +19,7 @@ export default function Document() {
           property='og:image'
           content='https://isometric.goudie.dev/images/isometric.png'
         />
+        <meta name='twitter:text:title' content='ISOMETRIC' />
         <meta name='twitter:card' content='app' />
         <meta name='twitter:creator' content='@daniel_j_goudie' />
         <meta name='twitter:description' content={description} />
