@@ -17,12 +17,16 @@ export default function Document() {
         <meta property='og:type' content='website' />
         <meta
           property='og:image'
-          content='https://isometric.goudie.dev/images/isometric.png'
+          content='https://isometric.goudie.dev/images/marketing_1.png'
         />
         <meta name='twitter:text:title' content='ISOMETRIC' />
-        <meta name='twitter:card' content='app' />
+        <meta name='twitter:card' content='summary' />
         <meta name='twitter:creator' content='@daniel_j_goudie' />
         <meta name='twitter:description' content={description} />
+        <meta
+          name='twitter:image'
+          content='https://isometric.goudie.dev/images/marketing_1.png'
+        />
         <meta charSet='utf-8' />
         <link
           rel='icon'
