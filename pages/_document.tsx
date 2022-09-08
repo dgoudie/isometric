@@ -4,6 +4,7 @@ import Script from 'next/script';
 import themes from '../utils/themes';
 
 export default function Document() {
+  const metaImageUrl = `https://${process.env.VERCEL_URL}/images/twitter_og.png`;
   const description =
     'ISOMETRIC is a simple app to record your workouts. ISOMETRIC can help you to keep track of important data points such as repetitions, resistance, and time for each set during your workout.';
   return (
@@ -15,18 +16,12 @@ export default function Document() {
         <meta property='og:url' content='https://isometric.goudie.dev' />
         <meta property='og:description' content={description} />
         <meta property='og:type' content='website' />
-        <meta
-          property='og:image'
-          content='https://isometric.goudie.dev/images/marketing_1.png'
-        />
+        <meta property='og:image' content={metaImageUrl} />
         <meta name='twitter:text:title' content='ISOMETRIC' />
         <meta name='twitter:card' content='summary' />
         <meta name='twitter:creator' content='@daniel_j_goudie' />
         <meta name='twitter:description' content={description} />
-        <meta
-          name='twitter:image'
-          content='https://isometric.goudie.dev/images/marketing_1.png'
-        />
+        <meta name='twitter:image' content={metaImageUrl} />
         <meta charSet='utf-8' />
         <link
           rel='icon'
