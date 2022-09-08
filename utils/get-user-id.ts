@@ -1,5 +1,6 @@
 import { GetServerSidePropsContext } from 'next';
 import { getToken } from 'next-auth/jwt';
+import hashEmail from './hash-email';
 import prisma from '../database/prisma';
 
 export const getUserId = async (
@@ -10,7 +11,7 @@ export const getUserId = async (
   const token = await getToken({ req });
   if (!!token) {
     const user = await prisma.user.findUnique({
-      where: { email: token.email! },
+      where: { email: hashEmail(token.email!) },
     });
     userId = user?.userId ?? null;
   }

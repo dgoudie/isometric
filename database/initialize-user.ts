@@ -1,16 +1,17 @@
 import { Prisma, User } from '@prisma/client';
 
+import hashEmail from '../utils/hash-email';
 import prisma from './prisma';
 
 export const initializeUserDataIfNecessary = async (
-  email: string
+  hashedEmail: string
 ): Promise<void> => {
-  if (await prisma.user.findFirst({ where: { email } })) {
+  if (await prisma.user.findFirst({ where: { email: hashedEmail } })) {
     return;
   }
   await prisma.user.create({
     data: {
-      email,
+      email: hashedEmail,
       exercises: {
         create: DEFAULT_EXERCISES,
       },
