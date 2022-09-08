@@ -8,7 +8,10 @@
     "start": "next start",
     "lint": "next lint",
     "vercel-build": "prisma generate && prisma migrate deploy && next build",
-    "postinstall": "prisma generate"
+    "postinstall": "prisma generate",
+    "generate-icons": "npx pwa-asset-generator public/images/isometric.png  ./public/icons -i asset-generator/index.html -m public/manifest.webmanifest --portrait-only --background \"#0a1023\" --icon-only --padding \"0\"",
+    "generate-splash": "npx pwa-asset-generator public/images/isometric.png  ./public/icons -i asset-generator/index.html -m public/manifest.webmanifest --portrait-only --background \"#0a1023\" --splash-only --padding \"35%\"",
+    "generate-assets": "npm run generate-splash && npm run generate-icons"
   },
   "dependencies": {
     "@fortawesome/fontawesome-free": "^6.1.2",
