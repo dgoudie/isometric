@@ -28,15 +28,9 @@ const nextAuthOptions: NextAuthOptions = {
       return verified;
     },
     async session({ session }) {
-      console.log('session.user.email', session.user!.email);
-      console.log(
-        'hashEmail(session.user!.email!)',
-        hashEmail(session.user!.email!)
-      );
       const userInDatabase = await prisma.user.findFirst({
         where: { email: hashEmail(session.user!.email!) },
       });
-      console.log('userInDatabase', userInDatabase);
       session.isInitialized = !!userInDatabase;
       return session;
     },

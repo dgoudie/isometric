@@ -4,10 +4,7 @@ import {
 } from '../../../database/domains/active_workout';
 
 import { NextApiHandler } from 'next';
-import { PrismaClientUnknownRequestError } from '@prisma/client/runtime';
-import broadcastApiMutations from '../../../utils/broadcast-api-mutations';
 import { getUserId } from '../../../utils/get-user-id';
-import { handlePrismaConflictError } from '../../../utils/handle-prisma-conflict-error';
 
 const handler: NextApiHandler = async (req, res) => {
   const userId = await getUserId(req, res);
@@ -28,19 +25,7 @@ const handler: NextApiHandler = async (req, res) => {
     res.status(400).send(`Parameter complete is invalid.`);
     return;
   }
-  try {
-    await persistSetComplete(
-      userId,
-      activeWorkoutExerciseId,
-      setIndex,
-      complete
-    );
-  } catch (e) {
-    if (handlePrismaConflictError(e, res)) {
-      return;
-    }
-    throw e;
-  }
+  await persistSetComplete(userId, activeWorkoutExerciseId, setIndex, complete);
   await addCheckInToActiveWorkout(userId);
   // await broadcastApiMutations(userId, [`/api/workout/active`]);
   res.end();

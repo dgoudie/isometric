@@ -238,36 +238,19 @@ export async function persistSetComplete(
   orderNumber: number,
   complete: boolean
 ) {
-  await prisma.$transaction(async (prisma) => {
-    await prisma.activeWorkoutExerciseSet.updateMany({
-      data: {
-        complete: true,
-      },
-      where: {
-        orderNumber: {
-          lte: complete ? orderNumber : orderNumber - 1,
-        },
-        activeWorkoutExerciseId,
-        activeWorkoutExercise: {
-          userId,
-        },
-      },
-    });
-    await prisma.activeWorkoutExerciseSet.updateMany({
-      data: {
-        complete: false,
-      },
-      where: {
-        orderNumber: {
-          gte: complete ? orderNumber + 1 : orderNumber,
-        },
-        activeWorkoutExercise: {
-          userId,
-          id: activeWorkoutExerciseId,
-        },
-      },
-    });
-  });
+  await prisma.$executeRaw`
+    update
+      "ActiveWorkoutExerciseSet" awes
+    set
+      "complete" = awes."orderNumber" <= ${
+        complete ? orderNumber : orderNumber - 1
+      }
+    from
+      "ActiveWorkoutExercise" awe
+    where
+      awes."activeWorkoutExerciseId" = ${activeWorkoutExerciseId} and 
+      awe."userId" = ${userId}
+  `;
 }
 
 export async function persistSetRepetitions(
