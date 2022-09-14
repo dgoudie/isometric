@@ -18,7 +18,7 @@ const handler: NextApiHandler = async (req, res) => {
     return;
   }
   if (typeof setIndex !== 'number') {
-    res.status(400).send(`Parameter set_setIndexindex is invalid.`);
+    res.status(400).send(`Parameter setIndex is invalid.`);
     return;
   }
   if (typeof complete !== 'boolean') {

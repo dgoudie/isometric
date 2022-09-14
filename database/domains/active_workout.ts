@@ -15,6 +15,7 @@ import { getLastPerformedForExerciseIds } from '../utils/last-performed';
 import { getNextDaySchedule } from './scheduled_workout';
 import { getPersonalBestsForExerciseIds } from '../utils/personal-best';
 import prisma from '../prisma';
+import withExponentialBackoffRetry from '../../utils/prisma-exponential-backoff';
 
 export async function getFinishedWorkouts(
   userId: string,
@@ -238,19 +239,21 @@ export async function persistSetComplete(
   orderNumber: number,
   complete: boolean
 ) {
-  await prisma.$executeRaw`
-    update
-      "ActiveWorkoutExerciseSet" awes
-    set
-      "complete" = awes."orderNumber" <= ${
-        complete ? orderNumber : orderNumber - 1
-      }
-    from
-      "ActiveWorkoutExercise" awe
-    where
-      awes."activeWorkoutExerciseId" = ${activeWorkoutExerciseId} and 
-      awe."userId" = ${userId}
-  `;
+  await withExponentialBackoffRetry(
+    () => prisma.$executeRaw`
+      update
+        "ActiveWorkoutExerciseSet" awes
+      set
+        "complete" = awes."orderNumber" <= ${
+          complete ? orderNumber : orderNumber - 1
+        }
+      from
+        "ActiveWorkoutExercise" awe
+      where
+        awes."activeWorkoutExerciseId" = ${activeWorkoutExerciseId} and 
+        awe."userId" = ${userId}
+    `
+  );
 }
 
 export async function persistSetRepetitions(
@@ -259,18 +262,20 @@ export async function persistSetRepetitions(
   setIndex: number,
   repetitions: number | undefined
 ) {
-  await prisma.activeWorkoutExerciseSet.updateMany({
-    data: {
-      repetitions,
-    },
-    where: {
-      orderNumber: setIndex,
-      activeWorkoutExercise: {
-        id: activeWorkoutExerciseId,
-        userId,
+  await withExponentialBackoffRetry(() =>
+    prisma.activeWorkoutExerciseSet.updateMany({
+      data: {
+        repetitions,
       },
-    },
-  });
+      where: {
+        orderNumber: setIndex,
+        activeWorkoutExercise: {
+          id: activeWorkoutExerciseId,
+          userId,
+        },
+      },
+    })
+  );
 }
 
 export async function persistSetResistance(
@@ -279,31 +284,33 @@ export async function persistSetResistance(
   setIndex: number,
   resistanceInPounds: number | undefined
 ) {
-  await prisma.activeWorkoutExerciseSet.updateMany({
-    data: {
-      resistanceInPounds,
-    },
-    where: {
-      OR: [
-        { orderNumber: setIndex },
-        {
-          // this weird snippet basically disables updating future sets if resistanceInPounds is null so we dont clear future sets
-          orderNumber:
-            resistanceInPounds !== null
-              ? {
-                  gt: setIndex,
-                }
-              : { lt: -1 },
-          complete: false,
-          OR: [{ resistanceInPounds: null }, { repetitions: null }],
-        },
-      ],
-      activeWorkoutExercise: {
-        userId,
-        id: activeWorkoutExerciseId,
+  await withExponentialBackoffRetry(() =>
+    prisma.activeWorkoutExerciseSet.updateMany({
+      data: {
+        resistanceInPounds,
       },
-    },
-  });
+      where: {
+        OR: [
+          { orderNumber: setIndex },
+          {
+            // this weird snippet basically disables updating future sets if resistanceInPounds is null so we dont clear future sets
+            orderNumber:
+              resistanceInPounds !== null
+                ? {
+                    gt: setIndex,
+                  }
+                : { lt: -1 },
+            complete: false,
+            OR: [{ resistanceInPounds: null }, { repetitions: null }],
+          },
+        ],
+        activeWorkoutExercise: {
+          userId,
+          id: activeWorkoutExerciseId,
+        },
+      },
+    })
+  );
 }
 
 export class ReplaceExerciseError extends Error {}
