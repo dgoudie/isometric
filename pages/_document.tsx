@@ -61,6 +61,11 @@ export default function Document() {
         />
         <link
           rel='apple-touch-startup-image'
+          href='/icons/apple-splash-1290-2796.jpg'
+          media='(device-width: 430px) and (device-height: 932px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)'
+        />
+        <link
+          rel='apple-touch-startup-image'
           href='/icons/apple-splash-1170-2532.jpg'
           media='(device-width: 390px) and (device-height: 844px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)'
         />
