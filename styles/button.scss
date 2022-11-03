@@ -62,3 +62,23 @@
     box-shadow: rgba(0, 0, 0, 0.1) 0 4px 12px;
   }
 }
+
+.combo-button {
+  display: flex;
+  gap: 2px;
+  min-height: 3rem;
+  > * {
+    height: 100%;
+    &:not(:first-child) {
+      border-top-left-radius: 0;
+      border-bottom-left-radius: 0;
+    }
+    &:not(:last-child) {
+      border-top-right-radius: 0;
+      border-bottom-right-radius: 0;
+    }
+    &:not(.spin-button) {
+      flex: 1;
+    }
+  }
+}

@@ -22,14 +22,12 @@ import { useHeadWithTitle } from '../utils/use-head-with-title';
 import { useRouter } from 'next/router';
 import useSWR from 'swr';
 
-const url = `/api/schedule/workouts`;
-
 const WorkoutPlan: NextPageWithLayout = () => {
   const fetcher = useFetchJSON();
 
-  const { data: scheduledWorkouts, error: fetchScheduleError } = useSWR<
+  const { data: scheduledWorkouts, error } = useSWR<
     ScheduledWorkoutWithExerciseInSchedulesWithExercise[]
-  >(url, fetcher, {
+  >(`/api/schedule/workouts`, fetcher, {
     revalidateOnMount: true,
     dedupingInterval: 0,
   });
@@ -44,6 +42,8 @@ const WorkoutPlan: NextPageWithLayout = () => {
     }).then((res) => res.text());
     router.push(`/schedule/${newScheduleWorkoutId}`);
   }, [router]);
+
+  if (error) throw error;
 
   if (!scheduledWorkouts) {
     return <RouteLoader />;

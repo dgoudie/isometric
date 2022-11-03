@@ -1,0 +1,35 @@
+.root {
+  position: relative;
+}
+
+.summary {
+  list-style: none;
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.detailsBody {
+  display: flex;
+  flex-direction: column;
+  background: var(--background-alt-2);
+  border-radius: 6px;
+  position: absolute;
+  bottom: calc(100% + 0.5rem);
+  right: 0rem;
+  z-index: 2;
+  box-shadow: rgb(0 0 0 / 19%) 0px 10px 20px, rgb(0 0 0 / 23%) 0px 6px 6px;
+  white-space: nowrap;
+
+  a,
+  button {
+    text-align: start;
+    padding: 0.75rem;
+    display: inline-flex;
+    gap: 0.5rem;
+    align-items: center;
+    color: var(--color);
+    font-family: 'Mitr', sans-serif;
+  }
+}

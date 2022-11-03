@@ -1,4 +1,4 @@
-import { useContext, useEffect, useMemo, useState } from 'react';
+import { useCallback, useContext, useEffect, useMemo, useState } from 'react';
 
 import AppBarWithAppHeaderLayout from '../layouts/AppBarWithAppHeaderLayout/AppBarWithAppHeaderLayout';
 import Link from 'next/link';
@@ -8,6 +8,9 @@ import { NextDaySchedule } from '../database/domains/scheduled_workout';
 import { NextPageWithLayout } from './_app';
 import { Prisma } from '@prisma/client';
 import RouteLoader from '../components/RouteLoader/RouteLoader';
+import { ScheduledWorkoutWithExerciseInSchedulesWithExercise } from '../types/ScheduledWorkout';
+import SelectScheduledWorkoutBottomSheet from '../components/BottomSheet/components/SelectScheduledWorkoutBottomSheet/SelectScheduledWorkoutBottomSheet';
+import SpinButton from '../components/SpinButton/SpinButton';
 import { WorkoutContext } from '../providers/Workout/Workout';
 import classNames from 'classnames';
 import { getGreeting } from '../utils/get-greeting';
@@ -33,6 +36,13 @@ const Dashboard: NextPageWithLayout = () => {
     `/api/schedule/upcoming`,
     fetcher
   );
+
+  const { data: scheduledWorkouts, error: workoutsError } = useSWR<
+    ScheduledWorkoutWithExerciseInSchedulesWithExercise[]
+  >(`/api/schedule/workouts`, fetcher, {
+    revalidateOnMount: true,
+    dedupingInterval: 0,
+  });
 
   const dayDurationInSeconds = useMemo(() => {
     if (!schedule?.day) {
@@ -64,7 +74,21 @@ const Dashboard: NextPageWithLayout = () => {
 
   const head = useHeadWithTitle('Dashboard');
 
+  const [selectDayBottomSheetVisible, setSelectDayBottomSheetVisible] =
+    useState(false);
+
+  const onDaySelected = useCallback(
+    (result: number | undefined) => {
+      setSelectDayBottomSheetVisible(false);
+      if (typeof result === 'number') {
+        startWorkout(result);
+      }
+    },
+    [startWorkout]
+  );
+
   if (error) throw error;
+  if (workoutsError) throw workoutsError;
 
   if (!schedule)
     return (
@@ -101,61 +125,80 @@ const Dashboard: NextPageWithLayout = () => {
   }
 
   return (
-    <div className={styles.wrapper}>
-      {head}
-      <h1 className='fade-in'>{greeting}</h1>
-      <div className={styles.root}>
-        <div className={classNames(styles.day, 'fade-in')}>
-          <div className={styles.dayHeader}>
-            <div className={styles.dayHeaderNumber}>
-              <div>
-                Day {schedule.day.orderNumber + 1}/{schedule.dayCount}
+    <>
+      <div className={styles.wrapper}>
+        {head}
+        <h1 className='fade-in'>{greeting}</h1>
+        <div className={styles.root}>
+          <div className={classNames(styles.day, 'fade-in')}>
+            <div className={styles.dayHeader}>
+              <div className={styles.dayHeaderNumber}>
+                <div>
+                  Day {schedule.day.orderNumber + 1}/{schedule.dayCount}
+                </div>
+                <div>{schedule.day.nickname}</div>
               </div>
-              <div>{schedule.day.nickname}</div>
+              <div className={styles.dayHeaderMeta}>
+                <HeaderItem
+                  title='Duration'
+                  value={dayDurationInMinutes}
+                  suffix='mins'
+                />
+                <HeaderItem
+                  title='Exercises'
+                  value={schedule.day.exercises.length}
+                />
+                <HeaderItem title='Sets' value={setCount!} />
+              </div>
             </div>
-            <div className={styles.dayHeaderMeta}>
-              <HeaderItem
-                title='Duration'
-                value={dayDurationInMinutes}
-                suffix='mins'
-              />
-              <HeaderItem
-                title='Exercises'
-                value={schedule.day.exercises.length}
-              />
-              <HeaderItem title='Sets' value={setCount!} />
+            <div className={styles.exercises}>
+              {schedule.day.exercises.map((exerciseInSchedule) => (
+                <ExerciseItem
+                  key={exerciseInSchedule.id}
+                  scheduledWorkoutWithExercise={exerciseInSchedule}
+                />
+              ))}
             </div>
           </div>
-          <div className={styles.exercises}>
-            {schedule.day.exercises.map((exerciseInSchedule) => (
-              <ExerciseItem
-                key={exerciseInSchedule.id}
-                scheduledWorkoutWithExercise={exerciseInSchedule}
-              />
-            ))}
+          <div className={styles.actions}>
+            <Link href={'/schedule'}>
+              <a
+                draggable='false'
+                className={classNames('standard-button', styles.editPlanButton)}
+              >
+                <i className='fa-solid fa-calendar-week'></i>
+                Edit Plan
+              </a>
+            </Link>
+            <div className={classNames('combo-button', styles.startButton)}>
+              <LoadingButton
+                type='button'
+                onClick={() => startWorkout()}
+                className={classNames('standard-button primary')}
+              >
+                <i className='fa-solid fa-person-walking'></i>
+                Start Day {schedule.day.orderNumber + 1}
+              </LoadingButton>
+              <SpinButton className={classNames('standard-button primary')}>
+                <button
+                  type='button'
+                  onClick={() => setSelectDayBottomSheetVisible(true)}
+                >
+                  <i className='fa-solid fa-calendar-day'></i>
+                  Pick a different day
+                </button>
+              </SpinButton>
+            </div>
           </div>
-        </div>
-        <div className={styles.actions}>
-          <Link href={'/schedule'}>
-            <a
-              draggable='false'
-              className={classNames('standard-button', styles.editPlanButton)}
-            >
-              <i className='fa-solid fa-calendar-week'></i>
-              Edit Plan
-            </a>
-          </Link>
-          <LoadingButton
-            type='button'
-            onClick={() => startWorkout()}
-            className={classNames('standard-button primary')}
-          >
-            <i className='fa-solid fa-person-walking'></i>
-            Start Day {schedule.day.orderNumber + 1}
-          </LoadingButton>
         </div>
       </div>
-    </div>
+      {selectDayBottomSheetVisible && !!scheduledWorkouts && (
+        <SelectScheduledWorkoutBottomSheet
+          onResult={onDaySelected}
+          days={scheduledWorkouts}
+        />
+      )}
+    </>
   );
 };
 

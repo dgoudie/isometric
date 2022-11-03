@@ -103,7 +103,10 @@
   display: flex;
   gap: 0.75rem;
 
-  > * {
+  .editPlanButton {
     flex: 1;
+  }
+  .startButton {
+    flex: 2;
   }
 }

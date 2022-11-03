@@ -8,11 +8,12 @@ import {
   millisecondsToSeconds,
   minutesToMilliseconds,
 } from 'date-fns';
+import { getNextDaySchedule, getScheduledDays } from './scheduled_workout';
 
 import { ActiveWorkoutWithExercisesWithExerciseWithSetsAndDetails } from '../../types/ActiveWorkout';
+import { ScheduledWorkoutWithExerciseInSchedulesWithExercise } from '../../types/ScheduledWorkout';
 import { getExerciseById } from './exercise';
 import { getLastPerformedForExerciseIds } from '../utils/last-performed';
-import { getNextDaySchedule } from './scheduled_workout';
 import { getPersonalBestsForExerciseIds } from '../utils/personal-best';
 import prisma from '../prisma';
 import withExponentialBackoffRetry from '../../utils/prisma-exponential-backoff';
@@ -171,18 +172,31 @@ async function getActiveWorkoutExerciseById(
   });
 }
 
-export async function startWorkout(userId: string): Promise<void> {
+export async function startWorkout(
+  userId: string,
+  dayNumber?: number
+): Promise<void> {
   const _hasActiveWorkout = await hasActiveWorkout(userId);
   if (_hasActiveWorkout) {
     return;
   }
 
-  const nextDaySchedule = await getNextDaySchedule(userId);
-  if (!nextDaySchedule.day) {
-    return;
+  let day: ScheduledWorkoutWithExerciseInSchedulesWithExercise;
+  if (typeof dayNumber === 'number') {
+    const schedule = await getScheduledDays(userId);
+    day = schedule[dayNumber];
+    if (!day) {
+      return;
+    }
+  } else {
+    const nextDaySchedule = await getNextDaySchedule(userId);
+    if (!nextDaySchedule.day) {
+      return;
+    }
+    day = nextDaySchedule.day;
   }
 
-  const { nickname, orderNumber, exercises } = nextDaySchedule.day;
+  const { nickname, orderNumber, exercises } = day;
 
   await prisma.$transaction(async (prisma) => {
     await prisma.activeWorkout.create({

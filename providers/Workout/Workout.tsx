@@ -6,7 +6,7 @@ import { useFetchJSON } from '../../utils/fetch-json';
 import { useSWRConfig } from 'swr';
 
 export const WorkoutContext = createContext<{
-  startWorkout: () => void;
+  startWorkout: (dayNumber?: number) => void;
   endWorkout: () => void;
   discardWorkout: () => void;
   persistSetComplete: (
@@ -70,9 +70,15 @@ export default function WorkoutProvider({
     [mutate, openSnackbar]
   );
 
-  const startWorkout = useCallback(() => {
-    return fetcher(`/api/workout/start`);
-  }, [fetcher]);
+  const startWorkout = useCallback(
+    (dayNumber?: number) => {
+      if (typeof dayNumber === 'number') {
+        return fetcher(`/api/workout/start/${dayNumber}`);
+      }
+      return fetcher(`/api/workout/start`);
+    },
+    [fetcher]
+  );
   const endWorkout = useCallback(() => {
     return fetcher(`/api/workout/end`);
   }, [fetcher]);

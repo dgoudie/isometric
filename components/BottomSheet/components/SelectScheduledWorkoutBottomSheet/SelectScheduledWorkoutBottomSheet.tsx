@@ -1,21 +1,21 @@
 import BottomSheet from '../../BottomSheet';
 import { ScheduledWorkout } from '@prisma/client';
-import styles from './CopyScheduledWorkoutBottomSheet.module.scss';
+import styles from './SelectScheduledWorkoutBottomSheet.module.scss';
 
 interface Props {
   days: ScheduledWorkout[];
   onResult: (result: number | undefined) => void;
 }
 
-export default function CopyScheduledWorkoutBottomSheet({
+export default function SelectScheduledWorkoutBottomSheet({
   days,
   onResult,
 }: Props) {
   return (
-    <BottomSheet onResult={onResult} title='Select a Day to Copy'>
+    <BottomSheet onResult={onResult} title='Select a Day'>
       {(onResult) => {
         const dayElements = days.map((day, index) => (
-          <CopyScheduledWorkoutBottomSheetButton
+          <SelectScheduledWorkoutBottomSheetButton
             key={index}
             scheduledWorkout={day}
             index={index}
@@ -28,17 +28,17 @@ export default function CopyScheduledWorkoutBottomSheet({
   );
 }
 
-interface CopyScheduledWorkoutBottomSheetButtonProps {
+interface SelectScheduledWorkoutBottomSheetButtonProps {
   index: number;
   scheduledWorkout: ScheduledWorkout;
   onSelected: () => void;
 }
 
-function CopyScheduledWorkoutBottomSheetButton({
+function SelectScheduledWorkoutBottomSheetButton({
   index,
   scheduledWorkout,
   onSelected,
-}: CopyScheduledWorkoutBottomSheetButtonProps) {
+}: SelectScheduledWorkoutBottomSheetButtonProps) {
   return (
     <button type='button' onClick={onSelected}>
       <div>
