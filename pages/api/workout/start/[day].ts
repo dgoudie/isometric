@@ -10,7 +10,7 @@ const handler: NextApiHandler = async (req, res) => {
     return;
   }
   const { day } = req.query;
-  if (typeof day !== 'string' || isNaN(parseInt(day)) || parseInt(day) < 1) {
+  if (typeof day !== 'string' || isNaN(parseInt(day)) || parseInt(day) < 0) {
     res.status(400).send(`Parameter day is invalid.`);
     return;
   }

@@ -279,7 +279,7 @@ export default function ActiveExerciseViewExercise({
           </div>
           <div className={classNames(styles.mainFooter)}>
             <i className='fa-solid fa-chevron-up'></i>
-            <span>Swipe up to view options & history</span>
+            <span>Performance & history</span>
           </div>
           {loading && (
             <div
