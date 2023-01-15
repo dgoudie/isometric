@@ -1,10 +1,11 @@
+import GoogleProvider, { GoogleProfile } from 'next-auth/providers/google';
+
+import { AuthOptions } from 'next-auth';
 import GoogleOneTapProvider from './google-one-tap-provider';
-import GoogleProvider from 'next-auth/providers/google';
-import { NextAuthOptions } from 'next-auth';
 import hashEmail from './hash-email';
 import prisma from '../database/prisma';
 
-const nextAuthOptions: NextAuthOptions = {
+const nextAuthOptions: AuthOptions = {
   providers: [
     GoogleProvider({
       clientId: process.env.NEXT_PUBLIC_GOOGLE_OAUTH_CLIENT_ID!,
@@ -22,8 +23,8 @@ const nextAuthOptions: NextAuthOptions = {
   callbacks: {
     async signIn({ account, profile }) {
       let verified = true;
-      if (account.provider === 'google') {
-        verified = profile.email_verified as boolean;
+      if (account?.provider === 'google' && !!profile) {
+        verified = (profile as GoogleProfile).email_verified as boolean;
       }
       return verified;
     },
