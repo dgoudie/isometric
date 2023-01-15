@@ -10,6 +10,14 @@ const themes = new Map([
       displayName: 'Solarized',
     },
   ],
+  [
+    'cool',
+    {
+      light: 'rgb(223,251,252)',
+      dark: 'rgb(27,36,40)',
+      displayName: 'Cool',
+    },
+  ],
 ]);
 
 export default themes;
