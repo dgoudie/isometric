@@ -10,7 +10,7 @@ const wait = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
 async function getAlbum() {
   await wait(120000);
-  const res = await fetch('https://isometric.goudie.dev/api/build_id');
+  const res = await fetch('https://jsonplaceholder.typicode.com/albums/1');
   return res.json();
 }
 
