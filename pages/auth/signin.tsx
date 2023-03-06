@@ -40,10 +40,10 @@ const SignIn: NextPageWithLayout = () => {
             />
             <span>Sign in with Google</span>
           </button>
-          <Link href={'/'}>
-            <a className={classNames(styles.signinButton, styles.cancel)}>
-              <span>Cancel</span>
-            </a>
+          <Link href={'/'} className={classNames(styles.signinButton, styles.cancel)}>
+
+            <span>Cancel</span>
+
           </Link>
         </div>
       </div>

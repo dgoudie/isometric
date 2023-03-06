@@ -54,14 +54,14 @@ type AppBarButtonProps = {
 function AppBarButton({ href, text, iconClass }: AppBarButtonProps) {
   const router = useRouter();
   return (
-    <Link href={{ pathname: href, query: '' }}>
-      <a
-        draggable='false'
-        className={classNames(router.pathname === href && styles.active)}
-      >
-        <i className={classNames('fa-solid', iconClass)}></i>
-        {text}
-      </a>
-    </Link>
+    (<Link
+      href={{ pathname: href, query: '' }}
+      draggable='false'
+      className={classNames(router.pathname === href && styles.active)}>
+
+      <i className={classNames('fa-solid', iconClass)}></i>
+      {text}
+
+    </Link>)
   );
 }

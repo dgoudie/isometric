@@ -24,14 +24,14 @@ export default function FloatingActionButton({
   if (as === 'a') {
     return (
       <Portal>
-        <Link href={href!}>
-          <a
-            onClick={onClick}
-            className={classNames('standard-button', styles.root, className)}
-          >
-            <i className={`fa-solid fa-${iconName}`}></i>
-            {text}
-          </a>
+        <Link
+          href={href!}
+          onClick={onClick}
+          className={classNames('standard-button', styles.root, className)}>
+
+          <i className={`fa-solid fa-${iconName}`}></i>
+          {text}
+
         </Link>
       </Portal>
     );

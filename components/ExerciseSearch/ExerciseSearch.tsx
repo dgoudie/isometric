@@ -221,11 +221,14 @@ const ExerciseButton = ({ exercise, onSelect }: ExerciseButtonProps) => {
     );
   } else {
     return (
-      <Link href={`/exercises/${exercise.name}`}>
-        <a draggable='false' className={classNames('fade-in', styles.item)}>
-          {itemInnards}
-        </a>
-      </Link>
+      (<Link
+        href={`/exercises/${exercise.name}`}
+        draggable='false'
+        className={classNames('fade-in', styles.item)}>
+
+        {itemInnards}
+
+      </Link>)
     );
   }
 };

@@ -4,6 +4,7 @@ import { useCallback, useRef } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import classNames from 'classnames';
+import { stop } from '../../utils/notification';
 import styles from './ProfileBadgeAndOptions.module.scss';
 import { useRouter } from 'next/router';
 
@@ -55,24 +56,19 @@ export default function ProfileBadgeAndOptions({ className }: Props) {
           </a>
         </Link> */}
         {router.pathname !== '/dashboard' && (
-          <Link href='/dashboard'>
-            <a onClick={() => closeDetails()}>
-              <i className='fa-solid fa-bars-progress'></i>
-              Workout Dashboard
-            </a>
+          <Link href='/dashboard' onClick={() => closeDetails()}>
+            <i className='fa-solid fa-bars-progress'></i>Workout Dashboard
           </Link>
         )}
         {router.pathname !== '/settings' && (
-          <Link href='/settings'>
-            <a onClick={() => closeDetails()}>
-              <i className='fa-solid fa-gear'></i>
-              User Settings
-            </a>
+          <Link href='/settings' onClick={() => closeDetails()}>
+            <i className='fa-solid fa-gear'></i>User Settings
           </Link>
         )}
         <button
           onClick={() => {
             signOut({ callbackUrl: '/' });
+            stop();
             closeDetails();
           }}
         >

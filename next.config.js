@@ -14,6 +14,7 @@ const nextConfig = {
       // },
     ];
   },
+  transpilePackages: ['@pusher/push-notifications-web'],
 };
 
 module.exports = nextConfig;

@@ -33,6 +33,9 @@ const nextAuthOptions: AuthOptions = {
         where: { email: hashEmail(session.user!.email!) },
       });
       session.isInitialized = !!userInDatabase;
+      if (!!userInDatabase) {
+        session.userId = userInDatabase.userId;
+      }
       return session;
     },
   },

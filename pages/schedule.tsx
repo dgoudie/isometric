@@ -85,11 +85,9 @@ const WorkoutPlan: NextPageWithLayout = () => {
             <i className='fa-solid fa-circle-info'></i>
             Changes saved automatically
           </div>
-          <Link href={`/dashboard`}>
-            <a className='standard-button primary slim'>
-              <i className='fa-solid fa-check'></i>
-              Done
-            </a>
+          <Link href={`/dashboard`} className='standard-button primary slim'>
+
+            <i className='fa-solid fa-check'></i>Done
           </Link>
         </div>
       </>
@@ -243,10 +241,11 @@ function ScheduledWorkouts({
                       </button>
 
                       <div className={styles.workoutBodyLower}>
-                        <Link href={`/schedule/${scheduledWorkout.id}`}>
-                          <a className='standard-button slim primary'>
-                            <i className='fa-solid fa-edit'></i>Edit
-                          </a>
+                        <Link
+                          href={`/schedule/${scheduledWorkout.id}`}
+                          className='standard-button slim primary'>
+
+                          <i className='fa-solid fa-edit'></i>Edit
                         </Link>
                         <button
                           className='standard-button slim'

@@ -14,6 +14,7 @@ import {
   millisecondsToSeconds,
   secondsToMilliseconds,
 } from 'date-fns';
+import { setupNotifications, showNotification } from '../../utils/notification';
 
 import { BREAK_TIME } from '../../pages/dashboard';
 import { CSSTransition } from 'react-transition-group';
@@ -24,7 +25,6 @@ import MuscleGroupTag from '../../components/MuscleGroupTag/MuscleGroupTag';
 import Portal from '../../components/Portal/Portal';
 import { WorkoutContext } from '../Workout/Workout';
 import classNames from 'classnames';
-import { showNotification } from '../../utils/notification';
 import styles from './AfterExerciseTimer.module.scss';
 
 type AfterExerciseTimerContextType = {
@@ -125,6 +125,7 @@ export default function AfterExerciseTimerProvider({
       if (!!onFinished) {
         setOnFinishedCallbacks([...onFinishedCallbacks, onFinished]);
       }
+      setupNotifications();
     },
     [onFinishedCallbacks]
   );

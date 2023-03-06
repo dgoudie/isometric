@@ -21,7 +21,6 @@ import { WorkoutContext } from '../providers/Workout/Workout';
 import WorkoutExercisesBottomSheet from '../components/BottomSheet/components/WorkoutExercisesBottomSheet/WorkoutExercisesBottomSheet';
 import classNames from 'classnames';
 import equal from 'deep-equal';
-import { requestNotificationPermission } from '../utils/notification';
 import styles from './Workout.module.scss';
 import { useFetchJSON } from '../utils/fetch-json';
 import { useHeadWithTitle } from '../utils/use-head-with-title';
@@ -32,10 +31,6 @@ export type ActiveExercise = {
 };
 
 const Workout: NextPageWithLayout = () => {
-  useEffect(() => {
-    requestNotificationPermission();
-  }, []);
-
   const { endWorkout, discardWorkout, addExercise } =
     useContext(WorkoutContext);
 

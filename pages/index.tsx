@@ -75,12 +75,10 @@ const Landing: NextPageWithLayout = () => {
           </button>
         )}
         {status === 'authenticated' && (
-          <Link href={'/dashboard'}>
-            <a className='standard-button primary'>
-              <i className='fa-solid fa-bars-progress'></i>
-              Go to Workout Dashboard
-            </a>
-          </Link>
+          (<Link href={'/dashboard'} className='standard-button primary'>
+
+            <i className='fa-solid fa-bars-progress'></i>Go to Workout Dashboard
+          </Link>)
         )}
         {status === 'loading' && (
           <div className={styles.loading}>

@@ -2,6 +2,7 @@ import React, { createContext, useCallback, useContext } from 'react';
 import pRetry, { AbortError } from 'p-retry';
 
 import { SnackbarContext } from '../Snackbar/Snackbar';
+import { setupNotifications } from '../../utils/notification';
 import { useFetchJSON } from '../../utils/fetch-json';
 import { useSWRConfig } from 'swr';
 
@@ -72,6 +73,7 @@ export default function WorkoutProvider({
 
   const startWorkout = useCallback(
     (dayNumber?: number) => {
+      setupNotifications();
       if (typeof dayNumber === 'number') {
         return fetcher(`/api/workout/start/${dayNumber}`);
       }

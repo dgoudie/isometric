@@ -15,10 +15,10 @@ export default function AppHeader({
 }: Props) {
   return (
     <header className={classNames(styles.topBar, className)}>
-      <Link href={'/'}>
-        <a className={styles.topBarTitle} draggable='false'>
+      <Link href={'/'} className={styles.topBarTitle} draggable='false'>
+        
           ISOMETRIC
-        </a>
+        
       </Link>
       {!hideProfileBadge && (
         <ProfileBadgeAndOptions className={styles.profileBadge} />

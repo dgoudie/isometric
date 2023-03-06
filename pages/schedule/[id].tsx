@@ -97,75 +97,71 @@ const ScheduleWorkout: NextPageWithLayout = () => {
       </>
     );
 
-  return (
-    <>
-      <div className={styles.root}>
-        {head}
-        <>
-          <h1>
-            Edit Schedule <i className='fa-solid fa-chevron-right'></i> Day{' '}
-            {data.orderNumber + 1}
-          </h1>
-          <div className={styles.main}>
-            <div className={classNames(styles.nickname, 'fade-in')}>
-              <h3>Workout Nickname</h3>
-              <div className={styles.nicknameTip}>
-                Add a nickname to help distinguish this workout.
-              </div>
-              <input
-                type='text'
-                value={nickname}
-                onChange={(e) => setNickname(e.target.value)}
-                onBlur={(e) => persistNickname()}
-                placeholder='Enter a nickname...'
-                spellCheck='false'
-                autoCapitalize='words'
+  return <>
+    <div className={styles.root}>
+      {head}
+      <>
+        <h1>
+          Edit Schedule <i className='fa-solid fa-chevron-right'></i> Day{' '}
+          {data.orderNumber + 1}
+        </h1>
+        <div className={styles.main}>
+          <div className={classNames(styles.nickname, 'fade-in')}>
+            <h3>Workout Nickname</h3>
+            <div className={styles.nicknameTip}>
+              Add a nickname to help distinguish this workout.
+            </div>
+            <input
+              type='text'
+              value={nickname}
+              onChange={(e) => setNickname(e.target.value)}
+              onBlur={(e) => persistNickname()}
+              placeholder='Enter a nickname...'
+              spellCheck='false'
+              autoCapitalize='words'
+            />
+          </div>
+          {!!data.exercises.length ? (
+            <>
+              <h3 className={classNames(styles.exercisesTitle)}>Exercises</h3>
+              <ScheduledWorkoutExercises
+                scheduledWorkoutId={scheduledWorkoutId}
+                scheduledWorkoutExercises={data.exercises}
+                addExercise={() => setAddExercisePickerVisible(true)}
               />
+            </>
+          ) : (
+            <div className={classNames(styles.noExercises, 'fade-in')}>
+              <span>
+                You haven&apos;t selected any exercises for this day yet.
+                Click the button below to add one.
+              </span>
+              <button
+                className={'standard-button primary'}
+                onClick={() => setAddExercisePickerVisible(true)}
+              >
+                <i className='fa-solid fa-plus'></i>
+                Add Exercise
+              </button>
             </div>
-            {!!data.exercises.length ? (
-              <>
-                <h3 className={classNames(styles.exercisesTitle)}>Exercises</h3>
-                <ScheduledWorkoutExercises
-                  scheduledWorkoutId={scheduledWorkoutId}
-                  scheduledWorkoutExercises={data.exercises}
-                  addExercise={() => setAddExercisePickerVisible(true)}
-                />
-              </>
-            ) : (
-              <div className={classNames(styles.noExercises, 'fade-in')}>
-                <span>
-                  You haven&apos;t selected any exercises for this day yet.
-                  Click the button below to add one.
-                </span>
-                <button
-                  className={'standard-button primary'}
-                  onClick={() => setAddExercisePickerVisible(true)}
-                >
-                  <i className='fa-solid fa-plus'></i>
-                  Add Exercise
-                </button>
-              </div>
-            )}
+          )}
+        </div>
+        <div className={classNames(styles.actions, 'fade-in')}>
+          <div className={styles.autoSaveTip}>
+            <i className='fa-solid fa-circle-info'></i>
+            Changes saved automatically
           </div>
-          <div className={classNames(styles.actions, 'fade-in')}>
-            <div className={styles.autoSaveTip}>
-              <i className='fa-solid fa-circle-info'></i>
-              Changes saved automatically
-            </div>
-            <Link href={`/schedule`}>
-              <a className='standard-button primary slim'>
-                <i className='fa-solid fa-check'></i>
-                Done
-              </a>
-            </Link>
-          </div>
-        </>
-      </div>
-      {!!addExercisePickerVisible && (
-        <ExercisePickerBottomSheet onResult={onExerciseAddResult} />
-      )}
-    </>
-  );
+          <Link href={`/schedule`} className='standard-button primary slim'>
+
+            <i className='fa-solid fa-check'></i>Done
+          </Link>
+        </div>
+      </>
+    </div>
+    {!!addExercisePickerVisible && (
+      <ExercisePickerBottomSheet onResult={onExerciseAddResult} />
+    )}
+  </>;
 };
 
 ScheduleWorkout.getLayout = (page) => (

@@ -112,11 +112,12 @@ const Dashboard: NextPageWithLayout = () => {
             </span>
           </div>
           <div className={styles.actions}>
-            <Link href={'/schedule'}>
-              <a className={'standard-button primary'} draggable={false}>
-                <i className='fa-solid fa-calendar-week'></i>
-                Edit Schedule
-              </a>
+            <Link
+              href={'/schedule'}
+              className={'standard-button primary'}
+              draggable={false}>
+
+              <i className='fa-solid fa-calendar-week'></i>Edit Schedule
             </Link>
           </div>
         </div>
@@ -124,82 +125,78 @@ const Dashboard: NextPageWithLayout = () => {
     );
   }
 
-  return (
-    <>
-      <div className={styles.wrapper}>
-        {head}
-        <h1 className='fade-in'>{greeting}</h1>
-        <div className={styles.root}>
-          <div className={classNames(styles.day, 'fade-in')}>
-            <div className={styles.dayHeader}>
-              <div className={styles.dayHeaderNumber}>
-                <div>
-                  Day {schedule.day.orderNumber + 1}/{schedule.dayCount}
-                </div>
-                <div>{schedule.day.nickname}</div>
+  return <>
+    <div className={styles.wrapper}>
+      {head}
+      <h1 className='fade-in'>{greeting}</h1>
+      <div className={styles.root}>
+        <div className={classNames(styles.day, 'fade-in')}>
+          <div className={styles.dayHeader}>
+            <div className={styles.dayHeaderNumber}>
+              <div>
+                Day {schedule.day.orderNumber + 1}/{schedule.dayCount}
               </div>
-              <div className={styles.dayHeaderMeta}>
-                <HeaderItem
-                  title='Duration'
-                  value={dayDurationInMinutes}
-                  suffix='mins'
-                />
-                <HeaderItem
-                  title='Exercises'
-                  value={schedule.day.exercises.length}
-                />
-                <HeaderItem title='Sets' value={setCount!} />
-              </div>
+              <div>{schedule.day.nickname}</div>
             </div>
-            <div className={styles.exercises}>
-              {schedule.day.exercises.map((exerciseInSchedule) => (
-                <ExerciseItem
-                  key={exerciseInSchedule.id}
-                  scheduledWorkoutWithExercise={exerciseInSchedule}
-                />
-              ))}
+            <div className={styles.dayHeaderMeta}>
+              <HeaderItem
+                title='Duration'
+                value={dayDurationInMinutes}
+                suffix='mins'
+              />
+              <HeaderItem
+                title='Exercises'
+                value={schedule.day.exercises.length}
+              />
+              <HeaderItem title='Sets' value={setCount!} />
             </div>
           </div>
-          <div className={styles.actions}>
-            <Link href={'/schedule'}>
-              <a
-                draggable='false'
-                className={classNames('standard-button', styles.editPlanButton)}
-              >
-                <i className='fa-solid fa-calendar-week'></i>
-                Edit Plan
-              </a>
-            </Link>
-            <div className={classNames('combo-button', styles.startButton)}>
-              <LoadingButton
+          <div className={styles.exercises}>
+            {schedule.day.exercises.map((exerciseInSchedule) => (
+              <ExerciseItem
+                key={exerciseInSchedule.id}
+                scheduledWorkoutWithExercise={exerciseInSchedule}
+              />
+            ))}
+          </div>
+        </div>
+        <div className={styles.actions}>
+          <Link
+            href={'/schedule'}
+            draggable='false'
+            className={classNames('standard-button', styles.editPlanButton)}>
+
+            <i className='fa-solid fa-calendar-week'></i>Edit Plan
+          </Link>
+          <div className={classNames('combo-button', styles.startButton)}>
+            <LoadingButton
+              type='button'
+              onClick={() => startWorkout()}
+              className={classNames('standard-button primary')}
+            >
+              <i className='fa-solid fa-person-walking'></i>
+              Start Day {schedule.day.orderNumber + 1}
+            </LoadingButton>
+            <SpinButton className={classNames('standard-button primary')}>
+              <button
                 type='button'
-                onClick={() => startWorkout()}
-                className={classNames('standard-button primary')}
+                onClick={() => setSelectDayBottomSheetVisible(true)}
               >
-                <i className='fa-solid fa-person-walking'></i>
-                Start Day {schedule.day.orderNumber + 1}
-              </LoadingButton>
-              <SpinButton className={classNames('standard-button primary')}>
-                <button
-                  type='button'
-                  onClick={() => setSelectDayBottomSheetVisible(true)}
-                >
-                  <i className='fa-solid fa-calendar-day'></i>
-                  Pick a different day
-                </button>
-              </SpinButton>
-            </div>
+                <i className='fa-solid fa-calendar-day'></i>
+                Pick a different day
+              </button>
+            </SpinButton>
           </div>
         </div>
       </div>
-      {selectDayBottomSheetVisible && !!scheduledWorkouts && (
-        <SelectScheduledWorkoutBottomSheet
-          onResult={onDaySelected}
-          days={scheduledWorkouts}
-        />
-      )}
-    </>
-  );
+    </div>
+    {selectDayBottomSheetVisible && !!scheduledWorkouts && (
+      <SelectScheduledWorkoutBottomSheet
+        onResult={onDaySelected}
+        days={scheduledWorkouts}
+      />
+    )}
+  </>;
 };
 
 Dashboard.getLayout = (page) => (
