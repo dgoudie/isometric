@@ -74,7 +74,7 @@ export default function AfterExerciseTimerProvider({
   useEffect(() => {
     if (!!endDate) {
       const remaining = differenceInMilliseconds(endDate, new Date());
-      queueNotification(2000);
+      queueNotification(remaining);
       intervalId.current = setInterval(() => {
         const remaining = differenceInMilliseconds(endDate, new Date());
         if (remaining > 0) {
