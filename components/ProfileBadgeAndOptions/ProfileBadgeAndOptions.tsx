@@ -4,7 +4,6 @@ import { useCallback, useRef } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import classNames from 'classnames';
-import { stop } from '../../utils/notification';
 import styles from './ProfileBadgeAndOptions.module.scss';
 import { useRouter } from 'next/router';
 

@@ -1,8 +1,8 @@
+import { Prisma } from '@prisma/client';
 import { PrismaClientUnknownRequestError } from '@prisma/client/runtime';
-import { PrismaPromise } from '@prisma/client';
 
 export default async function withExponentialBackoffRetry<T>(
-  queryProvider: () => PrismaPromise<T>,
+  queryProvider: () => Prisma.PrismaPromise<T>,
   maxRetries = 3
 ): Promise<T> {
   let counter = 0;
