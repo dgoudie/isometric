@@ -75,10 +75,9 @@ const Landing: NextPageWithLayout = () => {
           </button>
         )}
         {status === 'authenticated' && (
-          (<Link href={'/dashboard'} className='standard-button primary'>
-
+          <Link href={'/dashboard'} className='standard-button primary'>
             <i className='fa-solid fa-bars-progress'></i>Go to Workout Dashboard
-          </Link>)
+          </Link>
         )}
         {status === 'loading' && (
           <div className={styles.loading}>
@@ -88,40 +87,16 @@ const Landing: NextPageWithLayout = () => {
       </div>
       <div className={classNames(styles.marketingImages, styles.carousel)}>
         <div>
-          <Image
-            placeholder='blur'
-            height={2960}
-            width={1440}
-            src={marketingImage1}
-            alt=''
-          />
+          <Image placeholder='blur' src={marketingImage1} alt='' />
         </div>
         <div>
-          <Image
-            placeholder='blur'
-            height={2960}
-            width={1440}
-            src={marketingImage2}
-            alt=''
-          />
+          <Image placeholder='blur' src={marketingImage2} alt='' />
         </div>
         <div>
-          <Image
-            placeholder='blur'
-            height={2960}
-            width={1440}
-            src={marketingImage3}
-            alt=''
-          />
+          <Image placeholder='blur' src={marketingImage3} alt='' />
         </div>
         <div>
-          <Image
-            placeholder='blur'
-            height={2960}
-            width={1440}
-            src={marketingImage4}
-            alt=''
-          />
+          <Image placeholder='blur' src={marketingImage4} alt='' />
         </div>
       </div>
       <div className={styles.sectionHeader}>Why ISOMETRIC?</div>

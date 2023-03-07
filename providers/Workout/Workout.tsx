@@ -3,7 +3,6 @@ import pRetry, { AbortError } from 'p-retry';
 
 import { SnackbarContext } from '../Snackbar/Snackbar';
 import { setupNotifications } from '../../utils/notification';
-import { useFetchJSON } from '../../utils/fetch-json';
 import { useSWRConfig } from 'swr';
 
 export const WorkoutContext = createContext<{

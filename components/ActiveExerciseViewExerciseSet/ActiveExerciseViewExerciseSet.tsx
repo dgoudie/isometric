@@ -5,6 +5,10 @@ import {
   millisecondsToSeconds,
   secondsToMilliseconds,
 } from 'date-fns';
+import {
+  cancelNotification,
+  queueNotification,
+} from '../../utils/notification';
 import { useContext, useEffect, useMemo, useRef, useState } from 'react';
 
 import { ActiveWorkoutExerciseSet } from '@prisma/client';
@@ -13,7 +17,6 @@ import { WorkoutContext } from '../../providers/Workout/Workout';
 import classNames from 'classnames';
 import { inputForceInteger } from '../../utils/input-force-integer';
 import { inputSelectAllOnFocus } from '../../utils/input-select-all-on-focus';
-import { showNotification } from '../../utils/notification';
 import styles from './ActiveExerciseViewExerciseSet.module.scss';
 
 interface Props {
@@ -176,6 +179,7 @@ function TimedSet({
     clearInterval(intervalId);
     if (!paused) {
       const endDate = addMilliseconds(new Date(), millisecondsRemaining);
+      queueNotification(millisecondsRemaining);
       setIntervalId(
         setInterval(() => {
           const remaining = differenceInMilliseconds(endDate, new Date());
@@ -184,13 +188,15 @@ function TimedSet({
           } else {
             setMillisecondsRemaining(0);
             setPaused(true);
-            showNotification('Time is up...');
           }
         }, 50) as unknown as number
       );
+    } else {
+      cancelNotification();
     }
     return () => {
       clearInterval(intervalId);
+      cancelNotification();
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [paused]);

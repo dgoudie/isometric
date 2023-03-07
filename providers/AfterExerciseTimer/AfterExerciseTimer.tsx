@@ -14,7 +14,10 @@ import {
   millisecondsToSeconds,
   secondsToMilliseconds,
 } from 'date-fns';
-import { setupNotifications, showNotification } from '../../utils/notification';
+import {
+  cancelNotification,
+  queueNotification,
+} from '../../utils/notification';
 
 import { BREAK_TIME } from '../../pages/dashboard';
 import { CSSTransition } from 'react-transition-group';
@@ -70,17 +73,21 @@ export default function AfterExerciseTimerProvider({
 
   useEffect(() => {
     if (!!endDate) {
+      const remaining = differenceInMilliseconds(endDate, new Date());
+      queueNotification(2000);
       intervalId.current = setInterval(() => {
         const remaining = differenceInMilliseconds(endDate, new Date());
         if (remaining > 0) {
           setMillisecondsRemaining(remaining);
         } else {
-          showNotification('Time is up...');
           setEndDate(undefined);
         }
       }, 100) as unknown as number;
+    } else {
+      cancelNotification();
     }
     return () => {
+      cancelNotification();
       clearInterval(intervalId.current);
     };
   }, [endDate]);
@@ -125,7 +132,6 @@ export default function AfterExerciseTimerProvider({
       if (!!onFinished) {
         setOnFinishedCallbacks([...onFinishedCallbacks, onFinished]);
       }
-      setupNotifications();
     },
     [onFinishedCallbacks]
   );

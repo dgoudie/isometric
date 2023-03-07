@@ -1,6 +1,7 @@
 import React, { useCallback, useEffect } from 'react';
 
 import styles from './PageWrapper.module.scss';
+import { unsubscribe } from '../../utils/notification';
 import { useFetchJSON } from '../../utils/fetch-json';
 import { usePageVisibility } from 'react-page-visibility';
 import { usePusher } from '@harelpls/use-pusher';
@@ -35,6 +36,12 @@ export default function PageWrapper({ children }: React.PropsWithChildren<{}>) {
   );
 
   const router = useRouter();
+
+  useEffect(() => {
+    if (router.pathname !== '/workout') {
+      unsubscribe();
+    }
+  }, [router]);
 
   useEffect(() => {
     if (
