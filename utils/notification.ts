@@ -1,6 +1,6 @@
 export const unsubscribe = async () => {
   return navigator.serviceWorker.ready
-    .then((reg) => reg.pushManager.getSubscription())
+    .then((reg) => reg.pushManager.getSubscription().catch(() => null))
     .then((sub) => {
       if (sub) sub.unsubscribe();
     });
@@ -13,8 +13,7 @@ export const setupNotifications = async () => {
     return;
   }
 
-  await Notification.requestPermission();
-  if (Notification.permission === 'denied') {
+  if (Notification.permission !== 'granted') {
     console.warn('The user has blocked notifications.');
     return;
   }
@@ -25,10 +24,16 @@ export const setupNotifications = async () => {
     return;
   }
   const serviceWorkerRegistration = await navigator.serviceWorker.ready;
-  let subscription =
-    await serviceWorkerRegistration.pushManager.getSubscription();
-  // If this is the user's first visit we need to set up
-  // a subscription to push notifications
+  let subscription;
+  try {
+    subscription =
+      await serviceWorkerRegistration.pushManager.getSubscription();
+  } catch (e) {
+    if ((e as Error).message.includes('No connection to push daemon')) {
+      console.warn("Push messaging isn't supported.");
+      return;
+    }
+  }
   if (!!subscription) {
     await unsubscribe();
   }

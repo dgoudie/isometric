@@ -71,8 +71,8 @@ export default function WorkoutProvider({
   );
 
   const startWorkout = useCallback(
-    (dayNumber?: number) => {
-      setupNotifications();
+    async (dayNumber?: number) => {
+      await Notification.requestPermission();
       if (typeof dayNumber === 'number') {
         return fetcher(`/api/workout/start/${dayNumber}`);
       }

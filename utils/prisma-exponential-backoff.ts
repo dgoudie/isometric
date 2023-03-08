@@ -1,5 +1,5 @@
 import { Prisma } from '@prisma/client';
-import { PrismaClientUnknownRequestError } from '@prisma/client/runtime';
+import { PrismaClientUnknownRequestError } from '@prisma/client/runtime/library';
 
 export default async function withExponentialBackoffRetry<T>(
   queryProvider: () => Prisma.PrismaPromise<T>,

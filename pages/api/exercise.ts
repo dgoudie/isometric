@@ -1,6 +1,6 @@
 import { Exercise } from '@prisma/client';
 import { NextApiHandler } from 'next';
-import { PrismaClientValidationError } from '@prisma/client/runtime';
+import { PrismaClientValidationError } from '@prisma/client/runtime/library';
 import broadcastApiMutations from '../../utils/broadcast-api-mutations';
 import { getUserId } from '../../utils/get-user-id';
 import { saveExercise } from '../../database/domains/exercise';

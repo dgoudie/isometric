@@ -37,7 +37,18 @@ export default function MyApp({
     prevBuildId.current = buildId;
   }, [buildId, router]);
   useEffect(() => {
-    navigator.serviceWorker.register('/service-worker.js');
+    const fn = async () => {
+      const reg = await navigator.serviceWorker.register('/service-worker.js');
+      reg.active?.postMessage(window.navigator.userAgent);
+    };
+    fn();
+    document.addEventListener('visibilitychange', () => {
+      document.visibilityState === 'visible' &&
+        //@ts-ignore
+        navigator.clearAppBadge &&
+        //@ts-ignore
+        navigator.clearAppBadge();
+    });
   }, []);
 
   // Use the layout defined at the page level, if available
