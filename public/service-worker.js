@@ -34,10 +34,7 @@ addEventListener('push', async function (event) {
         },
       ],
       icon: '/images/isometric.png',
-      vibrate: [200, 100, 200],
-      data: {
-        url: '/workout',
-      },
+      vibrate: [200, 100, 200]
     })
   );
 });
