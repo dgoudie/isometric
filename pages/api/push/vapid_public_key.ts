@@ -4,11 +4,15 @@ const handler = async (req: NextRequest, res: NextResponse) => {
   const response = await fetch(
     `${process.env.NOTIFICATION_HOST}/vapid_public_key`
   );
-  response.headers.append(
+  if (!response.ok) {
+    return response;
+  }
+  const clonedResponse = response.clone();
+  clonedResponse.headers.append(
     'cache-control',
     's-maxage=1, stale-while-revalidate=59'
   );
-  return response;
+  return clonedResponse;
 };
 
 export const config = {
