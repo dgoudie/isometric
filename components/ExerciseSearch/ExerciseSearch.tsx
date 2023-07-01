@@ -16,7 +16,7 @@ import Link from 'next/link';
 import { MdChipSet } from '../material/MdChipSet';
 import { MdElevation } from '../material/MdElevation';
 import { MdFilledTextField } from '../material/MdFilledTextField';
-import { MdFilterChip } from '../material/MdAssistChip copy 2';
+import { MdFilterChip } from '../material/MdFilterChip';
 import { MdIcon } from '../material/MdIcon';
 import { MdRipple } from '../material/MdRipple';
 import MuscleGroupPicker from '../MuscleGroupPicker/MuscleGroupPicker';

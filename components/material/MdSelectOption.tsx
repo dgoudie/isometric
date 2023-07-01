@@ -7,4 +7,7 @@ export const MdSelectOption = createComponent({
   tagName: 'md-select-option',
   elementClass: _MdSelectOption,
   react: React,
+  events: {
+    onclick: 'click',
+  },
 });

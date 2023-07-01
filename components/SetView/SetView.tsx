@@ -8,7 +8,7 @@ import { useCallback, useMemo } from 'react';
 
 import { MdAssistChip } from '../material/MdAssistChip';
 import { MdChipSet } from '../material/MdChipSet';
-import { MdFilterChip } from '../material/MdAssistChip copy 2';
+import { MdFilterChip } from '../material/MdFilterChip';
 import classNames from 'classnames';
 import styles from './SetView.module.scss';
 

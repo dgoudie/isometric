@@ -23,18 +23,28 @@ export default function MuscleGroupPicker({
   const muscleGroupStyles = useMuscleGroupStyles(value);
 
   return (
-    <MdFilledSelect label='Muscle Group' hasLeadingIcon>
+    <MdFilledSelect
+      label='Muscle Group'
+      hasLeadingIcon
+      // onChange={(e) =>
+      //   valueChanged &&
+      //   //@ts-ignore
+      //   valueChanged((e.target.value as ExerciseMuscleGroup) ?? undefined)
+      // }
+      onChange={console.log}
+    >
       <MdIcon slot='leadingicon' data-role='icon'>
         exercise
       </MdIcon>
-      <MdSelectOption value={''} headline='N/A' />
+      <MdSelectOption headline='N/A' selected={!value} value={undefined} />
       {Object.keys(ExerciseMuscleGroup)
         .sort()
         .map((group) => (
           <MdSelectOption
             key={group}
-            value={group}
             headline={group.replace('_', ' ')}
+            selected={value === group}
+            value={value}
           />
         ))}
     </MdFilledSelect>

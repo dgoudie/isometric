@@ -8,6 +8,6 @@ export const MdFilledSelect = createComponent({
   elementClass: _MdFilledSelect,
   react: React,
   events: {
-    onchange: 'change',
+    onChange: 'change',
   },
 });
