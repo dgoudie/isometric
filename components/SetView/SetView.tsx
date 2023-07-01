@@ -4,10 +4,13 @@ import {
   FinishedWorkoutExerciseSet,
 } from '@prisma/client';
 import { intervalToDuration, secondsToMilliseconds } from 'date-fns';
+import { useCallback, useMemo } from 'react';
 
+import { MdAssistChip } from '../material/MdAssistChip';
+import { MdChipSet } from '../material/MdChipSet';
+import { MdFilterChip } from '../material/MdAssistChip copy 2';
 import classNames from 'classnames';
 import styles from './SetView.module.scss';
-import { useMemo } from 'react';
 
 interface Props {
   exerciseType: ExerciseType;
@@ -16,6 +19,48 @@ interface Props {
 }
 
 export default function SetView({ exerciseType, sets, className }: Props) {
+  const formatTime = useCallback((set: (typeof sets)[0]) => {
+    const duration = intervalToDuration({
+      start: 0,
+      end: secondsToMilliseconds(set.timeInSeconds!),
+    });
+    if (!duration.seconds) {
+      return `${duration.minutes} minutes`;
+    }
+    return `${duration.minutes}m ${duration.seconds
+      ?.toString()
+      .padStart(2, '0')}s`;
+  }, []);
+
+  const getLabel = useCallback(
+    (set: (typeof sets)[0]) => {
+      let label = '';
+      switch (exerciseType) {
+        case 'timed': {
+          label = formatTime(set);
+          break;
+        }
+        case 'rep_based': {
+          label = `${set.repetitions} reps`;
+          break;
+        }
+        default: {
+          label = `${set.repetitions} \u00D7 ${set.resistanceInPounds} lbs`;
+          break;
+        }
+      }
+      return label;
+    },
+    [exerciseType, formatTime]
+  );
+
+  return (
+    <MdChipSet>
+      {sets.map((set, index) => (
+        <MdAssistChip key={index} label={getLabel(set)} />
+      ))}
+    </MdChipSet>
+  );
   return (
     <div className={classNames(styles.root, className)}>
       {sets.map((set, index) => (

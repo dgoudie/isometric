@@ -13,9 +13,16 @@ import { ExerciseMuscleGroup } from '@prisma/client';
 import { ExerciseWithPersonalBestAndLastPerformed } from '../../database/domains/exercise';
 import InfiniteScroll from '../InfiniteScroll/InfiniteScroll';
 import Link from 'next/link';
+import { MdChipSet } from '../material/MdChipSet';
+import { MdElevation } from '../material/MdElevation';
+import { MdFilledTextField } from '../material/MdFilledTextField';
+import { MdFilterChip } from '../material/MdAssistChip copy 2';
+import { MdIcon } from '../material/MdIcon';
+import { MdRipple } from '../material/MdRipple';
 import MuscleGroupPicker from '../MuscleGroupPicker/MuscleGroupPicker';
 import MuscleGroupTag from '../MuscleGroupTag/MuscleGroupTag';
 import RouteLoader from '../RouteLoader/RouteLoader';
+import { MdFilledTextField as _MdFilledTextField } from '@material/web/textfield/filled-text-field';
 import classNames from 'classnames';
 import styles from './ExerciseSearch.module.scss';
 import { useFetchJSON } from '../../utils/fetch-json';
@@ -60,7 +67,7 @@ export default function ExerciseSearch({
   }, [muscleGroup, search, history]);
 
   const itemsRef = useRef<HTMLDivElement>(null);
-  const inputRef = useRef<HTMLInputElement>(null);
+  const inputRef = useRef<_MdFilledTextField>(null);
 
   useEffect(() => {
     itemsRef?.current?.scrollTo({ top: 0 });
@@ -117,44 +124,27 @@ export default function ExerciseSearch({
   return (
     <div className={classNames(styles.root, className)}>
       <div className={styles.filters}>
-        <div className={styles.filtersInput}>
-          <i className='fa-solid fa-search'></i>
-          <input
-            ref={inputRef}
-            autoCapitalize='none'
-            autoCorrect='off'
-            autoComplete='off'
-            defaultValue={search}
-            type={'text'}
-            placeholder='Enter a search term...'
-            onChange={(e) =>
-              searchChanged(e.target.value.replace(/\s+/g, ' ').trim())
-            }
-          />
-          <div className={styles.filtersInputClear}>
-            {search && (
-              <button
-                type='button'
-                onClick={() => {
-                  searchChanged('');
-                  inputRef.current!.value = '';
-                  inputRef.current!.focus();
-                }}
-              >
-                <i className='fa-solid fa-close'></i>
-              </button>
-            )}
-          </div>
-        </div>
-        <div className={styles.filtersOthers}>
-          <label>Muscle Group:</label>
-          <MuscleGroupPicker
-            value={muscleGroup}
-            valueChanged={muscleGroupChanged}
-          />
-          <label>History:</label>
-          <HistoryPicker value={history} valueChanged={historyChanged} />
-        </div>
+        <MdFilledTextField
+          className={styles.filtersInput}
+          ref={inputRef}
+          autoCapitalize='none'
+          autoCorrect='off'
+          defaultValue={search}
+          onChange={(e) =>
+            searchChanged(
+              (e.target as HTMLInputElement).value.replace(/\s+/g, ' ').trim()
+            )
+          }
+          label='Search...'
+          hasLeadingIcon
+        >
+          <MdIcon slot='leadingicon'>search</MdIcon>
+        </MdFilledTextField>
+        <MuscleGroupPicker
+          value={muscleGroup}
+          valueChanged={muscleGroupChanged}
+        />
+        <HistoryPicker value={history} valueChanged={historyChanged} />
       </div>
       <div className={styles.items} ref={itemsRef}>
         {!!data ? (
@@ -201,6 +191,8 @@ const ExerciseButton = ({ exercise, onSelect }: ExerciseButtonProps) => {
   const itemInnards = useMemo(
     () => (
       <>
+        <MdElevation />
+        <MdRipple />
         <div className={styles.itemTitle}>{exercise.name}</div>
         <div className={styles.itemMuscles}>{muscleGroupTags}</div>
         <ExerciseMetadata exercise={exercise} />
@@ -221,14 +213,13 @@ const ExerciseButton = ({ exercise, onSelect }: ExerciseButtonProps) => {
     );
   } else {
     return (
-      (<Link
+      <Link
         href={`/exercises/${exercise.name}`}
         draggable='false'
-        className={classNames('fade-in', styles.item)}>
-
+        className={classNames('fade-in', styles.item)}
+      >
         {itemInnards}
-
-      </Link>)
+      </Link>
     );
   }
 };
@@ -238,6 +229,20 @@ interface HistoryPickerProps {
 }
 
 function HistoryPicker({ value, valueChanged }: HistoryPickerProps) {
+  return (
+    <MdChipSet>
+      {(['not_performed', 'only_performed'] as HistoryOption[]).map(
+        (option) => (
+          <MdFilterChip
+            selected={value === option}
+            onClick={() => valueChanged(value === option ? 'all' : option)}
+            key={option}
+            label={getHistoryPickerTextValue(option)}
+          ></MdFilterChip>
+        )
+      )}
+    </MdChipSet>
+  );
   return (
     <select
       className={styles.historyPicker}
@@ -257,11 +262,9 @@ function HistoryPicker({ value, valueChanged }: HistoryPickerProps) {
 
 function getHistoryPickerTextValue(option: HistoryOption) {
   switch (option) {
-    case 'all':
-      return 'Show All';
     case 'not_performed':
-      return 'Show Never Performed';
+      return 'Never Performed';
     case 'only_performed':
-      return 'Show Previously Performed';
+      return 'Previously Performed';
   }
 }

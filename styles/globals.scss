@@ -4,10 +4,40 @@
 @import './themes.scss';
 
 @mixin dark {
-  --color: white;
-  --color-secondary: #999;
-  --color-inverse: black;
-  --placeholder: #ffffff55;
+  --md-sys-color-primary: hsla(var(--primary-hs), 80%);
+  --md-sys-color-on-primary: hsla(var(--primary-hs), 20%);
+  --md-sys-color-primary-container: hsla(var(--primary-hs), 30%);
+  --md-sys-color-on-primary-container: hsla(var(--primary-hs), 90%);
+
+  --md-sys-color-secondary: hsla(var(--secondary-hs), 80%);
+  --md-sys-color-on-secondary: hsla(var(--secondary-hs), 20%);
+  --md-sys-color-secondary-container: hsla(var(--secondary-hs), 30%);
+  --md-sys-color-on-secondary-container: hsla(var(--secondary-hs), 90%);
+
+  --md-sys-color-background: hsla(var(--primary-hs), 10%);
+  --md-sys-color-on-background: hsla(var(--neutral-hs), 90%);
+
+  --md-sys-color-surface-container: hsla(var(--primary-hs), 10%);
+  --md-sys-color-on-surface-container: hsla(var(--neutral-hs), 90%);
+  --md-sys-color-surface-container-high: hsla(var(--primary-hs), 12%);
+  --md-sys-color-on-surface-container-high: hsla(var(--neutral-hs), 90%);
+  --md-sys-color-surface-container-highest: hsla(var(--primary-hs), 14%);
+  --md-sys-color-on-surface-container-highest: hsla(var(--neutral-hs), 90%);
+
+  --md-sys-color-surface: hsla(var(--primary-hs), 15%);
+  --md-sys-color-on-surface: hsla(var(--neutral-hs), 90%);
+  --md-sys-color-surface-high: hsla(var(--primary-hs), 17%);
+  --md-sys-color-on-surface-high: hsla(var(--neutral-hs), 90%);
+  --md-sys-color-surface-highest: hsla(var(--primary-hs), 19%);
+  --md-sys-color-on-surface-highest: hsla(var(--neutral-hs), 90%);
+
+  --md-sys-color-surface-variant: hsla(var(--neutral-variant-hs), 30%);
+  --md-sys-color-on-surface-variant: hsla(var(--neutral-variant-hs), 80%);
+  --md-sys-color-outline: hsla(var(--neutral-variant-hs), 60%);
+  // --color: white;
+  // --color-secondary: #999;
+  // --color-inverse: black;
+  // --placeholder: #ffffff55;
   --completed-color: springgreen;
   --error: #e23737;
   --warn: #fc0;
@@ -15,18 +45,65 @@
 
 html,
 body {
+  --md-ref-typeface-plain: 'Mitr', sans-serif;
+
+  --button-shape: 10px;
+  --md-filled-button-container-shape: var(--button-shape);
+  --md-text-button-container-shape: var(--button-shape);
+  --md-tonal-button-container-shape: var(--button-shape);
+
+  --button-font: 500 16px / 1.25rem 'Permanent Marker', cursive;
+  --md-filled-button-label-text-type: var(--button-font);
+  --md-text-button-label-text-type: var(--button-font);
+  --md-tonal-button-label-text-type: var(--button-font);
+
+  --md-menu-container-shape: 10px;
+
+  --neutral-hs: 0, 0%;
+
+  --md-sys-color-primary: hsla(var(--primary-hs), 40%);
+  --md-sys-color-on-primary: hsla(var(--primary-hs), 100%);
+  --md-sys-color-primary-container: hsla(var(--primary-hs), 90%);
+  --md-sys-color-on-primary-container: hsla(var(--primary-hs), 10%);
+
+  --md-sys-color-secondary: hsla(var(--secondary-hs), 40%);
+  --md-sys-color-on-secondary: hsla(var(--secondary-hs), 100%);
+  --md-sys-color-secondary-container: hsla(var(--secondary-hs), 90%);
+  --md-sys-color-on-secondary-container: hsla(var(--secondary-hs), 10%);
+
+  --md-sys-color-background: hsla(var(--primary-hs), 90%);
+  --md-sys-color-on-background: hsla(var(--neutral-hs), 10%);
+
+  --md-sys-color-surface-container: hsla(var(--primary-hs), 90%);
+  --md-sys-color-on-surface-container: hsla(var(--neutral-hs), 10%);
+  --md-sys-color-surface-container-high: hsla(var(--primary-hs), 86%);
+  --md-sys-color-on-surface-container-high: hsla(var(--neutral-hs), 10%);
+  --md-sys-color-surface-container-highest: hsla(var(--primary-hs), 82%);
+  --md-sys-color-on-surface-container-highest: hsla(var(--neutral-hs), 10%);
+
+  --md-sys-color-surface: hsla(var(--primary-hs), 86%);
+  --md-sys-color-on-surface: hsla(var(--neutral-hs), 10%);
+  --md-sys-color-surface-high: hsla(var(--primary-hs), 84%);
+  --md-sys-color-on-surface-high: hsla(var(--neutral-hs), 10%);
+  --md-sys-color-surface-highest: hsla(var(--primary-hs), 82%);
+  --md-sys-color-on-surface-highest: hsla(var(--neutral-hs), 10%);
+
+  --md-sys-color-surface-variant: hsla(var(--neutral-variant-hs), 90%);
+  --md-sys-color-on-surface-variant: hsla(var(--neutral-variant-hs), 30%);
+  --md-sys-color-outline: hsla(var(--neutral-variant-hs), 50%);
+
   padding: 0;
   margin: 0;
   font-family: 'Mitr', sans-serif;
   font-size: initial;
   line-height: 1.1;
-  color: var(--color);
-  background-color: var(--background);
+  color: var(--md-sys-color-on-surface);
+  background-color: var(--md-sys-color-background);
 
-  --color: black;
-  --color-secondary: #444;
-  --color-inverse: white;
-  --placeholder: #00000055;
+  // --color: black;
+  // --color-secondary: #444;
+  // --color-inverse: white;
+  // --placeholder: #00000055;
   --completed-color: #00b359;
   --error: crimson;
   --warn: #ffe16b;
@@ -144,4 +221,9 @@ label {
   color: var(--accent-color);
   margin-bottom: 0.5rem;
   display: block;
+}
+
+.loading-button {
+  --md-circular-progress-active-indicator-color: var(--md-sys-color-secondary);
+  --md-circular-progress-size: 32px;
 }

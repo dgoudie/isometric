@@ -13,7 +13,7 @@
 }
 
 .noSchedule {
-  background: var(--background-alt);
+  background: var(--md-sys-color-surface-container-highest);
   border-radius: 8px;
   display: flex;
   flex-direction: column;
@@ -34,7 +34,7 @@
 }
 
 .day {
-  background: var(--background-alt);
+  background: var(--md-sys-color-surface);
   border-radius: 8px;
   display: grid;
   grid-template-rows: max-content auto;
@@ -59,7 +59,7 @@
 
 .headerItem {
   &Title {
-    color: var(--accent-color);
+    color: var(--md-sys-color-primary);
     font-size: 0.9rem;
     margin-bottom: 0.25rem;
   }
@@ -68,7 +68,7 @@
     &Suffix {
       margin-left: 0.15rem;
       font-size: 0.7rem;
-      color: var(--secondary-color);
+      color: var(--md-sys-color-primary);
     }
   }
 }
@@ -101,12 +101,15 @@
 
 .actions {
   display: flex;
-  gap: 0.75rem;
+  gap: 0.5rem;
 
   .editPlanButton {
     flex: 1;
   }
   .startButton {
     flex: 2;
+  }
+  .actionsMenu {
+    position: relative;
   }
 }

@@ -5,6 +5,8 @@ import { useContext, useEffect } from 'react';
 import AppHeader from '../components/AppHeader/AppHeader';
 import Image from 'next/image';
 import Link from 'next/link';
+import { MdFilledButton } from '../components/material/MdFilledButton';
+import { MdIcon } from '../components/material/MdIcon';
 import { NextPageWithLayout } from './_app';
 import { SnackbarContext } from '../providers/Snackbar/Snackbar';
 import ThreeDotLoader from '../components/ThreeDotLoader/ThreeDotLoader';
@@ -75,8 +77,11 @@ const Landing: NextPageWithLayout = () => {
           </button>
         )}
         {status === 'authenticated' && (
-          <Link href={'/dashboard'} className='standard-button primary'>
-            <i className='fa-solid fa-bars-progress'></i>Go to Workout Dashboard
+          <Link href={'/dashboard'}>
+            <MdFilledButton>
+              <MdIcon slot='icon'>dashboard</MdIcon>
+              Go to Workout Dashboard
+            </MdFilledButton>
           </Link>
         )}
         {status === 'loading' && (

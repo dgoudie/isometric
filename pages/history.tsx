@@ -5,6 +5,11 @@ import AppBarWithAppHeaderLayout from '../layouts/AppBarWithAppHeaderLayout/AppB
 import ConfirmationBottomSheet from '../components/BottomSheet/components/ConfirmationBottomSheet/ConfirmationBottomSheet';
 import { FinishedWorkoutWithExerciseWithSets } from '../types/FinishedWorkout';
 import InfiniteScroll from '../components/InfiniteScroll/InfiniteScroll';
+import { MdElevation } from '../components/material/MdElevation';
+import { MdFilledButton } from '../components/material/MdFilledButton';
+import { MdIcon } from '../components/material/MdIcon';
+import { MdTextButton } from '../components/material/MdTextButton';
+import { MdTonalButton } from '../components/material/MdTonalButton';
 import MuscleGroupTag from '../components/MuscleGroupTag/MuscleGroupTag';
 import { NextPageWithLayout } from './_app';
 import RouteLoader from '../components/RouteLoader/RouteLoader';
@@ -160,6 +165,7 @@ function Workout({ workout, reload }: WorkoutProps) {
   return (
     <>
       <div className={classNames(styles.workout, 'fade-in')}>
+        <MdElevation />
         <div className={styles.item}>
           <div className={styles.header}>{workout.nickname}</div>
         </div>
@@ -173,25 +179,23 @@ function Workout({ workout, reload }: WorkoutProps) {
           <div>{duration}</div>
         </div>
         <div className={styles.workoutActions}>
-          <button
-            type='button'
+          <MdTextButton
+            onClick={() => setConfirmDeleteBottomSheetOpen(true)}
+            className={'delete'}
+          >
+            <MdIcon slot='icon'>delete</MdIcon>
+            Delete
+          </MdTextButton>
+          <MdFilledButton
             onClick={() => setOpen(!open)}
             className={classNames(
               styles.workoutActionsViewExercises,
-              'standard-button outlined',
               open && 'highlighted'
             )}
           >
-            <i className='fa-solid fa-person-walking'></i>
-            <span>{open ? 'Hide' : 'Show'} Exercises</span>
-          </button>
-          <button
-            type='button'
-            onClick={() => setConfirmDeleteBottomSheetOpen(true)}
-            className={classNames('standard-button danger')}
-          >
-            <i className='fa-solid fa-trash'></i>
-          </button>
+            <MdIcon slot='icon'>sprint</MdIcon>
+            {open ? 'Hide' : 'Show'} Exercises
+          </MdFilledButton>
         </div>
         {open && <div className={styles.exercises}>{exercises}</div>}
       </div>

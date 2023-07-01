@@ -131,14 +131,14 @@ export default function Document() {
           crossOrigin='anonymous'
         />
         <link
-          rel='preconnect'
-          href='https://fonts.gstatic.com'
-          crossOrigin='anonymous'
-        />
-        <link
           href='https://fonts.googleapis.com/css2?family=Mitr:wght@300;400;500;600&family=Permanent+Marker&display=swap'
           rel='stylesheet'
         />
+        <link
+          href='https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined&display=swap'
+          rel='stylesheet'
+        />
+
         <Script
           src='https://accounts.google.com/gsi/client'
           strategy='afterInteractive'

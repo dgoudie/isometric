@@ -1,5 +1,7 @@
 import { ExerciseMuscleGroup } from '@prisma/client';
-import React from 'react';
+import { MdFilledSelect } from '../material/MdFilledSelect';
+import { MdIcon } from '../material/MdIcon';
+import { MdSelectOption } from '../material/MdSelectOption';
 import classNames from 'classnames';
 import styles from './MuscleGroupPicker.module.scss';
 import { useMuscleGroupStyles } from '../../utils/muscle-group-tag-styling';
@@ -19,6 +21,24 @@ export default function MuscleGroupPicker({
   disabled,
 }: Props) {
   const muscleGroupStyles = useMuscleGroupStyles(value);
+
+  return (
+    <MdFilledSelect label='Muscle Group' hasLeadingIcon>
+      <MdIcon slot='leadingicon' data-role='icon'>
+        exercise
+      </MdIcon>
+      <MdSelectOption value={''} headline='N/A' />
+      {Object.keys(ExerciseMuscleGroup)
+        .sort()
+        .map((group) => (
+          <MdSelectOption
+            key={group}
+            value={group}
+            headline={group.replace('_', ' ')}
+          />
+        ))}
+    </MdFilledSelect>
+  );
 
   return (
     <select

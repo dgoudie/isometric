@@ -1,8 +1,21 @@
-import { useCallback, useContext, useEffect, useMemo, useState } from 'react';
+import {
+  createRef,
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useState,
+} from 'react';
 
 import AppBarWithAppHeaderLayout from '../layouts/AppBarWithAppHeaderLayout/AppBarWithAppHeaderLayout';
 import Link from 'next/link';
-import LoadingButton from '../components/LoadingButton/LoadingButton';
+import { MdCircularProgress } from '../components/material/MdCircularProgress';
+import { MdFilledButton } from '../components/material/MdFilledButton';
+import { MdIcon } from '../components/material/MdIcon';
+import { MdMenu } from '../components/material/MdMenu';
+import { MdMenuItem } from '../components/material/MdMenuItem';
+import { MdStandardIconButton } from '../components/material/MdStandardIconButton';
+import { MdTextButton } from '../components/material/MdTextButton';
 import MuscleGroupTag from '../components/MuscleGroupTag/MuscleGroupTag';
 import { NextDaySchedule } from '../database/domains/scheduled_workout';
 import { NextPageWithLayout } from './_app';
@@ -10,8 +23,8 @@ import { Prisma } from '@prisma/client';
 import RouteLoader from '../components/RouteLoader/RouteLoader';
 import { ScheduledWorkoutWithExerciseInSchedulesWithExercise } from '../types/ScheduledWorkout';
 import SelectScheduledWorkoutBottomSheet from '../components/BottomSheet/components/SelectScheduledWorkoutBottomSheet/SelectScheduledWorkoutBottomSheet';
-import SpinButton from '../components/SpinButton/SpinButton';
 import { WorkoutContext } from '../providers/Workout/Workout';
+import { MdMenu as _MdMenu } from '@material/web/menu/menu';
 import classNames from 'classnames';
 import { getGreeting } from '../utils/get-greeting';
 import { secondsToMinutes } from 'date-fns';
@@ -87,6 +100,17 @@ const Dashboard: NextPageWithLayout = () => {
     [startWorkout]
   );
 
+  const menuAnchorRef = createRef<HTMLDivElement>();
+  const menuRef = createRef<_MdMenu>();
+
+  const [startLoading, setStartLoading] = useState(false);
+
+  useEffect(() => {
+    if (!!menuAnchorRef.current && !!menuRef.current) {
+      menuRef.current.anchor = menuAnchorRef.current;
+    }
+  }, [menuAnchorRef, menuRef]);
+
   if (error) throw error;
   if (workoutsError) throw workoutsError;
 
@@ -112,12 +136,11 @@ const Dashboard: NextPageWithLayout = () => {
             </span>
           </div>
           <div className={styles.actions}>
-            <Link
-              href={'/schedule'}
-              className={'standard-button primary'}
-              draggable={false}>
-
-              <i className='fa-solid fa-calendar-week'></i>Edit Schedule
+            <Link href={'/schedule'} draggable='false'>
+              <MdTextButton className={styles.editPlanButton}>
+                <MdIcon slot='icon'>calendar_month</MdIcon>
+                Edit Plan
+              </MdTextButton>
             </Link>
           </div>
         </div>
@@ -125,78 +148,114 @@ const Dashboard: NextPageWithLayout = () => {
     );
   }
 
-  return <>
-    <div className={styles.wrapper}>
-      {head}
-      <h1 className='fade-in'>{greeting}</h1>
-      <div className={styles.root}>
-        <div className={classNames(styles.day, 'fade-in')}>
-          <div className={styles.dayHeader}>
-            <div className={styles.dayHeaderNumber}>
-              <div>
-                Day {schedule.day.orderNumber + 1}/{schedule.dayCount}
+  return (
+    <>
+      <div className={styles.wrapper}>
+        {head}
+        <h1 className='fade-in'>{greeting}</h1>
+        <div className={styles.root}>
+          <div className={classNames(styles.day, 'fade-in')}>
+            <div className={styles.dayHeader}>
+              <div className={styles.dayHeaderNumber}>
+                <div>
+                  Day {schedule.day.orderNumber + 1}/{schedule.dayCount}
+                </div>
+                <div>{schedule.day.nickname}</div>
               </div>
-              <div>{schedule.day.nickname}</div>
+              <div className={styles.dayHeaderMeta}>
+                <HeaderItem
+                  title='Duration'
+                  value={dayDurationInMinutes}
+                  suffix='mins'
+                />
+                <HeaderItem
+                  title='Exercises'
+                  value={schedule.day.exercises.length}
+                />
+                <HeaderItem title='Sets' value={setCount!} />
+              </div>
             </div>
-            <div className={styles.dayHeaderMeta}>
-              <HeaderItem
-                title='Duration'
-                value={dayDurationInMinutes}
-                suffix='mins'
-              />
-              <HeaderItem
-                title='Exercises'
-                value={schedule.day.exercises.length}
-              />
-              <HeaderItem title='Sets' value={setCount!} />
+            <div className={styles.exercises}>
+              {schedule.day.exercises.map((exerciseInSchedule) => (
+                <ExerciseItem
+                  key={exerciseInSchedule.id}
+                  scheduledWorkoutWithExercise={exerciseInSchedule}
+                />
+              ))}
             </div>
           </div>
-          <div className={styles.exercises}>
-            {schedule.day.exercises.map((exerciseInSchedule) => (
-              <ExerciseItem
-                key={exerciseInSchedule.id}
-                scheduledWorkoutWithExercise={exerciseInSchedule}
-              />
-            ))}
-          </div>
-        </div>
-        <div className={styles.actions}>
-          <Link
-            href={'/schedule'}
-            draggable='false'
-            className={classNames('standard-button', styles.editPlanButton)}>
-
-            <i className='fa-solid fa-calendar-week'></i>Edit Plan
-          </Link>
-          <div className={classNames('combo-button', styles.startButton)}>
-            <LoadingButton
-              type='button'
-              onClick={() => startWorkout()}
-              className={classNames('standard-button primary')}
-            >
-              <i className='fa-solid fa-person-walking'></i>
-              Start Day {schedule.day.orderNumber + 1}
-            </LoadingButton>
-            <SpinButton className={classNames('standard-button primary')}>
-              <button
-                type='button'
-                onClick={() => setSelectDayBottomSheetVisible(true)}
+          <div className={styles.actions}>
+            <Link href={'/schedule'} draggable='false'>
+              <MdTextButton className={styles.editPlanButton}>
+                <MdIcon slot='icon'>calendar_month</MdIcon>
+                Edit Plan
+              </MdTextButton>
+            </Link>
+            {!startLoading ? (
+              <MdFilledButton
+                onClick={() => {
+                  startWorkout();
+                  setStartLoading(true);
+                }}
+                className={styles.startButton}
               >
-                <i className='fa-solid fa-calendar-day'></i>
-                Pick a different day
-              </button>
-            </SpinButton>
+                <MdIcon slot='icon'>sprint</MdIcon>
+                Start Day {schedule.day.orderNumber + 1}
+              </MdFilledButton>
+            ) : (
+              <MdFilledButton
+                disabled
+                className={classNames(styles.startButton, 'loading-button')}
+              >
+                <MdCircularProgress indeterminate />
+              </MdFilledButton>
+            )}
+            <div className={styles.actionsMenu} ref={menuAnchorRef}>
+              <MdStandardIconButton onClick={() => menuRef.current?.show()}>
+                <MdIcon>more_vert</MdIcon>
+              </MdStandardIconButton>
+              <MdMenu
+                ref={menuRef}
+                anchor={menuAnchorRef.current}
+                anchorCorner='START_END'
+                menuCorner='END_END'
+              >
+                <MdMenuItem
+                  headline='Pick a different day'
+                  onClick={() => setSelectDayBottomSheetVisible(true)}
+                />
+              </MdMenu>
+            </div>
+            {/* <div className={classNames('combo-button', styles.startButton)}>
+              <LoadingButton
+                type='button'
+                onClick={() => startWorkout()}
+                className={classNames('standard-button primary')}
+              >
+                <i className='fa-solid fa-person-walking'></i>
+                Start Day {schedule.day.orderNumber + 1}
+              </LoadingButton>
+              <SpinButton className={classNames('standard-button primary')}>
+                <button
+                  type='button'
+                  onClick={() => setSelectDayBottomSheetVisible(true)}
+                >
+                  <i className='fa-solid fa-calendar-day'></i>
+                  Pick a different day
+                </button>
+              </SpinButton>
+            </div> */}
           </div>
         </div>
       </div>
-    </div>
-    {selectDayBottomSheetVisible && !!scheduledWorkouts && (
-      <SelectScheduledWorkoutBottomSheet
-        onResult={onDaySelected}
-        days={scheduledWorkouts}
-      />
-    )}
-  </>;
+      {selectDayBottomSheetVisible && !!scheduledWorkouts && (
+        <SelectScheduledWorkoutBottomSheet
+          onResult={onDaySelected}
+          days={scheduledWorkouts}
+        />
+      )}
+    </>
+  );
 };
 
 Dashboard.getLayout = (page) => (
