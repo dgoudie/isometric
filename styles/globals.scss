@@ -1,112 +1,106 @@
-@import '@fortawesome/fontawesome-free/css/fontawesome.css';
-@import '@fortawesome/fontawesome-free/css/solid.css';
-
 @import './themes.scss';
 
+@mixin light {
+  --md-sys-color-primary: var(--md-sys-color-primary-light);
+  --md-sys-color-on-primary: var(--md-sys-color-on-primary-light);
+  --md-sys-color-primary-container: var(--md-sys-color-primary-container-light);
+  --md-sys-color-on-primary-container: var(
+    --md-sys-color-on-primary-container-light
+  );
+  --md-sys-color-secondary: var(--md-sys-color-secondary-light);
+  --md-sys-color-on-secondary: var(--md-sys-color-on-secondary-light);
+  --md-sys-color-secondary-container: var(
+    --md-sys-color-secondary-container-light
+  );
+  --md-sys-color-on-secondary-container: var(
+    --md-sys-color-on-secondary-container-light
+  );
+  --md-sys-color-tertiary: var(--md-sys-color-tertiary-light);
+  --md-sys-color-on-tertiary: var(--md-sys-color-on-tertiary-light);
+  --md-sys-color-tertiary-container: var(
+    --md-sys-color-tertiary-container-light
+  );
+  --md-sys-color-on-tertiary-container: var(
+    --md-sys-color-on-tertiary-container-light
+  );
+  --md-sys-color-error: var(--md-sys-color-error-light);
+  --md-sys-color-error-container: var(--md-sys-color-error-container-light);
+  --md-sys-color-on-error: var(--md-sys-color-on-error-light);
+  --md-sys-color-on-error-container: var(
+    --md-sys-color-on-error-container-light
+  );
+  --md-sys-color-background: var(--md-sys-color-background-light);
+  --md-sys-color-on-background: var(--md-sys-color-on-background-light);
+  --md-sys-color-surface: var(--md-sys-color-surface-light);
+  --md-sys-color-on-surface: var(--md-sys-color-on-surface-light);
+  --md-sys-color-surface-variant: var(--md-sys-color-surface-variant-light);
+  --md-sys-color-on-surface-variant: var(
+    --md-sys-color-on-surface-variant-light
+  );
+  --md-sys-color-outline: var(--md-sys-color-outline-light);
+  --md-sys-color-inverse-on-surface: var(
+    --md-sys-color-inverse-on-surface-light
+  );
+  --md-sys-color-inverse-surface: var(--md-sys-color-inverse-surface-light);
+  --md-sys-color-inverse-primary: var(--md-sys-color-inverse-primary-light);
+  --md-sys-color-shadow: var(--md-sys-color-shadow-light);
+  --md-sys-color-surface-tint: var(--md-sys-color-surface-tint-light);
+  --md-sys-color-outline-variant: var(--md-sys-color-outline-variant-light);
+  --md-sys-color-scrim: var(--md-sys-color-scrim-light);
+}
+
 @mixin dark {
-  --md-sys-color-primary: hsla(var(--primary-hs), 80%);
-  --md-sys-color-on-primary: hsla(var(--primary-hs), 20%);
-  --md-sys-color-primary-container: hsla(var(--primary-hs), 30%);
-  --md-sys-color-on-primary-container: hsla(var(--primary-hs), 90%);
-
-  --md-sys-color-secondary: hsla(var(--secondary-hs), 80%);
-  --md-sys-color-on-secondary: hsla(var(--secondary-hs), 20%);
-  --md-sys-color-secondary-container: hsla(var(--secondary-hs), 30%);
-  --md-sys-color-on-secondary-container: hsla(var(--secondary-hs), 90%);
-
-  --md-sys-color-background: hsla(var(--primary-hs), 10%);
-  --md-sys-color-on-background: hsla(var(--neutral-hs), 90%);
-
-  --md-sys-color-surface-container: hsla(var(--primary-hs), 10%);
-  --md-sys-color-on-surface-container: hsla(var(--neutral-hs), 90%);
-  --md-sys-color-surface-container-high: hsla(var(--primary-hs), 12%);
-  --md-sys-color-on-surface-container-high: hsla(var(--neutral-hs), 90%);
-  --md-sys-color-surface-container-highest: hsla(var(--primary-hs), 14%);
-  --md-sys-color-on-surface-container-highest: hsla(var(--neutral-hs), 90%);
-
-  --md-sys-color-surface: hsla(var(--primary-hs), 15%);
-  --md-sys-color-on-surface: hsla(var(--neutral-hs), 90%);
-  --md-sys-color-surface-high: hsla(var(--primary-hs), 17%);
-  --md-sys-color-on-surface-high: hsla(var(--neutral-hs), 90%);
-  --md-sys-color-surface-highest: hsla(var(--primary-hs), 19%);
-  --md-sys-color-on-surface-highest: hsla(var(--neutral-hs), 90%);
-
-  --md-sys-color-surface-variant: hsla(var(--neutral-variant-hs), 30%);
-  --md-sys-color-on-surface-variant: hsla(var(--neutral-variant-hs), 80%);
-  --md-sys-color-outline: hsla(var(--neutral-variant-hs), 60%);
-  // --color: white;
-  // --color-secondary: #999;
-  // --color-inverse: black;
-  // --placeholder: #ffffff55;
-  --completed-color: springgreen;
-  --error: #e23737;
-  --warn: #fc0;
+  --md-sys-color-primary: var(--md-sys-color-primary-dark);
+  --md-sys-color-on-primary: var(--md-sys-color-on-primary-dark);
+  --md-sys-color-primary-container: var(--md-sys-color-primary-container-dark);
+  --md-sys-color-on-primary-container: var(
+    --md-sys-color-on-primary-container-dark
+  );
+  --md-sys-color-secondary: var(--md-sys-color-secondary-dark);
+  --md-sys-color-on-secondary: var(--md-sys-color-on-secondary-dark);
+  --md-sys-color-secondary-container: var(
+    --md-sys-color-secondary-container-dark
+  );
+  --md-sys-color-on-secondary-container: var(
+    --md-sys-color-on-secondary-container-dark
+  );
+  --md-sys-color-tertiary: var(--md-sys-color-tertiary-dark);
+  --md-sys-color-on-tertiary: var(--md-sys-color-on-tertiary-dark);
+  --md-sys-color-tertiary-container: var(
+    --md-sys-color-tertiary-container-dark
+  );
+  --md-sys-color-on-tertiary-container: var(
+    --md-sys-color-on-tertiary-container-dark
+  );
+  --md-sys-color-error: var(--md-sys-color-error-dark);
+  --md-sys-color-error-container: var(--md-sys-color-error-container-dark);
+  --md-sys-color-on-error: var(--md-sys-color-on-error-dark);
+  --md-sys-color-on-error-container: var(
+    --md-sys-color-on-error-container-dark
+  );
+  --md-sys-color-background: var(--md-sys-color-background-dark);
+  --md-sys-color-on-background: var(--md-sys-color-on-background-dark);
+  --md-sys-color-surface: var(--md-sys-color-surface-dark);
+  --md-sys-color-on-surface: var(--md-sys-color-on-surface-dark);
+  --md-sys-color-surface-variant: var(--md-sys-color-surface-variant-dark);
+  --md-sys-color-on-surface-variant: var(
+    --md-sys-color-on-surface-variant-dark
+  );
+  --md-sys-color-outline: var(--md-sys-color-outline-dark);
+  --md-sys-color-inverse-on-surface: var(
+    --md-sys-color-inverse-on-surface-dark
+  );
+  --md-sys-color-inverse-surface: var(--md-sys-color-inverse-surface-dark);
+  --md-sys-color-inverse-primary: var(--md-sys-color-inverse-primary-dark);
+  --md-sys-color-shadow: var(--md-sys-color-shadow-dark);
+  --md-sys-color-surface-tint: var(--md-sys-color-surface-tint-dark);
+  --md-sys-color-outline-variant: var(--md-sys-color-outline-variant-dark);
+  --md-sys-color-scrim: var(--md-sys-color-scrim-dark);
 }
 
 html,
 body {
-  --md-ref-typeface-plain: 'Mitr', sans-serif;
-
-  --button-shape: 10px;
-  --md-filled-button-container-shape: var(--button-shape);
-  --md-text-button-container-shape: var(--button-shape);
-  --md-tonal-button-container-shape: var(--button-shape);
-
-  --button-font: 500 16px / 1.25rem 'Permanent Marker', cursive;
-  --md-filled-button-label-text-type: var(--button-font);
-  --md-text-button-label-text-type: var(--button-font);
-  --md-tonal-button-label-text-type: var(--button-font);
-
-  --md-menu-container-shape: 10px;
-
-  --neutral-hs: 0, 0%;
-
-  --md-sys-color-primary: hsla(var(--primary-hs), 40%);
-  --md-sys-color-on-primary: hsla(var(--primary-hs), 100%);
-  --md-sys-color-primary-container: hsla(var(--primary-hs), 90%);
-  --md-sys-color-on-primary-container: hsla(var(--primary-hs), 10%);
-
-  --md-sys-color-secondary: hsla(var(--secondary-hs), 40%);
-  --md-sys-color-on-secondary: hsla(var(--secondary-hs), 100%);
-  --md-sys-color-secondary-container: hsla(var(--secondary-hs), 90%);
-  --md-sys-color-on-secondary-container: hsla(var(--secondary-hs), 10%);
-
-  --md-sys-color-background: hsla(var(--primary-hs), 90%);
-  --md-sys-color-on-background: hsla(var(--neutral-hs), 10%);
-
-  --md-sys-color-surface-container: hsla(var(--primary-hs), 90%);
-  --md-sys-color-on-surface-container: hsla(var(--neutral-hs), 10%);
-  --md-sys-color-surface-container-high: hsla(var(--primary-hs), 86%);
-  --md-sys-color-on-surface-container-high: hsla(var(--neutral-hs), 10%);
-  --md-sys-color-surface-container-highest: hsla(var(--primary-hs), 82%);
-  --md-sys-color-on-surface-container-highest: hsla(var(--neutral-hs), 10%);
-
-  --md-sys-color-surface: hsla(var(--primary-hs), 86%);
-  --md-sys-color-on-surface: hsla(var(--neutral-hs), 10%);
-  --md-sys-color-surface-high: hsla(var(--primary-hs), 84%);
-  --md-sys-color-on-surface-high: hsla(var(--neutral-hs), 10%);
-  --md-sys-color-surface-highest: hsla(var(--primary-hs), 82%);
-  --md-sys-color-on-surface-highest: hsla(var(--neutral-hs), 10%);
-
-  --md-sys-color-surface-variant: hsla(var(--neutral-variant-hs), 90%);
-  --md-sys-color-on-surface-variant: hsla(var(--neutral-variant-hs), 30%);
-  --md-sys-color-outline: hsla(var(--neutral-variant-hs), 50%);
-
-  padding: 0;
-  margin: 0;
-  font-family: 'Mitr', sans-serif;
-  font-size: initial;
-  line-height: 1.1;
-  color: var(--md-sys-color-on-surface);
-  background-color: var(--md-sys-color-background);
-
-  // --color: black;
-  // --color-secondary: #444;
-  // --color-inverse: white;
-  // --placeholder: #00000055;
-  --completed-color: #00b359;
-  --error: crimson;
-  --warn: #ffe16b;
+  @include light;
 
   --max-width: 540px;
   --top-bar-height: 3rem;
@@ -114,6 +108,37 @@ body {
   --between-bars: calc(
     100vh - calc(var(--top-bar-height) + var(--bottom-bar-height))
   );
+  --md-ref-typeface-plain: 'Mitr', sans-serif;
+  --md-ref-typeface-brand: 'Permanent Marker', sans-serif;
+
+  --md-sys-color-surface-container-highest: color-mix(
+    in oklab,
+    var(--md-sys-color-background),
+    var(--md-sys-color-primary) 16%
+  );
+  --md-sys-color-surface-container-high: color-mix(
+    in oklab,
+    var(--md-sys-color-background),
+    var(--md-sys-color-primary) 12%
+  );
+  --md-sys-color-surface-container: color-mix(
+    in oklab,
+    var(--md-sys-color-background),
+    var(--md-sys-color-primary) 8%
+  );
+  --md-sys-color-surface-container-low: color-mix(
+    in oklab,
+    var(--md-sys-color-background),
+    var(--md-sys-color-primary) 4%
+  );
+  --md-sys-color-surface-container-lowest: var(--md-sys-color-background);
+
+  padding: 0;
+  margin: 0;
+  font-family: var(--md-ref-typeface-plain);
+  color: var(--md-sys-color-on-background);
+  line-height: 1.1;
+  background-color: var(--md-sys-color-background);
 
   &.dark {
     @include dark;
@@ -161,7 +186,7 @@ input[type='reset'] {
   -webkit-tap-highlight-color: transparent;
   text-decoration: none;
   -webkit-touch-callout: none;
-  transition: transform 200ms cubic-bezier(0.4, 0, 0.2, 1);
+  appearance: none;
 }
 
 h1,
@@ -177,50 +202,8 @@ h1 {
 }
 
 h2 {
-  color: var(--accent-color);
   font-size: 1.125rem;
   padding: 1rem 0 0.25rem;
-}
-
-summary {
-  outline: none;
-  -webkit-tap-highlight-color: transparent;
-  &::-webkit-details-marker {
-    display: none;
-  }
-}
-
-@import './button.scss';
-@import './fade-in.scss';
-
-.standard-form-input {
-  color: var(--color);
-  border: none;
-  border-bottom: 2px solid rgba(128, 128, 128, 0.2);
-  outline: none;
-  font-size: 1.2rem;
-  letter-spacing: inherit;
-  font-family: inherit;
-  border-radius: 0;
-  background-color: transparent;
-  padding: 0 0 0.2rem;
-  caret-color: var(--accent-color);
-  min-width: 0;
-
-  &:focus {
-    border-bottom-color: var(--accent-color);
-  }
-}
-
-input::placeholder {
-  color: var(--placeholder);
-}
-
-label {
-  font-size: 0.9rem;
-  color: var(--accent-color);
-  margin-bottom: 0.5rem;
-  display: block;
 }
 
 .loading-button {

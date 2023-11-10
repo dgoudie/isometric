@@ -34,7 +34,8 @@
 }
 
 .day {
-  background: var(--md-sys-color-surface);
+  background-color: var(--md-sys-color-surface-container-high);
+  color: var(--md-sys-color-on-surface-variant);
   border-radius: 8px;
   display: grid;
   grid-template-rows: max-content auto;
@@ -111,5 +112,9 @@
   }
   .actionsMenu {
     position: relative;
+
+    &Menu {
+      min-width: 250px;
+    }
   }
 }

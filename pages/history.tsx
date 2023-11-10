@@ -9,7 +9,6 @@ import { MdElevation } from '../components/material/MdElevation';
 import { MdFilledButton } from '../components/material/MdFilledButton';
 import { MdIcon } from '../components/material/MdIcon';
 import { MdTextButton } from '../components/material/MdTextButton';
-import { MdTonalButton } from '../components/material/MdTonalButton';
 import MuscleGroupTag from '../components/MuscleGroupTag/MuscleGroupTag';
 import { NextPageWithLayout } from './_app';
 import RouteLoader from '../components/RouteLoader/RouteLoader';

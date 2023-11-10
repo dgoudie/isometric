@@ -49,7 +49,6 @@ export default function MyApp({
         //@ts-ignore
         navigator.clearAppBadge();
     });
-    loadMaterialComponents();
   }, []);
 
   // Use the layout defined at the page level, if available
@@ -69,13 +68,3 @@ export default function MyApp({
     </SessionProvider>
   );
 }
-
-const loadMaterialComponents = () => {
-  import('@material/web/icon/icon.js');
-  import('@material/web/button/filled-button.js');
-  import('@material/web/button/text-button.js');
-  import('@material/web/iconbutton/standard-icon-button.js');
-  import('@material/web/menu/menu.js');
-  import('@material/web/menu/menu-item.js');
-  import('@material/web/menu/menu-item-link.js');
-};

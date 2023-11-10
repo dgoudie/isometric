@@ -11,10 +11,11 @@ import AppBarWithAppHeaderLayout from '../layouts/AppBarWithAppHeaderLayout/AppB
 import Link from 'next/link';
 import { MdCircularProgress } from '../components/material/MdCircularProgress';
 import { MdFilledButton } from '../components/material/MdFilledButton';
+import { MdFilledTonalButton } from '../components/material/MdFilledTonalButton';
 import { MdIcon } from '../components/material/MdIcon';
+import { MdIconButton } from '../components/material/MdStandardIconButton';
 import { MdMenu } from '../components/material/MdMenu';
 import { MdMenuItem } from '../components/material/MdMenuItem';
-import { MdStandardIconButton } from '../components/material/MdStandardIconButton';
 import { MdTextButton } from '../components/material/MdTextButton';
 import MuscleGroupTag from '../components/MuscleGroupTag/MuscleGroupTag';
 import { NextDaySchedule } from '../database/domains/scheduled_workout';
@@ -107,7 +108,7 @@ const Dashboard: NextPageWithLayout = () => {
 
   useEffect(() => {
     if (!!menuAnchorRef.current && !!menuRef.current) {
-      menuRef.current.anchor = menuAnchorRef.current;
+      menuRef.current.anchorElement = menuAnchorRef.current;
     }
   }, [menuAnchorRef, menuRef]);
 
@@ -126,8 +127,8 @@ const Dashboard: NextPageWithLayout = () => {
     return (
       <div className={styles.wrapper}>
         {head}
-        <h1 className='fade-in'>{greeting}</h1>
-        <div className={classNames(styles.root, 'fade-in')}>
+        <h1>{greeting}</h1>
+        <div className={styles.root}>
           <div className={styles.noSchedule}>
             <i className='fa-solid fa-warning'></i>
             <span>
@@ -152,9 +153,9 @@ const Dashboard: NextPageWithLayout = () => {
     <>
       <div className={styles.wrapper}>
         {head}
-        <h1 className='fade-in'>{greeting}</h1>
+        <h1>{greeting}</h1>
         <div className={styles.root}>
-          <div className={classNames(styles.day, 'fade-in')}>
+          <div className={styles.day}>
             <div className={styles.dayHeader}>
               <div className={styles.dayHeaderNumber}>
                 <div>
@@ -211,40 +212,23 @@ const Dashboard: NextPageWithLayout = () => {
               </MdFilledButton>
             )}
             <div className={styles.actionsMenu} ref={menuAnchorRef}>
-              <MdStandardIconButton onClick={() => menuRef.current?.show()}>
+              <MdIconButton onClick={() => menuRef.current?.show()}>
                 <MdIcon>more_vert</MdIcon>
-              </MdStandardIconButton>
+              </MdIconButton>
               <MdMenu
                 ref={menuRef}
-                anchor={menuAnchorRef.current}
-                anchorCorner='START_END'
-                menuCorner='END_END'
+                anchorElement={menuAnchorRef.current}
+                anchorCorner='start-end'
+                menuCorner='end-end'
+                className={styles.actionsMenuMenu}
               >
                 <MdMenuItem
-                  headline='Pick a different day'
-                  onClick={() => setSelectDayBottomSheetVisible(true)}
-                />
-              </MdMenu>
-            </div>
-            {/* <div className={classNames('combo-button', styles.startButton)}>
-              <LoadingButton
-                type='button'
-                onClick={() => startWorkout()}
-                className={classNames('standard-button primary')}
-              >
-                <i className='fa-solid fa-person-walking'></i>
-                Start Day {schedule.day.orderNumber + 1}
-              </LoadingButton>
-              <SpinButton className={classNames('standard-button primary')}>
-                <button
-                  type='button'
                   onClick={() => setSelectDayBottomSheetVisible(true)}
                 >
-                  <i className='fa-solid fa-calendar-day'></i>
-                  Pick a different day
-                </button>
-              </SpinButton>
-            </div> */}
+                  <div slot='headline'>Pick a different day</div>
+                </MdMenuItem>
+              </MdMenu>
+            </div>
           </div>
         </div>
       </div>

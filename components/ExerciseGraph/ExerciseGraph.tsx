@@ -171,13 +171,13 @@ export default function ExerciseGraph({
             <CartesianGrid horizontal={false} vertical={false} />
             <XAxis
               tick={{
-                fill: 'var(--color-secondary)',
+                fill: 'var(--md-sys-color-on-surface-variant)',
               }}
               tickLine={{
-                stroke: 'var(--color-secondary)',
+                stroke: 'var(--md-sys-color-on-surface-variant)',
               }}
               axisLine={{
-                stroke: 'var(--color-secondary)',
+                stroke: 'var(--md-sys-color-on-surface-variant)',
               }}
               dataKey='performedAt'
               tickFormatter={XAxisTickFormatter}
@@ -185,13 +185,13 @@ export default function ExerciseGraph({
             />
             <YAxis
               tick={{
-                fill: 'var(--color-secondary)',
+                fill: 'var(--md-sys-color-on-surface-variant)',
               }}
               tickLine={{
-                stroke: 'var(--color-secondary)',
+                stroke: 'var(--md-sys-color-on-surface-variant)',
               }}
               axisLine={{
-                stroke: 'var(--color-secondary)',
+                stroke: 'var(--md-sys-color-on-surface-variant)',
               }}
               dataKey={'performance'}
               domain={['auto', 'auto']}
@@ -199,7 +199,7 @@ export default function ExerciseGraph({
             />
             <Tooltip
               contentStyle={{
-                background: 'var(--background-alt-2)',
+                background: 'var(--md-sys-color-surface-highest)',
                 border: 'none',
                 borderRadius: 8,
                 padding: 8,
@@ -210,7 +210,7 @@ export default function ExerciseGraph({
             <Line
               type='monotone'
               dataKey={'performance'}
-              stroke='var(--pop-color)'
+              stroke='var(--md-sys-color-secondary)'
               strokeWidth={3}
               dot={false}
               activeDot={{ strokeWidth: 0, r: 4 }}
@@ -221,11 +221,11 @@ export default function ExerciseGraph({
             {!!personalBestValue && personalBest && (
               <ReferenceLine
                 y={personalBestValue}
-                stroke='var(--accent-color)'
+                stroke='var(--md-sys-color-primary)'
                 strokeDasharray='3 3'
               >
                 <Label
-                  fill='var(--color)'
+                  fill='var(--md-sys-color-on-surface)'
                   position={'top'}
                   fontWeight={200}
                   fontSize={14}

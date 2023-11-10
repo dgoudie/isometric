@@ -68,7 +68,8 @@
 }
 
 .sellingPoint {
-  background-color: var(--background-alt-2);
+  background-color: var(--md-sys-color-tertiary-container);
+  color: var(--md-sys-color-on-tertiary-container);
   padding: 1rem;
   border-radius: 8px;
 
@@ -79,10 +80,12 @@
     gap: 0.5rem;
     margin-bottom: 0.75rem;
     font-size: 1.5rem;
-    :global {
-      .fa-solid {
-        color: var(--accent-color);
-      }
-    }
+    font-weight: normal;
+  }
+
+  &Icon {
+    font-size: 36px;
+    width: 36px;
+    height: 36px;
   }
 }

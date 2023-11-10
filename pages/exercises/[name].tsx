@@ -13,8 +13,11 @@ import { ExerciseWithPersonalBestAndLastPerformed } from '../../database/domains
 import { FinishedWorkoutExerciseWithSets } from '../../types/FinishedWorkout';
 import FloatingActionButton from '../../components/FloatingActionButton/FloatingActionButton';
 import InfiniteScroll from '../../components/InfiniteScroll/InfiniteScroll';
+import { MdElevatedButton } from '../../components/material/MdElevatedButton';
+import { MdIcon } from '../../components/material/MdIcon';
 import MuscleGroupTag from '../../components/MuscleGroupTag/MuscleGroupTag';
 import { NextPageWithLayout } from '../_app';
+import Portal from '../../components/Portal/Portal';
 import RouteLoader from '../../components/RouteLoader/RouteLoader';
 import SetView from '../../components/SetView/SetView';
 import { SnackbarContext } from '../../providers/Snackbar/Snackbar';
@@ -81,12 +84,15 @@ const Exercise: NextPageWithLayout = () => {
           />
         </div>
         <History exerciseName={exerciseName} />
-        <FloatingActionButton
-          as='a'
-          href={`/exercises/${encodeURIComponent(exerciseName)}/edit`}
-          text='Edit Exercise'
-          iconName='edit'
-        />
+        <Portal>
+          <MdElevatedButton
+            className={styles.editButton}
+            href={`/exercises/${encodeURIComponent(exerciseName)}/edit`}
+          >
+            <MdIcon slot='icon'>edit</MdIcon>
+            Edit Exercise
+          </MdElevatedButton>
+        </Portal>
       </div>
     </>
   );

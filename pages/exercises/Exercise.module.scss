@@ -19,7 +19,7 @@
 }
 
 .chart {
-  background-color: var(--background-alt);
+  background: var(--md-sys-color-surface);
   border-radius: 8px;
   margin: 0 1rem 1rem;
 
@@ -51,4 +51,10 @@
     margin: 2rem;
     text-align: center;
   }
+}
+
+.editButton {
+  position: fixed;
+  bottom: calc(0.75rem + var(--bottom-bar-height));
+  right: 0.75rem;
 }

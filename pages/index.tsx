@@ -1,17 +1,14 @@
-import { GetServerSidePropsContext, GetServerSidePropsResult } from 'next';
 import { signIn, useSession } from 'next-auth/react';
-import { useContext, useEffect } from 'react';
 
 import AppHeader from '../components/AppHeader/AppHeader';
 import Image from 'next/image';
 import Link from 'next/link';
 import { MdFilledButton } from '../components/material/MdFilledButton';
+import { MdFilledTonalButton } from '../components/material/MdFilledTonalButton';
 import { MdIcon } from '../components/material/MdIcon';
 import { NextPageWithLayout } from './_app';
-import { SnackbarContext } from '../providers/Snackbar/Snackbar';
 import ThreeDotLoader from '../components/ThreeDotLoader/ThreeDotLoader';
 import classNames from 'classnames';
-import { getUserId } from '../utils/get-user-id';
 import marketingImage1 from '../public/images/marketing_1.png';
 import marketingImage2 from '../public/images/marketing_2.png';
 import marketingImage3 from '../public/images/marketing_3.png';
@@ -19,8 +16,6 @@ import marketingImage4 from '../public/images/marketing_4.png';
 import styles from './Landing.module.scss';
 import { useHeadWithTitle } from '../utils/use-head-with-title';
 import useOneTapSignin from '../utils/use-google-one-tap-signin';
-import { useRouter } from 'next/router';
-import { useSWRConfig } from 'swr';
 
 interface SellingPoint {
   iconClass: string;
@@ -30,20 +25,20 @@ interface SellingPoint {
 
 const sellingPoints: SellingPoint[] = [
   {
-    iconClass: 'fa-star',
+    iconClass: 'star',
     title: 'Simple',
     content: `Create your day-by-day workout plan by 
     adding exercises, then start. Its that simple.`,
   },
   {
-    iconClass: 'fa-wrench',
+    iconClass: 'tune',
     title: 'Customizable',
     content: `ISOMETRIC comes with many exercises preconfigured 
       out of the box, but you can add new ones and modify 
       the existing ones however you'd like.`,
   },
   {
-    iconClass: 'fa-handshake-simple-slash',
+    iconClass: 'security',
     title: 'Hands-Off',
     content: `ISOMETRIC is designed for experienced gym-goers. 
     The app is not going to tell you what you to, or what 
@@ -67,21 +62,17 @@ const Landing: NextPageWithLayout = () => {
       </p>
       <div className={styles.buttonWrapper}>
         {status === 'unauthenticated' && (
-          <button
-            type='button'
-            className='standard-button primary'
-            onClick={() => signIn()}
-          >
-            <i className='fa-solid fa-right-to-bracket'></i>
+          <MdFilledTonalButton type='button' onClick={() => signIn()}>
+            <MdIcon slot='icon'>login</MdIcon>
             Sign in
-          </button>
+          </MdFilledTonalButton>
         )}
         {status === 'authenticated' && (
           <Link href={'/dashboard'}>
-            <MdFilledButton>
+            <MdFilledTonalButton>
               <MdIcon slot='icon'>dashboard</MdIcon>
               Go to Workout Dashboard
-            </MdFilledButton>
+            </MdFilledTonalButton>
           </Link>
         )}
         {status === 'loading' && (
@@ -109,7 +100,9 @@ const Landing: NextPageWithLayout = () => {
         {sellingPoints.map((sellingPoint) => (
           <div key={sellingPoint.title} className={styles.sellingPoint}>
             <div className={styles.sellingPointHeader}>
-              <i className={classNames('fa-solid', sellingPoint.iconClass)}></i>
+              <MdIcon className={styles.sellingPointIcon}>
+                {sellingPoint.iconClass}
+              </MdIcon>
               {sellingPoint.title}
             </div>
             <div className={styles.sellingPointBody}>

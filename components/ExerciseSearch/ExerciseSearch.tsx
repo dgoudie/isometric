@@ -15,14 +15,14 @@ import InfiniteScroll from '../InfiniteScroll/InfiniteScroll';
 import Link from 'next/link';
 import { MdChipSet } from '../material/MdChipSet';
 import { MdElevation } from '../material/MdElevation';
-import { MdFilledTextField } from '../material/MdFilledTextField';
 import { MdFilterChip } from '../material/MdFilterChip';
 import { MdIcon } from '../material/MdIcon';
+import { MdOutlinedTextField } from '../material/MdOutlinedTextField';
 import { MdRipple } from '../material/MdRipple';
 import MuscleGroupPicker from '../MuscleGroupPicker/MuscleGroupPicker';
 import MuscleGroupTag from '../MuscleGroupTag/MuscleGroupTag';
 import RouteLoader from '../RouteLoader/RouteLoader';
-import { MdFilledTextField as _MdFilledTextField } from '@material/web/textfield/filled-text-field';
+import { MdOutlinedTextField as _MdOutlinedTextField } from '@material/web/textfield/outlined-text-field';
 import classNames from 'classnames';
 import styles from './ExerciseSearch.module.scss';
 import { useFetchJSON } from '../../utils/fetch-json';
@@ -67,7 +67,7 @@ export default function ExerciseSearch({
   }, [muscleGroup, search, history]);
 
   const itemsRef = useRef<HTMLDivElement>(null);
-  const inputRef = useRef<_MdFilledTextField>(null);
+  const inputRef = useRef<_MdOutlinedTextField>(null);
 
   useEffect(() => {
     itemsRef?.current?.scrollTo({ top: 0 });
@@ -124,13 +124,13 @@ export default function ExerciseSearch({
   return (
     <div className={classNames(styles.root, className)}>
       <div className={styles.filters}>
-        <MdFilledTextField
+        <MdOutlinedTextField
           className={styles.filtersInput}
           ref={inputRef}
           autoCapitalize='none'
           autoCorrect='off'
           defaultValue={search}
-          onChange={(e) =>
+          onInput={(e) =>
             searchChanged(
               (e.target as HTMLInputElement).value.replace(/\s+/g, ' ').trim()
             )
@@ -138,8 +138,8 @@ export default function ExerciseSearch({
           label='Search...'
           hasLeadingIcon
         >
-          <MdIcon slot='leadingicon'>search</MdIcon>
-        </MdFilledTextField>
+          <MdIcon slot='leading-icon'>search</MdIcon>
+        </MdOutlinedTextField>
         <MuscleGroupPicker
           value={muscleGroup}
           valueChanged={muscleGroupChanged}
@@ -191,7 +191,6 @@ const ExerciseButton = ({ exercise, onSelect }: ExerciseButtonProps) => {
   const itemInnards = useMemo(
     () => (
       <>
-        <MdElevation />
         <MdRipple />
         <div className={styles.itemTitle}>{exercise.name}</div>
         <div className={styles.itemMuscles}>{muscleGroupTags}</div>

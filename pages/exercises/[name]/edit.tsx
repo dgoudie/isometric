@@ -9,6 +9,7 @@ import { ExerciseType } from '@prisma/client';
 import ExerciseTypePickerField from '../../../components/ExerciseTypePickerField/ExerciseTypePickerField';
 import { ExerciseWithPersonalBestAndLastPerformed } from '../../../database/domains/exercise';
 import LoadingButton from '../../../components/LoadingButton/LoadingButton';
+import MdFilledTextFieldField from '../../../components/MdOutlinedTextFieldField/MdOutlinedTextFieldField';
 import MuscleGroupPickerField from '../../../components/MuscleGroupPickerField/MuscleGroupPickerField';
 import { NextPageWithLayout } from '../../_app';
 import RouteLoader from '../../../components/RouteLoader/RouteLoader';
@@ -202,18 +203,12 @@ const ExerciseEdit: NextPageWithLayout = () => {
 
           return (
             <Form>
-              <label htmlFor='name'>Name</label>
-              <Field
+              <MdFilledTextFieldField
+                aria-label='Name'
                 autoFocus
                 id='name'
                 name='name'
-                className={standardFormInputStyles}
                 disabled={isSubmitting}
-              />
-              <ErrorMessage
-                name='name'
-                component='span'
-                className={styles.errorMessage}
               />
               <label htmlFor='setCount'>Primary Muscle Group</label>
               <MuscleGroupPickerField

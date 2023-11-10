@@ -18,15 +18,16 @@
   font-family: 'Permanent Marker', cursive;
   font-weight: bold;
   user-select: none;
+  padding-bottom: 1.5rem;
+  background-color: var(--md-sys-color-background);
 
   &Inner {
     max-width: var(--max-width);
     margin: 0 auto;
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    align-items: center;
     justify-items: center;
-    height: 100%;
+    --md-navigation-bar-container-elevation: 0;
+    --md-divider-color: transparent;
+    // --md-primary-tab-container-color: var(--md-sys-color-background);
 
     a {
       display: flex;

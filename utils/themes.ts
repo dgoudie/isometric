@@ -1,21 +1,34 @@
 const themes = new Map([
-  ['default', { light: '#bdcadb', dark: '#091024', displayName: 'Default' }],
-  ['edge', { light: '#CCCCCC', dark: '#14171A', displayName: 'Edge' }],
-  ['lime', { light: '#c2d6cc', dark: '#0b0d0e', displayName: 'Lime' }],
   [
-    'solarized',
+    'default',
     {
-      light: 'hsl(44, 20%, 80%)',
-      dark: 'hsl(197, 58%, 13%)',
-      displayName: 'Solarized',
+      light: 'rgb(222, 229, 237)',
+      dark: 'rgb(18, 25, 33)',
+      displayName: 'Default',
     },
   ],
   [
-    'cool',
+    'edge',
     {
-      light: 'rgb(223,251,252)',
-      dark: 'rgb(27,36,40)',
-      displayName: 'Cool',
+      light: 'rgb(217, 228, 242)',
+      dark: 'rgb(13, 24, 38)',
+      displayName: 'Edge',
+    },
+  ],
+  [
+    'lime',
+    {
+      light: 'rgb(219, 240, 230)',
+      dark: 'rgb(15, 36, 26)',
+      displayName: 'Lime',
+    },
+  ],
+  [
+    'solarized',
+    {
+      light: 'rgb(211, 237, 248)',
+      dark: 'rgb(7, 33, 44)',
+      displayName: 'Solarized',
     },
   ],
 ]);
